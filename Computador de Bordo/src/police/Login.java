@@ -68,7 +68,6 @@ public class Login extends javax.swing.JFrame {
             } catch (SQLException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
             att.setVisible(config.VerificarAtt());
             AtualizarAtt();
         }else{
@@ -83,7 +82,7 @@ public class Login extends javax.swing.JFrame {
     }
     
     public void AttDBUsuarios(){
-        usuariosDBarray = police.AttDBUsuarios();
+        usuariosDBarray = usuarios.AttDBUsuarios();
     }
     
     public void AttDBHierarquia(){
@@ -170,7 +169,7 @@ public class Login extends javax.swing.JFrame {
         //att.setVisible(true);
         //pack();
         
-        ConexaoDB conexao = new ConexaoDB();
+        
         String passaporteI = Nome.getText();
         String codigoI = Codigo.getText();
         
@@ -178,61 +177,43 @@ public class Login extends javax.swing.JFrame {
             TextoErro("Campos vazios, digite os dados");
             return false;
         }
-        
-        boolean conta=false;
-        boolean lspd=false;
-        JSONObject set_info = new JSONObject();
-        JSONObject sal_info = new JSONObject();
-        
-        ResultSet resulteSet = null;
-        resulteSet = conexao.GetPersonalizado("select * from cb_identities WHERE id='"+passaporteI+"' AND codigo='"+codigoI+"' ORDER BY id DESC");
-        
-        try {
-            while (resulteSet.next()) {
-                set_info.put("passaporte", resulteSet.getString("id"));
-                for(int i = 0; i < usuariosDBarray.length(); i++){
-                    JSONObject o = usuariosDBarray.getJSONObject(i);
-                    if(o.getString("id_usuario").equals(resulteSet.getString("id"))){
-                        conta=true;
-                        for(int i2 = 0; i2 < hierarquiaDBarray.length(); i2++){
-                            JSONObject ohier = hierarquiaDBarray.getJSONObject(i2);
-                            //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
-                            if(o.getInt("id_usuario")==ohier.getInt("id_usuario")){
-                                if(ohier.getInt("cargo")!=99){
-                                    lspd = true;
-                                }else{
-                                    lspd = false;
-                                }
-                            }
+        int servidor_id = VerificarConta(Integer.parseInt(passaporteI), codigoI);
+        System.out.println("servidor_id: "+servidor_id);
+        if(servidor_id > 0){
+            if(servidor_id > 1){
+                if(VerificarEhPolicia(Integer.parseInt(passaporteI))){
+                    PegarInfoServidor(servidor_id);
+                    //System.out.println("PegarInfo: "+PegarInfo);
+                    //if(PegarInfo == 1){
+                        AttDBUsuarios();
+                        JSONObject sal_info = PegarUsuario(Integer.parseInt(passaporteI));
+                        if(sal_info != null){
+                            usuarios.setDados(sal_info);
+                            //System.out.println("Resultado do JSON: "+sal_info);
+                            new Painel().setVisible(true);
+                            this.dispose();
+                        }else{
+                            TextoErro("Erro ao pegar sua conta no Banco de Dados.");
+                            AttDBHierarquia();
+                            return false;
                         }
-                        if(lspd){
-                            sal_info=o;
-                        }
-                    }
+                    /*}else{
+                        TextoErro("Erro ao consultar DB da Cidade.");
+                        System.out.println("Erro ao setar servidor da DB: "+PegarInfo);
+                        return false;
+                    }*/
+                }else{
+                    TextoErro("Desculpe, me parece que você não possui mais acesso.");
+                    AttDBHierarquia();
+                    return false;
                 }
-                
-                conexao.AttDataLogin(Integer.parseInt(passaporteI));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if(conta){
-            if(lspd){
-                conexao.AttDataLogin(Integer.parseInt(passaporteI));
-                //usuario.setDados(set_info);
-                
-                
-                usuarios.setDados(sal_info);
-                //System.out.println("Resultado do JSON: "+sal_info);
-                new Painel().setVisible(true);
-                this.dispose();
             }else{
-                TextoErro("Desculpe, me parece que você não é da LSPD.");
-                AttDBHierarquia();
+                TextoErro("Desculpe, passaporte ou código incorretos.");
+                tentativas++;
                 return false;
             }
         }else{
-            TextoErro("Desculpe, passaporte ou código incorretos.");
+            TextoErro("Desculpe, ocorreu um erro na DB.");
             tentativas++;
             //AttDBHierarquia();
             //police.AttDBUsuariosSetDiscord();
@@ -275,6 +256,68 @@ public class Login extends javax.swing.JFrame {
         //System.out.print(" / getDados: "+pageName);
         //usuario.savePreference("aaaaa");
         return true;
+    }
+    
+    public int VerificarConta(int Login, String Senha){
+        ConexaoDB conexao = new ConexaoDB();
+        ResultSet resulteSet = null;
+        resulteSet = conexao.GetPersonalizado("select * from cb_identities WHERE user_id="+Login+" AND codigo='"+Senha+"' ORDER BY id DESC");
+        
+        try {
+            while (resulteSet.next()) {
+                int Passaporte_Login = resulteSet.getInt("user_id");
+                
+                if(Login == Passaporte_Login){
+                    System.out.print("Login: "+Login+" / Passaporte_Login: "+Passaporte_Login);
+                    conexao.AttDataLogin(Passaporte_Login);
+                    return resulteSet.getInt("server_id");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+    
+    public boolean VerificarEhPolicia(Integer user_id){
+        for(int i2 = 0; i2 < hierarquiaDBarray.length(); i2++){
+            JSONObject ohier = hierarquiaDBarray.getJSONObject(i2);
+            if(user_id==ohier.getInt("id_usuario")){
+                if(ohier.getInt("cargo")!=99){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public JSONObject PegarUsuario(Integer user_id){
+        for(int i = 0; i < usuariosDBarray.length(); i++){
+            JSONObject data = usuariosDBarray.getJSONObject(i);
+            System.out.println("user_id: "+user_id+" / data.getInt(id_usuario): "+data.getInt("id_usuario"));
+            if(user_id==data.getInt("id_usuario")){
+                return data;
+            }
+        }
+        return null;
+    }
+    
+    public boolean PegarInfoServidor(int Server_ID){
+        ConexaoDB conexao = new ConexaoDB();
+        ResultSet resulteSet = null;
+        resulteSet = conexao.GetPersonalizado("select * from cb_servers WHERE id='"+Server_ID+"' ORDER BY id DESC");
+        
+        try {
+            while (resulteSet.next()) {
+                System.out.println("Server_ID: "+Server_ID);
+                return conexao.SetarBancoServidor(resulteSet.getString("db_host"), resulteSet.getString("db_banco"), resulteSet.getString("db_user"), resulteSet.getString("db_senha"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     /**

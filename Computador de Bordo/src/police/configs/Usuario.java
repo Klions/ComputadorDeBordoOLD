@@ -181,7 +181,8 @@ public class Usuario {
                 contage2++;
                 JSONObject getTempoInfo = new JSONObject();
                 //getTempoInfo.put("id", contage2);
-                getTempoInfo.put("id_usuario", resulteSet2.getString("id"));/*
+                getTempoInfo.put("id", resulteSet2.getString("id"));
+                getTempoInfo.put("id_usuario", resulteSet2.getString("user_id"));/*
                 getTemporario.put("nome", resulteSet2.getString("nome"));
                 getTemporario.put("sobrenome", resulteSet2.getString("sobrenome"));
                 getTemporario.put("registration", resulteSet2.getString("phone"));
@@ -203,55 +204,56 @@ public class Usuario {
         } catch (SQLException ex) {
             Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
         }
-        ResultSet resulteSet = conexao.PegarContas();
-        int contage=0;
-        try {
-            while (resulteSet.next()) {
-                JSONObject getTemporario = new JSONObject();
-                //JSONObject o = usuariosInfo.getJSONObject(contage);
-                boolean setador=false;
-                for(int i = 0; i < usuariosInfo.length(); i++){
-                    JSONObject o = usuariosInfo.getJSONObject(i);
-                    if(o.getInt("id_usuario") == resulteSet.getInt("user_id")){
-                        getTemporario.put("lspd", o.getInt("lspd"));
-                        getTemporario.put("discord", o.getString("discord"));
-                        getTemporario.put("permissao", o.getInt("permissao"));
-                        getTemporario.put("codigo", o.getString("codigo"));
-                        getTemporario.put("ultimologin", o.getString("ultimologin"));
-                        setador=true;
+        if(conexao.Servidor_Config){
+            ResultSet resulteSet = conexao.PegarContas();
+            int contage=0;
+            try {
+                while (resulteSet.next()) {
+                    JSONObject getTemporario = new JSONObject();
+                    //JSONObject o = usuariosInfo.getJSONObject(contage);
+                    boolean setador=false;
+                    for(int i = 0; i < usuariosInfo.length(); i++){
+                        JSONObject o = usuariosInfo.getJSONObject(i);
+                        if(o.getInt("id_usuario") == resulteSet.getInt("user_id")){
+                            getTemporario.put("lspd", o.getInt("lspd"));
+                            getTemporario.put("discord", o.getString("discord"));
+                            getTemporario.put("permissao", o.getInt("permissao"));
+                            getTemporario.put("codigo", o.getString("codigo"));
+                            getTemporario.put("ultimologin", o.getString("ultimologin"));
+                            setador=true;
+                        }
                     }
-                }
-                if(!setador){
-                    getTemporario.put("lspd", 0);
-                    getTemporario.put("discord", "");
-                    getTemporario.put("permissao", 0);
-                    getTemporario.put("codigo", "");
-                    getTemporario.put("ultimologin", 0);
-                }
-                contage++;
-                
-                getTemporario.put("id", contage);
-                getTemporario.put("id_usuario", resulteSet.getString("user_id"));
-                getTemporario.put("nome", resulteSet.getString("name"));
-                getTemporario.put("sobrenome", resulteSet.getString("firstname"));
-                getTemporario.put("registration", resulteSet.getString("registration"));
-                getTemporario.put("phone", resulteSet.getString("phone"));
-                getTemporario.put("age", resulteSet.getString("age"));
-                
-                usuariosDBarray.put(getTemporario);
-                    
-                //System.out.println("+1 / ");
-                //getTemporario2.setJSONArray("animals", values);
+                    if(!setador){
+                        getTemporario.put("lspd", 0);
+                        getTemporario.put("discord", "");
+                        getTemporario.put("permissao", 0);
+                        getTemporario.put("codigo", "");
+                        getTemporario.put("ultimologin", 0);
+                    }
+                    contage++;
 
-                //System.out.print("deu certo!!");
-                
+                    getTemporario.put("id", contage);
+                    getTemporario.put("id_usuario", resulteSet.getString("user_id"));
+                    getTemporario.put("nome", resulteSet.getString("name"));
+                    getTemporario.put("sobrenome", resulteSet.getString("firstname"));
+                    getTemporario.put("registration", resulteSet.getString("registration"));
+                    getTemporario.put("phone", resulteSet.getString("phone"));
+                    getTemporario.put("age", resulteSet.getString("age"));
+
+                    usuariosDBarray.put(getTemporario);
+
+                    //System.out.println("+1 / ");
+                    //getTemporario2.setJSONArray("animals", values);
+
+                    //System.out.print("deu certo!!");
+
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
+        }else{
+            System.out.println("Não foi conectado ao PegarContas()");
         }
-        
-        
-        
         /*for(int ir = 0; ir < usuariosDBarray.length(); ir++){
             JSONObject o = usuariosDBarray.getJSONObject(ir);
             System.out.println(o.toString());
@@ -299,28 +301,30 @@ public class Usuario {
     public JSONArray AttDBDiscord(){
         ConexaoDB conexao = new ConexaoDB();
         JSONArray usuariosDBarray = new JSONArray();
-        ResultSet resulteSet = conexao.PegarDiscord();
-        int contage=0;
-        try {
-            while (resulteSet.next()) {
-                JSONObject getTemporario = new JSONObject();
-                String path = resulteSet.getString("identifier");
-                // Split path into segments
-                String PegarDiscord="discord:";
-                if(path.startsWith(PegarDiscord)){
-                    contage++;
-                    String segments[] = path.split(PegarDiscord);
-                    String document = segments[segments.length - 1];
-                    //System.out.println("id: "+resulteSet.getString("user_id")+" - "+document);
-                    getTemporario.put("id", contage);
-                    getTemporario.put("user_id", resulteSet.getString("user_id"));
-                    getTemporario.put("identifier", document);
-                    usuariosDBarray.put(getTemporario);
+        if(conexao.Servidor_Config){
+            ResultSet resulteSet = conexao.PegarDiscord();
+            int contage=0;
+            try {
+                while (resulteSet.next()) {
+                    JSONObject getTemporario = new JSONObject();
+                    String path = resulteSet.getString("identifier");
+                    // Split path into segments
+                    String PegarDiscord="discord:";
+                    if(path.startsWith(PegarDiscord)){
+                        contage++;
+                        String segments[] = path.split(PegarDiscord);
+                        String document = segments[segments.length - 1];
+                        //System.out.println("id: "+resulteSet.getString("user_id")+" - "+document);
+                        getTemporario.put("id", contage);
+                        getTemporario.put("user_id", resulteSet.getString("user_id"));
+                        getTemporario.put("identifier", document);
+                        usuariosDBarray.put(getTemporario);
+                    }
+
                 }
-                
+            } catch (SQLException ex) {
+                Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
         }
         //System.out.print(usuariosDBarray.toString());
         return usuariosDBarray;

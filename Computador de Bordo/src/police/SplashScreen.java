@@ -30,7 +30,7 @@ public class SplashScreen extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/mclost_1.png")));
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/lspd-small.png")));
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/RC.png")));
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         //patt.setBackground(new java.awt.Color(30, 11, 67));
         IniciarSobre();

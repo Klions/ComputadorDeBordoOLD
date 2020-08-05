@@ -8,6 +8,7 @@ package police.configs;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import org.json.JSONObject;
 import police.Corporacao;
 
@@ -24,16 +25,40 @@ public class ConexaoDB {
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
     
-    private final String host=  "mysql-mariadb15-bra-104.zap-hosting.com"; //"axirouxe.com";
-    private final String banco= "zap485970-1";//"axiroux1_cbgta";
-    private final String user=  "zap485970-1";//"cborigin";
-    private final String pass=  "YS6bm2gWQEH0Dbbk";//"4_iDca63";
+    private final String host =  "axirouxe.com"; //"axirouxe.com"; //mysql-mariadb15-bra-104.zap-hosting.com
+    private final String banco = "rainbow_cb";//"axiroux1_cbgta";
+    private final String user =  "user_cb";//"cborigin";
+    private final String pass =  "V5n7fg@3";//"4_iDca63";
     
-    private final String host_server=  host; //"158.69.22.55";
-    private final String banco_server= banco;//"vrp";
-    private final String user_server=  user;//"ferrazgado";
-    private final String pass_server=  pass;//"gadoferraz";
+    private String host_server =  host; //"158.69.22.55";
+    private String banco_server = banco;//"vrp";
+    private String user_server =  user;//"ferrazgado";
+    private String pass_server =  pass;//"gadoferraz";
     
+    private String Servidor_Config = "";
+    
+    Preferences prefs = Preferences.userNodeForPackage(Example.class);
+    
+    public boolean SetarBancoServidor(String s_host, String s_banco, String s_user, String s_senha){
+        prefs.put(host_server, s_host);
+        prefs.put(banco_server, s_banco);
+        prefs.put(user_server, s_user);
+        prefs.put(pass_server, s_senha);
+        prefs.put(Servidor_Config, "true");
+        //Servidor_Config = true;
+        System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
+        return true;
+    }
+    
+    public boolean AttDB(){
+        host_server = prefs.get(host_server, "padrao");
+        banco_server = prefs.get(banco_server, "padrao");
+        user_server = prefs.get(user_server, "padrao");
+        pass_server = prefs.get(pass_server, "padrao");
+        Servidor_Config = prefs.get(Servidor_Config, "padrao");
+        System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
+        return true;
+    }
 
     public ResultSet PegarContas() {
         try {
@@ -498,7 +523,7 @@ public class ConexaoDB {
             /*resultSet = statement
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
-            String query1 = "update cb_identities set ultimologin='"+datar+"' where id='"+ide+"'";
+            String query1 = "update cb_identities set ultimologin='"+datar+"' where user_id='"+ide+"'";
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
             return true;
