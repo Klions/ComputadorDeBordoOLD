@@ -101,21 +101,21 @@ public class Prender extends javax.swing.JFrame {
         jPanel11.setBackground(new java.awt.Color(13, 32, 64));
         
         
-        jda = policia.getJDA();
-        usuariosDBarray = policia.AttDBUsuarios();
-        discordDBarray = policia.AttDBDiscord();
+        jda = InicializadorMain.jda;
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        discordDBarray = InicializadorMain.discordDBarray;
         
         Usuario usuario = new Usuario();
         JSONObject usua = new JSONObject(usuario.getDados());
         if(usua.getInt("permissao") < 1) check7.setVisible(false);
         
         AttBancos();
-        
+        /*
         for (int i=1; i<=tamanhototal; i++) {
             BtMais(i).setBackground(new java.awt.Color(255, 255, 255));
             BtMenos(i).setBackground(new java.awt.Color(255, 255, 255));
             BtZerar(i).setBackground(new java.awt.Color(255, 255, 255));
-        }
+        }*/
         pack();
     }
     
@@ -124,10 +124,16 @@ public class Prender extends javax.swing.JFrame {
         AttDBPrisoes();
     }
     public void AttDBPrisoes(){
-        Usuario usuarios = new Usuario();
+        
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
+        blacklistDBarray = InicializadorMain.blacklistDBarray;
+        procuradosDBarray = InicializadorMain.procuradosDBarray;
+        /*Usuario usuarios = new Usuario();
         prisoesDBarray = usuarios.AttDBPrisoes();
         blacklistDBarray = usuarios.AttBlackList();
-        procuradosDBarray = usuarios.AttDBProcurados();
+        procuradosDBarray = usuarios.AttDBProcurados();*/
+        
+        
         verprisoes.prisoesDBarray=prisoesDBarray;
         verprisoes.procuradosDBarray=procuradosDBarray;
         verprisoes.TabelaAtt();
@@ -7358,7 +7364,7 @@ public class Prender extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        new Sobre().setVisible(true);
+        InicializadorMain.sobre.setVisible(true);
         /*if(!policia.sobre.isVisible()){
             policia.sobre.setVisible(true);
         }else{

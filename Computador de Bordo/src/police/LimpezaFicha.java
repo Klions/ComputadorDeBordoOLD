@@ -61,17 +61,28 @@ public class LimpezaFicha extends javax.swing.JFrame {
         jPanel6.setBackground(new java.awt.Color(13, 32, 64));
         jPanel7.setBackground(new java.awt.Color(13, 32, 64));
         
-        usuariosDBarray = policia.AttDBUsuarios();
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        blacklistDBarray = InicializadorMain.blacklistDBarray;
+        discordDBarray = InicializadorMain.discordDBarray;
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
+        
+        /*usuariosDBarray = policia.AttDBUsuarios();
         //prisoesDBarray = usuarios.AttDBPrisoes();
         blacklistDBarray = usuarios.AttBlackList();
-        discordDBarray = policia.AttDBDiscord();
+        discordDBarray = policia.AttDBDiscord();*/
         jda = policia.getJDA();
         Resetar();
         //Timere();
     }
     
     public void AttDbs(){
-        prisoesDBarray = usuarios.AttDBPrisoes();
+        policia.AttDBSTodas();
+        
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        blacklistDBarray = InicializadorMain.blacklistDBarray;
+        discordDBarray = InicializadorMain.discordDBarray;
+        //prisoesDBarray = usuarios.AttDBPrisoes();
     }
     int TimerAtte=0;
     boolean AtivarTimer=false;
@@ -133,7 +144,7 @@ public class LimpezaFicha extends javax.swing.JFrame {
         penatotalTxt.setText("FAÇA A PESQUISA");
         ultimoregistroTxt.setText("Pesquise pelo ID");
         tempoesperaTxt.setText("");
-        AttDbs();
+        //AttDbs();
         pack();
         ID.setText("");
         ID.requestFocus();
@@ -864,6 +875,7 @@ public class LimpezaFicha extends javax.swing.JFrame {
                 JOptionPane.PLAIN_MESSAGE);
             MensagemDiscordFicha(my_obj);
             MensagemPrivado(my_obj);
+            AttDbs();
             Resetar();
         }
     }//GEN-LAST:event_limparActionPerformed
@@ -878,7 +890,7 @@ public class LimpezaFicha extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        new Sobre().setVisible(true);
+        InicializadorMain.sobre.setVisible(true);
         //this.dispose();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 

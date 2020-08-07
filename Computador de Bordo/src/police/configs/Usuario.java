@@ -204,7 +204,10 @@ public class Usuario {
         } catch (SQLException ex) {
             Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(conexao.Servidor_Config){
+        //System.out.println("conexao.GetConexaoServer(): "+conexao.GetConexaoServer()+" <--");
+        
+        //InicializadorMain main = new InicializadorMain();
+        if(!"".equals(InicializadorMain.host_server)){
             ResultSet resulteSet = conexao.PegarContas();
             int contage=0;
             try {
@@ -252,7 +255,7 @@ public class Usuario {
                 Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
-            System.out.println("Não foi conectado ao PegarContas()");
+            System.out.println("Não foi conectado ao PegarContas( / InicializadorMain.host_server: "+InicializadorMain.host_server);
         }
         /*for(int ir = 0; ir < usuariosDBarray.length(); ir++){
             JSONObject o = usuariosDBarray.getJSONObject(ir);
@@ -301,7 +304,7 @@ public class Usuario {
     public JSONArray AttDBDiscord(){
         ConexaoDB conexao = new ConexaoDB();
         JSONArray usuariosDBarray = new JSONArray();
-        if(conexao.Servidor_Config){
+        if(conexao.Servidor_Config()){
             ResultSet resulteSet = conexao.PegarDiscord();
             int contage=0;
             try {

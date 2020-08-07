@@ -129,8 +129,11 @@ public class Corporacao extends javax.swing.JFrame {
         
         btexonerado.setEnabled(false);
         
-        usuariosDBarray = usuarios.AttDBUsuarios();
-        discordDBarray = usuarios.AttDBDiscord();
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        discordDBarray = InicializadorMain.discordDBarray;
+        
+        //usuariosDBarray = usuarios.AttDBUsuarios();
+        //discordDBarray = usuarios.AttDBDiscord();
         
         //AttDBUsuarios();
         AttDBHierarquia();
@@ -680,8 +683,10 @@ public class Corporacao extends javax.swing.JFrame {
                     } 
                 }
                 //AttDBUsuarios();
-                policia.AttDBUsuariosSet();
-                usuariosDBarray = policia.AttDBUsuarios();
+                policia.AttDBSTodas();
+                usuariosDBarray = InicializadorMain.usuariosDBarray;
+                discordDBarray = InicializadorMain.discordDBarray;
+                //usuariosDBarray = policia.AttDBUsuarios();
                 AttDBUsuarioMy();
                 AttDBHierarquia();
                 TabelaAtt();
@@ -797,15 +802,16 @@ public class Corporacao extends javax.swing.JFrame {
     }
     
     public void AttDBUsuarios(){
-        policia.AttDBUsuariosSet();
-        usuariosDBarray = policia.AttDBUsuarios();
+        //policia.AttDBUsuariosSet();
+        usuariosDBarray = InicializadorMain.usuariosDBarray;//policia.AttDBUsuarios();
     }
     public void AttDBUsuarioMy(){
-        usuarioMyDBarray = usuarios.AttDBUsuarioMy();
+        //usuarioMyDBarray = usuarios.AttDBUsuarioMy();
+        usuariosDBarray = InicializadorMain.usuarioMyDBarray;//policia.AttDBUsuarios();
     }
     
     public void AttDBHierarquia(){
-        hierarquiaDBarray = usuarios.AttDBHierarquia();
+        hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;//usuarios.AttDBHierarquia();
     }
     
     public void AtivarCampos(){
@@ -1878,8 +1884,8 @@ public class Corporacao extends javax.swing.JFrame {
             String Pasw=txtPassaporte.getText();
             //PassaAddU="";
             
-            ResultSet resulteSet = null;
-            resulteSet = conexao.readDataBase2("cb_identities", "id", Pasw);
+            /*ResultSet resulteSet = null;
+            resulteSet = conexao.readDataBase2("cb_identities", "id", Pasw);*/
             long datar=System.currentTimeMillis();
             boolean conte=false;
             boolean lspde=false;
@@ -2005,7 +2011,7 @@ public class Corporacao extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        new Sobre().setVisible(true);
+        InicializadorMain.sobre.setVisible(true);
         //this.dispose();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 

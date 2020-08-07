@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import org.json.JSONObject;
 import police.Corporacao;
+import police.InicializadorMain;
 
 /**
  *
@@ -20,15 +21,16 @@ public class ConexaoDB {
     public void ConectarMysql(){
         
     }
+    InicializadorMain main = new InicializadorMain();
     private Connection connect = null;
     private Statement statement = null;
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
     
-    private final String host =  "axirouxe.com"; //"axirouxe.com"; //mysql-mariadb15-bra-104.zap-hosting.com
-    private final String banco = "rainbow_cb";//"axiroux1_cbgta";
-    private final String user =  "user_cb";//"cborigin";
-    private final String pass =  "V5n7fg@3";//"4_iDca63";
+    public final String host =  "axirouxe.com"; //"axirouxe.com"; //mysql-mariadb15-bra-104.zap-hosting.com
+    public final String banco = "rainbow_cb";//"axiroux1_cbgta";
+    public final String user =  "user_cb";//"cborigin";
+    public final String pass =  "V5n7fg@3";//"4_iDca63";
     
     private String host_server =  host; //"158.69.22.55";
     private String banco_server = banco;//"vrp";
@@ -37,16 +39,24 @@ public class ConexaoDB {
     
     private String Servidor_Config = "";
     
+    private String Url_Conexao = "";
+    
     Preferences prefs = Preferences.userNodeForPackage(Example.class);
     
     public boolean SetarBancoServidor(String s_host, String s_banco, String s_user, String s_senha){
-        prefs.put(host_server, s_host);
+        
+        InicializadorMain.host_server = s_host;
+        InicializadorMain.banco_server = s_banco;
+        InicializadorMain.user_server = s_user;
+        InicializadorMain.pass_server = s_senha;
+        /*prefs.put(host_server, s_host);
         prefs.put(banco_server, s_banco);
         prefs.put(user_server, s_user);
         prefs.put(pass_server, s_senha);
-        prefs.put(Servidor_Config, "true");
+        prefs.put(Servidor_Config, "true");*/
+        prefs.put(Url_Conexao, "jdbc:mysql://"+s_host+"/"+s_banco+"?"+ "user="+s_user+"&password="+s_senha);
         //Servidor_Config = true;
-        System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
+        System.out.println("host_server: "+main.host_server+" / banco_server: "+main.banco_server+" / user_server: "+main.user_server+" / pass_server: "+main.pass_server);
         return true;
     }
     
@@ -59,15 +69,27 @@ public class ConexaoDB {
         System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
         return true;
     }
+    public String GetConexaoServer(){
+        return prefs.get(Url_Conexao, "url");
+    }
+    
+    public boolean Servidor_Config(){
+        Servidor_Config = prefs.get(Servidor_Config, "padrao");
+        if("true".equals(Servidor_Config)) return true;
+        return false;
+    }
 
     public ResultSet PegarContas() {
         try {
             // This will load the MySQL driver, each DB has its own driver
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
-            connect = DriverManager
+            /*connect = DriverManager
                     .getConnection("jdbc:mysql://"+host_server+"/"+banco_server+"?"
-                            + "user="+user_server+"&password="+pass_server);
+                            + "user="+user_server+"&password="+pass_server);*/
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -75,7 +97,7 @@ public class ConexaoDB {
             resultSet = statement
                     .executeQuery("select * from vrp_user_identities ORDER BY user_id");
             
-            System.out.println("Conectado ao banco de dados do SERVIDOR: "+host_server);
+            System.out.println("Conectado ao banco de dados do SERVIDOR: "+InicializadorMain.host_server);
             return resultSet;
 
         } catch (Exception e) {
@@ -94,8 +116,7 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host_server+"/"+banco_server+"?"
-                            + "user="+user_server+"&password="+pass_server);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -103,7 +124,7 @@ public class ConexaoDB {
             resultSet = statement
                     .executeQuery("select * from vrp_user_ids ORDER BY user_id");
             
-            System.out.println("Conectado ao banco de dados do SERVIDOR: "+host_server);
+            System.out.println("Conectado ao banco de dados do SERVIDOR: "+InicializadorMain.host_server);
             return resultSet;
 
         } catch (Exception e) {
@@ -194,7 +215,7 @@ public class ConexaoDB {
             writeMetaData(resultSet);*/
             
            
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor: "+host+" / tabela: "+tabelad+" - readDataBase()");
             return resultSet;
 
         } catch (Exception e) {
@@ -221,7 +242,7 @@ public class ConexaoDB {
             // Result set get the result of the SQL query
             resultSet = statement
                     .executeQuery("select * from "+tabelad+" WHERE "+where+" LIKE '"+where2+"' ORDER BY id DESC");
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor: "+host+" / tabela: "+tabelad+" - readDataBase2()");
             return resultSet;
 
         } catch (Exception e) {
@@ -249,7 +270,7 @@ public class ConexaoDB {
             if("".equals(orderby)) orderby="id";
             resultSet = statement
                     .executeQuery("select * from "+tabelad+" ORDER BY "+orderby+" ASC");
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor: "+host+" / tabela: "+tabelad+" - getDadosBanco()");
             return resultSet;
 
         } catch (Exception e) {
@@ -268,8 +289,7 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host_server+"/"+banco_server+"?"
-                            + "user="+user_server+"&password="+pass_server);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -277,7 +297,7 @@ public class ConexaoDB {
             if("".equals(orderby)) orderby="id";
             resultSet = statement
                     .executeQuery("select * from "+tabelad+" ORDER BY "+orderby+" ASC");
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor: "+InicializadorMain.host_server+" / getDadosBanco2()");
             return resultSet;
 
         } catch (Exception e) {
@@ -613,7 +633,7 @@ public class ConexaoDB {
             //String query1 = "update "+tabelad+" set passaporte='"+cid+"', nome='"+cnome+"', codigo='"+ccodigo+"', discord='"+cdiscord+"' where passaporte='"+ide+"'";
             String query1 = "INSERT INTO cb_prisoes (id_usuario, data, motivo, id_prendeu, protocolo, meses, multas, tornz, justificado, contravencoes) VALUES ('"+passaporte+"', '"+data+"', '"+motivo+"', '"+id_prendeu+"', '"+protocolo+"', '"+meses+"', '"+multas+"', '"+tornz+"', '"+justificado+"', '"+contravencoes+"')";
             statement.executeUpdate(query1);
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor: "+host+" INSERT id_usuario: "+passaporte);
             return true;
 
         } catch (Exception e) {

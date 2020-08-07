@@ -58,7 +58,7 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         PainelLogin.setBackground(new java.awt.Color(13, 32, 64));
         att.setBackground(new java.awt.Color(222, 82, 82));
-        AttDBUsuarios();
+        //AttDBUsuarios();
         AttDBHierarquia();
         
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
@@ -192,6 +192,8 @@ public class Login extends javax.swing.JFrame {
                             //System.out.println("Resultado do JSON: "+sal_info);
                             new Painel().setVisible(true);
                             this.dispose();
+                            
+                            police.AttDBSTodas();
                         }else{
                             TextoErro("Erro ao pegar sua conta no Banco de Dados.");
                             AttDBHierarquia();

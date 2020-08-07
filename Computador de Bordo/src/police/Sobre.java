@@ -6,7 +6,6 @@
 package police;
 
 import java.awt.Toolkit;
-import police.configs.ConexaoDB;
 import police.configs.Config;
 
 /**

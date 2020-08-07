@@ -5,13 +5,14 @@
  */
 package police;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.json.JSONArray;
-import police.configs.ConexaoDB;
 import police.configs.DiscordMessage;
 import police.configs.Usuario;
 
@@ -24,12 +25,23 @@ public class InicializadorMain {
     /**
      * @param args the command line arguments
      */
-    static JDA jda = null;
-    static JSONArray discordDBarray = new JSONArray();
-    static JSONArray usuariosDBarray = new JSONArray();
-    ConexaoDB conexao = new ConexaoDB();
-
+    public static JDA jda = null;
+    public static JSONArray discordDBarray = new JSONArray();
+    public static JSONArray usuariosDBarray = new JSONArray();
     
+    public static JSONArray prisoesDBarray = new JSONArray();
+    public static JSONArray blacklistDBarray = new JSONArray();
+    public static JSONArray procuradosDBarray = new JSONArray();
+    public static JSONArray hierarquiaDBarray = new JSONArray();
+    
+    public static JSONArray usuarioMyDBarray = new JSONArray();
+    
+    public static String host_server =  ""; //"158.69.22.55";
+    public static String banco_server = "";//"vrp";
+    public static String user_server =  "";//"ferrazgado";
+    public static String pass_server =  "";//"gadoferraz";
+    
+    public static Sobre sobre = new Sobre();
     
     public static void main(String[] args) throws InterruptedException {
         SplashScreen splash = new SplashScreen();
@@ -55,13 +67,15 @@ public class InicializadorMain {
         splash.ProgressoAtual=40;
         splash.texto.setText("VERIFICANDO INTEGRIDADE DOS REGISTROS");
         
-        Usuario usuarios = new Usuario();
+        /*Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuarios();
+        discordDBarray = usuarios.AttDBDiscord();*/
+        
         splash.ValorProgresso=85;
         splash.ProgressoAtual=70;
         splash.ContandoFalhas=0;
         splash.texto.setText("MONTANDO INTERFACE POLICIAL");
-        discordDBarray = usuarios.AttDBDiscord();
+        
         splash.ValorProgresso=100;
         splash.ProgressoAtual=85;
         splash.texto.setText("FAZENDO ÚLTIMOS AJUSTES");
@@ -73,6 +87,20 @@ public class InicializadorMain {
         logins.setVisible(true);
         splash.Fechar=true;
         splash.dispose();
+        
+        new Timer().scheduleAtFixedRate(new TimerTask(){
+            @Override
+            public void run(){
+                Usuario usuarios = new Usuario();
+                usuariosDBarray = usuarios.AttDBUsuarios();
+                discordDBarray = usuarios.AttDBDiscord();
+                prisoesDBarray = usuarios.AttDBPrisoes();
+                procuradosDBarray = usuarios.AttDBProcurados();
+                hierarquiaDBarray = usuarios.AttDBHierarquia();
+                usuarioMyDBarray = usuarios.AttDBUsuarioMy();
+               System.out.println("Banco de dados ATUALIZADO.");
+            }
+        },0,60000);
     }
     public JSONArray AttDBUsuarios(){
         return usuariosDBarray;
@@ -90,5 +118,16 @@ public class InicializadorMain {
     public void AttDBUsuariosSetDiscord(){
         Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuariosDiscord();
+    }
+    
+    public void AttDBSTodas(){
+        Usuario usuarios = new Usuario();
+        usuariosDBarray = usuarios.AttDBUsuarios();
+        discordDBarray = usuarios.AttDBDiscord();
+        prisoesDBarray = usuarios.AttDBPrisoes();
+        blacklistDBarray = usuarios.AttBlackList();
+        procuradosDBarray = usuarios.AttDBProcurados();
+        hierarquiaDBarray = usuarios.AttDBHierarquia();
+        usuarioMyDBarray = usuarios.AttDBUsuarioMy();
     }
 }

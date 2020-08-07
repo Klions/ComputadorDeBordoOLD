@@ -55,10 +55,17 @@ public class VerPrisoes extends javax.swing.JFrame {
     public VerPrisoes() {
         
         initComponents();
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
+        hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;
+        procuradosDBarray = InicializadorMain.procuradosDBarray;
+        
+        /*
         usuariosDBarray = usuarios.AttDBUsuarios();
         prisoesDBarray = usuarios.AttDBPrisoes();
         hierarquiaDBarray = usuarios.AttDBHierarquia();
         procuradosDBarray = usuarios.AttDBProcurados();
+        */
         
         //copiado.setVisible(false);
         this.setLocationRelativeTo(null);
