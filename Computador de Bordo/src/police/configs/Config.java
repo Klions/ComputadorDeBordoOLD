@@ -6,14 +6,15 @@
 package police.configs;
 
 import java.util.prefs.Preferences;
+import police.InicializadorMain;
 
 /**
  *
  * @author John
  */
 public class Config {
-    public int build = 20200730;
-    public String versao = "0.15 [Alpha]";
+    public int build = 20200816;
+    public String versao = "1.0 [BETA]";
     public String linkB = "https://rainbowcity.com.br/LSPD.exe";
     Preferences prefs = Preferences.userNodeForPackage(Example.class);
     
@@ -23,17 +24,17 @@ public class Config {
     public String img_DiscordPolicia    = "https://i.imgur.com/WveHfXw.png";
     public String img_CBIcone           = "imagens/RC.png";
     
-    private static final String buildB = "20200730";
-    private static final String versaoB = "0.15 [Alpha]";
+    private static final String buildB = "20200816";
+    private static final String versaoB = "1.0 [BETA]";
     private static final String needB = "0";
     private static final String link = "";
     private static final String mensagem = "";
     
     public void setBuild(String Valor) {
-        prefs.put(buildB, Valor);
+        InicializadorMain.BuildCB = Valor; //prefs.put(buildB, Valor);
     }
     public String getBuild() {
-        return prefs.get(buildB, "default");
+        return InicializadorMain.BuildCB;
     }
     
     public void setVersao(String Valor) {
@@ -67,7 +68,7 @@ public class Config {
     
     public boolean VerificarAtt(){
         int AttBuild1 = build;
-        int AttBuild2 = Integer.parseInt(prefs.get(buildB, "default"));
+        int AttBuild2 = Integer.parseInt(InicializadorMain.BuildCB);//Integer.parseInt(prefs.get(buildB, "default"));
         return AttBuild1 < AttBuild2;
     }
 }

@@ -38,7 +38,7 @@ public class Login extends javax.swing.JFrame {
     /**
      * Creates new form Login
      */
-    private static final int PORT = 9996;
+    private static final int PORT = 9999;
     private static ServerSocket socket; 
    
     JSONArray usuariosDBarray = new JSONArray();
@@ -309,7 +309,7 @@ public class Login extends javax.swing.JFrame {
     public boolean PegarInfoServidor(int Server_ID){
         ConexaoDB conexao = new ConexaoDB();
         ResultSet resulteSet = null;
-        resulteSet = conexao.GetPersonalizado("select * from cb_servers WHERE id='"+Server_ID+"' ORDER BY id DESC");
+        resulteSet = conexao.GetPersonalizado("select * from cb_servers WHERE id="+Server_ID+" ORDER BY id DESC");
         
         try {
             while (resulteSet.next()) {
@@ -439,7 +439,7 @@ public class Login extends javax.swing.JFrame {
 
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel5.setText("Desenvolvido por kli0ns#3092 vulgo Ferraz");
+        jLabel5.setText("Desenvolvido por kli0ns#7497 vulgo Ferraz");
         jLabel5.setEnabled(false);
 
         txtAtt.setFont(new java.awt.Font("Arial Narrow", 1, 24)); // NOI18N

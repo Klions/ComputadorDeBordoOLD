@@ -41,6 +41,8 @@ public class InicializadorMain {
     public static String user_server =  "";//"ferrazgado";
     public static String pass_server =  "";//"gadoferraz";
     
+    public static String BuildCB = "0";
+    
     public static Sobre sobre = new Sobre();
     
     public static void main(String[] args) throws InterruptedException {

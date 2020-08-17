@@ -136,7 +136,7 @@ public class Sobre extends javax.swing.JFrame {
         buildt1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         buildt1.setForeground(new java.awt.Color(255, 255, 255));
         buildt1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        buildt1.setText("kli0ns#3092 [discord]");
+        buildt1.setText("kli0ns#7497 [discord]");
 
         txtAtt.setFont(new java.awt.Font("Arial Narrow", 0, 18)); // NOI18N
         txtAtt.setForeground(new java.awt.Color(255, 255, 255));
