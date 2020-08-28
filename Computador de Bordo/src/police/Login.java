@@ -38,7 +38,7 @@ public class Login extends javax.swing.JFrame {
     /**
      * Creates new form Login
      */
-    private static final int PORT = 9999;
+    private static final int PORT = 9998;
     private static ServerSocket socket; 
    
     JSONArray usuariosDBarray = new JSONArray();

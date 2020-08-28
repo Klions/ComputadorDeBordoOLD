@@ -13,7 +13,7 @@ import police.InicializadorMain;
  * @author John
  */
 public class Config {
-    public int build = 20200816;
+    public int build = 20200817;
     public String versao = "1.0 [BETA]";
     public String linkB = "https://rainbowcity.com.br/LSPD.exe";
     Preferences prefs = Preferences.userNodeForPackage(Example.class);
@@ -24,7 +24,7 @@ public class Config {
     public String img_DiscordPolicia    = "https://i.imgur.com/WveHfXw.png";
     public String img_CBIcone           = "imagens/RC.png";
     
-    private static final String buildB = "20200816";
+    private static final String buildB = "20200817";
     private static final String versaoB = "1.0 [BETA]";
     private static final String needB = "0";
     private static final String link = "";

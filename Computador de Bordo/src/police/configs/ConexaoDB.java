@@ -447,8 +447,10 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    /*.getConnection("jdbc:mysql://"+host+"/"+banco+"?"
+                            + "user="+user+"&password="+pass);*/
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -621,8 +623,10 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    /*.getConnection("jdbc:mysql://"+host+"/"+banco+"?"
+                            + "user="+user+"&password="+pass);*/
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
