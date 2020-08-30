@@ -192,6 +192,7 @@ public class Login extends javax.swing.JFrame {
                             //System.out.println("Resultado do JSON: "+sal_info);
                             new Painel().setVisible(true);
                             this.dispose();
+                            InicializadorMain.server_id = servidor_id;
                             
                             police.AttDBSTodas();
                         }else{

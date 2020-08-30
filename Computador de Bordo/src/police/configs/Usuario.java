@@ -546,4 +546,63 @@ public class Usuario {
         }
         return prisaoDBarray;
     }
+    
+    public JSONArray AttDBCrimes(){
+        //PassaAddU
+        ConexaoDB conexao = new ConexaoDB();
+        JSONArray prisaoDBarray = new JSONArray();
+        ResultSet resulteSet = conexao.getDadosBanco("cb_procurados", "id");
+        int contage=0;
+        try {
+            while (resulteSet.next()) {
+                contage++;
+
+                JSONObject getTemporario = new JSONObject();
+
+                getTemporario.put("id", contage);
+                getTemporario.put("id_usuario", resulteSet.getInt("id_usuario"));
+                getTemporario.put("data", resulteSet.getString("data"));
+                getTemporario.put("motivo", resulteSet.getString("motivo"));
+                getTemporario.put("procurou_id", resulteSet.getInt("procurou_id"));
+                getTemporario.put("protocolo", resulteSet.getString("protocolo"));
+                getTemporario.put("meses", resulteSet.getInt("meses"));
+                getTemporario.put("multas", resulteSet.getInt("multas"));
+                getTemporario.put("tornz", resulteSet.getInt("tornz"));
+                getTemporario.put("justificado", resulteSet.getString("justificado"));
+                getTemporario.put("nivel_procurado", resulteSet.getInt("nivel_procurado"));
+                getTemporario.put("observacao", resulteSet.getString("observacao"));
+                getTemporario.put("contravencoes", resulteSet.getString("contravencoes"));
+                if(resulteSet.getString("pagou")==null){
+                    getTemporario.put("pagou", "0");
+                }else{
+                    getTemporario.put("pagou", resulteSet.getString("pagou"));
+                }
+
+                prisaoDBarray.put(getTemporario);
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return prisaoDBarray;
+    }
+    
+    public JSONArray CrimesServerID(){
+        //PassaAddU
+        ConexaoDB conexao = new ConexaoDB();
+        JSONArray crimesserverDBarray = new JSONArray();
+        ResultSet resulteSet = conexao.PegarValoresPorServerID("cb_crimes");
+        try {
+            while (resulteSet.next()) {
+                JSONObject getTemporario = new JSONObject();
+                getTemporario.put("id", resulteSet.getInt("id"));
+                getTemporario.put("categorias", resulteSet.getString("categorias"));
+                getTemporario.put("crimes", resulteSet.getString("crimes"));
+                crimesserverDBarray.put(getTemporario);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return crimesserverDBarray;
+    }
 }

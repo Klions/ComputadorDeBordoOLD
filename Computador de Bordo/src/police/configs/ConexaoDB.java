@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import police.Corporacao;
 import police.InicializadorMain;
@@ -771,6 +772,60 @@ public class ConexaoDB {
             String query1 = "update cb_procurados set pagou='"+protocolo+"' where id_usuario='"+user_id+"' AND pagou=0";
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
+            return true;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+     
+    public ResultSet PegarValoresPorServerID(String tabelad) {
+        try {
+            // This will load the MySQL driver, each DB has its own driver
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
+                            + "user="+user+"&password="+pass);
+
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            // Result set get the result of the SQL query
+            resultSet = statement
+                    .executeQuery("select * from "+tabelad+" WHERE server_id LIKE 1 ORDER BY id DESC"); //"+InicializadorMain.server_id+"
+            System.out.println("Conectado ao servidor: "+host+" / tabela: "+tabelad+" - PegarValoresPorServerID()");
+            return resultSet;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    
+    public boolean SetarCrimesECategoria(String categorias, String crimes, int GetCrimes) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
+                            + "user="+user+"&password="+pass);
+
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            String query = "INSERT INTO cb_crimes (categorias, crimes) VALUES ('"+categorias+"', '"+crimes+"')";
+            if(GetCrimes > 0) query = "update cb_crimes set categorias='"+categorias+"', crimes='"+crimes+"' where id="+GetCrimes+"";
+            statement.executeUpdate(query);
+            
+            System.out.println("Conectado ao servidor ( SetarCrimesECategoria() ): "+host);
             return true;
 
         } catch (Exception e) {
