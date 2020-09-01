@@ -44,20 +44,15 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jPanel2" max="32767" attributes="0"/>
                   <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
                   <Component id="jTabbedPane1" alignment="0" pref="947" max="32767" attributes="0"/>
                   <Component id="DetalhesPainel" alignment="0" max="32767" attributes="0"/>
                   <Component id="PesquisarPainel" alignment="0" max="32767" attributes="0"/>
                   <Component id="PainelDetalhes" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="ResetarBt" min="-2" pref="140" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" pref="140" max="-2" attributes="0"/>
-                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -73,14 +68,11 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="DetalhesPainel" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" pref="345" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" pref="347" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="PainelDetalhes" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jButton1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-                  <Component id="ResetarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -151,19 +143,23 @@
                       <Component id="TimeAgora" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="des_Nome2" max="32767" attributes="0"/>
-                              <Component id="des_Nome1" max="32767" attributes="0"/>
+                              <Component id="info_Crimes" max="32767" attributes="0"/>
+                              <Component id="info_Pena1" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="PenaTotal" min="-2" pref="355" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="des_Nome3" min="-2" pref="121" max="-2" attributes="0"/>
+                                  <Component id="info_Pena1S" min="-2" pref="120" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="info_Pena2" min="-2" pref="128" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="PenaTotal1" max="32767" attributes="0"/>
+                                  <Component id="info_Pena2S" min="-2" pref="120" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="info_Comando" min="-2" pref="121" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="info_ComandoS" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="CrimesCometidos" max="32767" attributes="0"/>
+                              <Component id="info_CrimesS" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -176,15 +172,17 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="CrimesCometidos" pref="25" max="32767" attributes="0"/>
-                      <Component id="des_Nome2" max="32767" attributes="0"/>
+                      <Component id="info_CrimesS" pref="25" max="32767" attributes="0"/>
+                      <Component id="info_Crimes" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="PenaTotal" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="des_Nome1" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="PenaTotal1" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="des_Nome3" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_Pena1S" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_ComandoS" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_Comando" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_Pena1" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_Pena2" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="info_Pena2S" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="TimeAgora" min="-2" max="-2" attributes="0"/>
@@ -194,7 +192,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JTextField" name="CrimesCometidos">
+        <Component class="javax.swing.JTextField" name="info_CrimesS">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -205,32 +203,18 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="PenaTotal">
+        <Component class="javax.swing.JLabel" name="info_Pena1S">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="14" style="0"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="99" red="99" type="rgb"/>
             </Property>
-            <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="ASDASDASDASDASD"/>
+            <Property name="text" type="java.lang.String" value="CARREGANDO"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="des_Nome1">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Tahoma" size="16" style="0"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" red="ff" type="rgb"/>
-            </Property>
-            <Property name="horizontalAlignment" type="int" value="4"/>
-            <Property name="text" type="java.lang.String" value="PENA TOTAL:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="des_Nome2">
+        <Component class="javax.swing.JLabel" name="info_Crimes">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="16" style="0"/>
@@ -242,7 +226,7 @@
             <Property name="text" type="java.lang.String" value="CRIMES COMETIDOS:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="des_Nome3">
+        <Component class="javax.swing.JLabel" name="info_Comando">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="16" style="0"/>
@@ -254,7 +238,7 @@
             <Property name="text" type="java.lang.String" value="COMANDOS:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="PenaTotal1">
+        <Component class="javax.swing.JTextField" name="info_ComandoS">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -270,6 +254,41 @@
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value=" "/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="info_Pena1">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="16" style="0"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="text" type="java.lang.String" value="MULTA TOTAL:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="info_Pena2">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="16" style="0"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="text" type="java.lang.String" value="PENA TOTAL:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="info_Pena2S">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="14" style="0"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="99" red="99" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="CARREGANDO"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -532,11 +551,11 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="des_RegistroS" alignment="0" min="-2" pref="25" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="des_ReuS" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                               <Component id="des_Reu" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                               <Component id="des_Registro" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                              <Component id="des_RegistroS" alignment="0" min="-2" pref="25" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
                               <Group type="103" alignment="0" groupAlignment="3" attributes="0">
@@ -768,24 +787,79 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="jButton1">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Arial Unicode MS" size="12" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="REGISTRAR"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="ResetarBt">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Arial Unicode MS" size="12" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="RESETAR"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarBtActionPerformed"/>
-      </Events>
-    </Component>
+    <Container class="javax.swing.JPanel" name="jPanel2">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="ResetarBt" min="-2" pref="160" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="ResetarBt1" min="-2" pref="160" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="SalvarBt1" min="-2" pref="195" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="SalvarBt" min="-2" pref="195" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="SalvarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="ResetarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="SalvarBt1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="ResetarBt1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="SalvarBt">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Arial Unicode MS" size="12" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="REGISTRAR PRIS&#xc3;O"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="ResetarBt">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Arial Unicode MS" size="12" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="RESETAR"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarBtActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="SalvarBt1">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Arial Unicode MS" size="12" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="REGISTRAR PROCURADO"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="ResetarBt1">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Arial Unicode MS" size="12" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="COPIAR DISCORD"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarBt1ActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>
