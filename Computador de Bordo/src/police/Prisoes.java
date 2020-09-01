@@ -6,8 +6,11 @@
 package police;
 
 import java.awt.Container;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +21,7 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +40,8 @@ public class Prisoes extends javax.swing.JFrame {
     JSONArray CategoriasCrimes = new JSONArray();
     
     JSONArray RegistroBotoes = new JSONArray();
+    JSONArray RegistroInputs = new JSONArray();
+    
     JSONArray GetCrimes = new JSONArray();
     
     JSONArray usuariosDBarray = new JSONArray();
@@ -82,14 +88,18 @@ public class Prisoes extends javax.swing.JFrame {
     }
     //private javax.swing.JLabel Textos[];
     //private javax.swing.JToggleButton Botoes[];
+    int QntCategorias = 10;
+    int QntCrimes = 100;
     
-    JScrollPane[] ScrollPainel = new JScrollPane[10];
-    JPanel[] PainelBase = new JPanel[10];
-    JPanel[][] Painel = new JPanel[10][100];
-    JLabel[] Textos = new JLabel[100];
-    JToggleButton[][] Botoes = new JToggleButton[10][100];
+    JScrollPane[] ScrollPainel = new JScrollPane[QntCategorias];
+    JPanel[] PainelBase = new JPanel[QntCategorias];
+    JPanel[][] Painel = new JPanel[QntCategorias][QntCrimes];
+    JLabel[][] Textos = new JLabel[QntCategorias][QntCrimes];
+    JToggleButton[][] Botoes = new JToggleButton[QntCategorias][QntCrimes];
+    JTextField[][] InputText = new JTextField[QntCategorias][QntCrimes];
     
     public void AdicionarBotoes(){
+        AttCrimes();
         for(int i2 = 0; i2 < CategoriasCrimes.length(); i2++){
             JSONObject o2 = CategoriasCrimes.getJSONObject(i2);
             
@@ -123,15 +133,11 @@ public class Prisoes extends javax.swing.JFrame {
             container.setLayout(null);
             
             for(int i = 0; i < CrimesRegistro.length(); i++){
+                final int As = i;
+                final int As2 = i2;
+                
                 JSONObject o = CrimesRegistro.getJSONObject(i);
                 if(o.getInt("categoria") == o2.getInt("id")){
-
-                    JSONObject PegarDadosBt = o;
-                    PegarDadosBt.put("i1", i2);
-                    PegarDadosBt.put("i2", i);
-                    RegistroBotoes.put(PegarDadosBt);
-                    
-                    
                     Painel[i2][i] = new JPanel();
                     Painel[i2][i].setBounds(PadraoX+(TamanhoPainel*ContagemLimite), 20+(50*Linha), 220, 45);
                     
@@ -142,49 +148,123 @@ public class Prisoes extends javax.swing.JFrame {
                     Container container2 = Painel[i2][i];
                     container2.setLayout(null);
 
-                    /*Textos[i] = new JLabel();//new javax.swing.JLabel();
-                    Textos[i].setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-                    Textos[i].setText(o.getString("texto"));
-                    Textos[i].setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-                    Textos[i].setBounds(PadraoX, 0, 150, 35);
-                    container2.add( Textos[i] );*/
-
                     //Botoes[i] = new javax.swing.JToggleButton();
-                    Botoes[i2][i] = new JToggleButton(o.getString("texto"));
-                    Botoes[i2][i].setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/falso.png"))); // NOI18N
-                    Botoes[i2][i].setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-                    Botoes[i2][i].setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-                    Botoes[i2][i].setRolloverEnabled(false);
-                    Botoes[i2][i].setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/verdadeiro.png"))); // NOI18N
+                    
+                    //================ BOTOES ================
+                    if("UNICO".equals(o.getString("tipo"))){
+                        JSONObject PegarDadosBt = o;
+                        PegarDadosBt.put("i1", i2);
+                        PegarDadosBt.put("i2", i);
+                        RegistroBotoes.put(PegarDadosBt);
 
-                    Botoes[i2][i].addItemListener(new ItemListener() {
-                        public void itemStateChanged(ItemEvent ev) {
-                           AttCrimes();
+                        Botoes[i2][i] = new JToggleButton(o.getString("texto"));
+                        Botoes[i2][i].setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/falso.png"))); // NOI18N
+                        Botoes[i2][i].setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                        Botoes[i2][i].setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+                        Botoes[i2][i].setRolloverEnabled(false);
+                        Botoes[i2][i].setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/verdadeiro.png"))); // NOI18N
+
+                        Botoes[i2][i].addItemListener(new ItemListener() {
+                            public void itemStateChanged(ItemEvent ev) {
+                               AttCrimes();
+                            }
+                        });
+                        if(o.getString("texto").length() > 27){
+                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 8));
+                        }else if(o.getString("texto").length() > 24){
+                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 9));
+                        }else if(o.getString("texto").length() > 20){
+                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 10));
+                        }else if(o.getString("texto").length() > 15){
+                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 11));
+                        }else if(o.getString("texto").length() > 9){
+                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 12));
                         }
-                    });
-                    //System.out.println("o.getString(\"texto\").length(): "+o.getString("texto").length());
-                    /*if(o.getString("texto").length() > 33){
-                        Botoes[i].setFont(new java.awt.Font("Tahoma", 0, 7));
-                    }else*/ if(o.getString("texto").length() > 27){
-                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 8));
-                    }else if(o.getString("texto").length() > 24){
-                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 9));
-                    }else if(o.getString("texto").length() > 20){
-                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 10));
-                    }else if(o.getString("texto").length() > 15){
-                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 11));
-                    }else if(o.getString("texto").length() > 9){
-                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 12));
+                        Botoes[i2][i].setBounds(3, 3, 214, 39);
+                        container2.add( Botoes[i2][i] );
+                    //=========================================
+                    }else{
+                        JSONObject PegarDadosBt = o;
+                        PegarDadosBt.put("i1", i2);
+                        PegarDadosBt.put("i2", i);
+                        RegistroInputs.put(PegarDadosBt);
+                        /*Textos[i2][i] = new JLabel(o.getString("texto"));//new javax.swing.JLabel();
+                        Textos[i2][i].setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+                        Textos[i2][i].setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+                        Textos[i2][i].setBounds(3, 3, 214, 39);
+                        container2.add( Textos[i2][i] );*/
+                        
+                        InputText[i2][i] = new JTextField(o.getString("texto"));
+                        //InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 16));
+                        InputText[i2][i].setHorizontalAlignment(javax.swing.JTextField.CENTER);
+                        
+                        InputText[i2][i].setBounds(3, 3, 214, 39);
+                        
+                        if(o.getString("texto").length() > 27){
+                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 8));
+                        }else if(o.getString("texto").length() > 24){
+                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 9));
+                        }else if(o.getString("texto").length() > 20){
+                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 10));
+                        }else if(o.getString("texto").length() > 15){
+                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 11));
+                        }else{
+                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 12));
+                        }
+                        
+                        InputText[i2][i].addKeyListener(new KeyAdapter() {
+                            public void keyTyped(KeyEvent e) {
+                                char c = e.getKeyChar();
+                                String TextoGet = InputText[As2][As].getText();
+                                if (!((c >= '0') && (c <= '9') ||
+                                    (c == KeyEvent.VK_BACK_SPACE) ||
+                                    (c == KeyEvent.VK_DELETE)) ||
+                                    (TextoGet.length() > 8)) {
+                                  getToolkit().beep();
+                                  e.consume();
+                                }
+                                System.out.println("TextoGet.length(): "+TextoGet.length());
+                            }
+                            public void keyReleased(java.awt.event.KeyEvent evt) {
+                                AttCrimes();
+                            }
+                         });
+                        
+                        InputText[i2][i].addFocusListener(new FocusListener() {
+                            @Override
+                            public void focusGained(FocusEvent e) {
+                                if (InputText[As2][As].getText().equals(o.getString("texto"))) {
+                                    InputText[As2][As].setText("");
+                                    InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 16));
+                                    //InputText[As2][As].setForeground(Color.BLACK);
+                                }
+                            }
+                            @Override
+                            public void focusLost(FocusEvent e) {
+                                if (InputText[As2][As].getText().isEmpty()) {
+                                    //InputText[As2][As].setForeground(Color.GRAY);
+                                    InputText[As2][As].setText(o.getString("texto"));
+                                    
+                                    if(o.getString("texto").length() > 27){
+                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 8));
+                                    }else if(o.getString("texto").length() > 24){
+                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 9));
+                                    }else if(o.getString("texto").length() > 20){
+                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 10));
+                                    }else if(o.getString("texto").length() > 15){
+                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 11));
+                                    }else{
+                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 12));
+                                    }
+                                }
+                            }
+                        });
+                        container2.add( InputText[i2][i] );
                     }
-
-
-                    //Botoes[i].setBounds(PadraoX+160, 0, 35, 35);
-                    Botoes[i2][i].setBounds(3, 3, 214, 39);
-
-                    container2.add( Botoes[i2][i] );
-
-                    //System.out.println("o.toString: "+o.toString());
+                    
+                    
+                    
                     ContagemLimite++;
                     if(ContagemLimite>=LimiteQuadro){
                         ContagemLimite=0;
@@ -243,6 +323,11 @@ public class Prisoes extends javax.swing.JFrame {
     public void AttCrimes(){
         int MultaTotal = 0;
         int MesesTotal = 0;
+        String StrMeses = "N/A";
+        String StrMultas = "N/A";
+        
+        String CrimesExtenso = "N/A";
+        int ContageCrimes = 0;
         for(int i = 0; i < RegistroBotoes.length(); i++){
             JSONObject obj = RegistroBotoes.getJSONObject(i);
             int ir1 = obj.getInt("i1");
@@ -251,14 +336,43 @@ public class Prisoes extends javax.swing.JFrame {
                 //System.out.println("Nome do crime: "+obj.getString("texto"));
                 MultaTotal+=obj.getInt("multa");
                 MesesTotal+=obj.getInt("meses");
+                if(ContageCrimes == 0){
+                    CrimesExtenso = obj.getString("texto");
+                }else{
+                    CrimesExtenso += " + "+obj.getString("texto");
+                }
+                ContageCrimes++;
             }
         }
-        PenaTotal.setText("Multa: R$"+MultaTotal+" / Meses: "+MesesTotal);
+        for(int i = 0; i < RegistroInputs.length(); i++){
+            JSONObject obj = RegistroInputs.getJSONObject(i);
+            int ir1 = obj.getInt("i1");
+            int ir2 = obj.getInt("i2");
+            String TextoInput = InputText[ir1][ir2].getText();
+            if(!TextoInput.isEmpty() && !TextoInput.equals(obj.getString("texto"))){
+                int ValorInput = Integer.parseInt(TextoInput);
+                System.out.println("TextoInput: "+Integer.parseInt(TextoInput));
+                if(ValorInput > 0){
+                    MultaTotal+=(obj.getInt("multa")*ValorInput);
+                    MesesTotal+=(obj.getInt("meses")*ValorInput);
+                    if(ContageCrimes == 0){
+                    CrimesExtenso = obj.getString("texto")+"[x"+ValorInput+"]";
+                    }else{
+                        CrimesExtenso += " + "+obj.getString("texto")+"[x"+ValorInput+"]";
+                    }
+                    ContageCrimes++;
+                }
+            }
+        }
+        if(MultaTotal>0) StrMeses = "R$"+String.format("%,d", MultaTotal);
+        if(MesesTotal>0) StrMultas = MesesTotal+" meses";
+        info_Pena1S.setText(StrMeses);
+        info_Pena2S.setText(StrMultas);
+        
+        info_CrimesS.setText(CrimesExtenso);
     }
     
     public void ResetarBotoes(){
-        int MultaTotal = 0;
-        int MesesTotal = 0;
         for(int i = 0; i < RegistroBotoes.length(); i++){
             JSONObject obj = RegistroBotoes.getJSONObject(i);
             int ir1 = obj.getInt("i1");
@@ -267,7 +381,6 @@ public class Prisoes extends javax.swing.JFrame {
                 Botoes[ir1][ir2].setSelected(false);
             }
         }
-        PenaTotal.setText("Multa: R$"+MultaTotal+" / Meses: "+MesesTotal);
     }
     
     public JSONObject UsuarioPorID(int user_id){
@@ -541,13 +654,15 @@ public class Prisoes extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         PainelDetalhes = new javax.swing.JPanel();
-        CrimesCometidos = new javax.swing.JTextField();
-        PenaTotal = new javax.swing.JTextField();
-        des_Nome1 = new javax.swing.JLabel();
-        des_Nome2 = new javax.swing.JLabel();
-        des_Nome3 = new javax.swing.JLabel();
-        PenaTotal1 = new javax.swing.JTextField();
+        info_CrimesS = new javax.swing.JTextField();
+        info_Pena1S = new javax.swing.JLabel();
+        info_Crimes = new javax.swing.JLabel();
+        info_Comando = new javax.swing.JLabel();
+        info_ComandoS = new javax.swing.JTextField();
         TimeAgora = new javax.swing.JLabel();
+        info_Pena1 = new javax.swing.JLabel();
+        info_Pena2 = new javax.swing.JLabel();
+        info_Pena2S = new javax.swing.JLabel();
         PesquisarPainel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         txtID = new javax.swing.JTextField();
@@ -578,8 +693,11 @@ public class Prisoes extends javax.swing.JFrame {
         des_ProcuradoS = new javax.swing.JLabel();
         procuradoBt = new javax.swing.JButton();
         des_Info = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        SalvarBt = new javax.swing.JButton();
         ResetarBt = new javax.swing.JButton();
+        SalvarBt1 = new javax.swing.JButton();
+        ResetarBt1 = new javax.swing.JButton();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -613,38 +731,45 @@ public class Prisoes extends javax.swing.JFrame {
 
         PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder("INFORMAÇÕES PENAL"));
 
-        CrimesCometidos.setEditable(false);
-        CrimesCometidos.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        CrimesCometidos.setForeground(new java.awt.Color(153, 153, 255));
+        info_CrimesS.setEditable(false);
+        info_CrimesS.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        info_CrimesS.setForeground(new java.awt.Color(153, 153, 255));
 
-        PenaTotal.setEditable(false);
-        PenaTotal.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        PenaTotal.setForeground(new java.awt.Color(153, 153, 255));
-        PenaTotal.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        PenaTotal.setText("ASDASDASDASDASD");
+        info_Pena1S.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        info_Pena1S.setForeground(new java.awt.Color(153, 153, 255));
+        info_Pena1S.setText("CARREGANDO");
 
-        des_Nome1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        des_Nome1.setForeground(new java.awt.Color(255, 255, 255));
-        des_Nome1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        des_Nome1.setText("PENA TOTAL:");
+        info_Crimes.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        info_Crimes.setForeground(new java.awt.Color(255, 255, 255));
+        info_Crimes.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        info_Crimes.setText("CRIMES COMETIDOS:");
 
-        des_Nome2.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        des_Nome2.setForeground(new java.awt.Color(255, 255, 255));
-        des_Nome2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        des_Nome2.setText("CRIMES COMETIDOS:");
+        info_Comando.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        info_Comando.setForeground(new java.awt.Color(255, 255, 255));
+        info_Comando.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        info_Comando.setText("COMANDOS:");
 
-        des_Nome3.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        des_Nome3.setForeground(new java.awt.Color(255, 255, 255));
-        des_Nome3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        des_Nome3.setText("COMANDOS:");
-
-        PenaTotal1.setEditable(false);
-        PenaTotal1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        PenaTotal1.setForeground(new java.awt.Color(153, 153, 255));
-        PenaTotal1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        info_ComandoS.setEditable(false);
+        info_ComandoS.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        info_ComandoS.setForeground(new java.awt.Color(153, 153, 255));
+        info_ComandoS.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         TimeAgora.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         TimeAgora.setText(" ");
+
+        info_Pena1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        info_Pena1.setForeground(new java.awt.Color(255, 255, 255));
+        info_Pena1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        info_Pena1.setText("MULTA TOTAL:");
+
+        info_Pena2.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        info_Pena2.setForeground(new java.awt.Color(255, 255, 255));
+        info_Pena2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        info_Pena2.setText("PENA TOTAL:");
+
+        info_Pena2S.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        info_Pena2S.setForeground(new java.awt.Color(153, 153, 255));
+        info_Pena2S.setText("CARREGANDO");
 
         javax.swing.GroupLayout PainelDetalhesLayout = new javax.swing.GroupLayout(PainelDetalhes);
         PainelDetalhes.setLayout(PainelDetalhesLayout);
@@ -656,17 +781,21 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(TimeAgora, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PainelDetalhesLayout.createSequentialGroup()
                         .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(des_Nome2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(des_Nome1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(info_Crimes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(info_Pena1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(PainelDetalhesLayout.createSequentialGroup()
-                                .addComponent(PenaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(des_Nome3, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(info_Pena1S, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(info_Pena2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(PenaTotal1))
-                            .addComponent(CrimesCometidos))))
+                                .addComponent(info_Pena2S, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(info_Comando, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(info_ComandoS))
+                            .addComponent(info_CrimesS))))
                 .addContainerGap())
         );
         PainelDetalhesLayout.setVerticalGroup(
@@ -674,14 +803,16 @@ public class Prisoes extends javax.swing.JFrame {
             .addGroup(PainelDetalhesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(CrimesCometidos, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-                    .addComponent(des_Nome2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(info_CrimesS, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .addComponent(info_Crimes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(PenaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(des_Nome1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(PenaTotal1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(des_Nome3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(info_Pena1S, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info_ComandoS, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info_Comando, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info_Pena1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info_Pena2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info_Pena2S, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TimeAgora)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -953,11 +1084,11 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(des_Multa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(des_RegistroS, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(des_ReuS, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(des_Reu, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(des_Registro, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(des_RegistroS, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(des_Registro, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(des_ProcuradoS, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
@@ -984,8 +1115,8 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        jButton1.setText("REGISTRAR");
+        SalvarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        SalvarBt.setText("REGISTRAR PRISÃO");
 
         ResetarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         ResetarBt.setText("RESETAR");
@@ -995,6 +1126,44 @@ public class Prisoes extends javax.swing.JFrame {
             }
         });
 
+        SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        SalvarBt1.setText("REGISTRAR PROCURADO");
+
+        ResetarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        ResetarBt1.setText("COPIAR DISCORD");
+        ResetarBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ResetarBt1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(ResetarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ResetarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1002,16 +1171,12 @@ public class Prisoes extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
                     .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1024,13 +1189,11 @@ public class Prisoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1090,6 +1253,10 @@ public class Prisoes extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtPlacaKeyPressed
 
+    private void ResetarBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ResetarBt1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1126,13 +1293,13 @@ public class Prisoes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField CrimesCometidos;
     private javax.swing.JPanel DetalhesPainel;
     private javax.swing.JPanel PainelDetalhes;
-    private javax.swing.JTextField PenaTotal;
-    private javax.swing.JTextField PenaTotal1;
     private javax.swing.JPanel PesquisarPainel;
     private javax.swing.JButton ResetarBt;
+    private javax.swing.JButton ResetarBt1;
+    private javax.swing.JButton SalvarBt;
+    private javax.swing.JButton SalvarBt1;
     private javax.swing.JLabel TimeAgora;
     private javax.swing.JLabel des_Idade;
     private javax.swing.JLabel des_IdadeS;
@@ -1140,9 +1307,6 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JLabel des_Multa;
     private javax.swing.JLabel des_MultaS;
     private javax.swing.JLabel des_Nome;
-    private javax.swing.JLabel des_Nome1;
-    private javax.swing.JLabel des_Nome2;
-    private javax.swing.JLabel des_Nome3;
     private javax.swing.JLabel des_NomeS;
     private javax.swing.JLabel des_Passagem;
     private javax.swing.JLabel des_PassagemS;
@@ -1152,7 +1316,14 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JLabel des_RegistroS;
     private javax.swing.JLabel des_Reu;
     private javax.swing.JLabel des_ReuS;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel info_Comando;
+    private javax.swing.JTextField info_ComandoS;
+    private javax.swing.JLabel info_Crimes;
+    private javax.swing.JTextField info_CrimesS;
+    private javax.swing.JLabel info_Pena1;
+    private javax.swing.JLabel info_Pena1S;
+    private javax.swing.JLabel info_Pena2;
+    private javax.swing.JLabel info_Pena2S;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -1164,6 +1335,7 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
