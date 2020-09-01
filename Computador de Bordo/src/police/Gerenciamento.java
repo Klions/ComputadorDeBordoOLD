@@ -11,7 +11,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,6 +26,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import static police.InicializadorMain.discordDBarray;
+import static police.InicializadorMain.hierarquiaDBarray;
+import static police.InicializadorMain.prisoesDBarray;
+import static police.InicializadorMain.procuradosDBarray;
+import static police.InicializadorMain.usuarioMyDBarray;
+import static police.InicializadorMain.usuariosDBarray;
 import police.configs.ConexaoDB;
 import police.configs.Usuario;
 
@@ -49,6 +58,8 @@ public class Gerenciamento extends javax.swing.JFrame {
     
     int TotalIdsTab = 0;
     
+    int SalvarTime = 0;
+    
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     public Gerenciamento() {
@@ -56,6 +67,25 @@ public class Gerenciamento extends javax.swing.JFrame {
         PegarDB();
         //AdicionarBotoes();
         //jTable1.setTransferHandler(new TableRowTransferHandler(jTable1)); 
+        
+        new Timer().scheduleAtFixedRate(new TimerTask(){
+            @Override
+            public void run(){
+                if(SalvarTime > 0){
+                    SalvarDados.setEnabled(false);
+                    ResetarTudo.setEnabled(false);
+                    
+                    SalvarDados.setText("SALVAR ("+SalvarTime+")");
+                    ResetarTudo.setText("RESETAR ("+SalvarTime+")");
+                    SalvarTime--;
+                }else{
+                    SalvarDados.setEnabled(true);
+                    ResetarTudo.setEnabled(true);
+                    SalvarDados.setText("SALVAR");
+                    ResetarTudo.setText("RESETAR");
+                }
+            }
+        },0,1000);
     }
     
     
@@ -69,6 +99,11 @@ public class Gerenciamento extends javax.swing.JFrame {
             CrimesRegistro = new JSONArray(o2.getString("crimes"));
             contageGetCrimes = o2.getInt("id");
         }
+        novo_CategoriasCrimes = CategoriasCrimes;
+        novo_CrimesRegistro = CrimesRegistro;
+        
+        AtualizarJanelas();
+        SalvarTime=20;
         /*
         JSONObject getTemporario10 = new JSONObject();
         getTemporario10.put("id", 1);
@@ -126,10 +161,6 @@ public class Gerenciamento extends javax.swing.JFrame {
         getTemporario2.put("meses", 5);
         CrimesRegistro.put(getTemporario2);
         */
-        novo_CategoriasCrimes = CategoriasCrimes;
-        novo_CrimesRegistro = CrimesRegistro;
-        
-        AtualizarJanelas();
     }
     //private javax.swing.JLabel Textos[];
     //private javax.swing.JToggleButton Botoes[];
@@ -143,7 +174,11 @@ public class Gerenciamento extends javax.swing.JFrame {
     JButton[] BotoesRem = new JButton[10];
     
     JTextField[] RenameTabc = new JTextField[10];
-    JButton[] RenameTabBtc = new JButton[10];;
+    JButton[] RenameTabBtc = new JButton[10];
+    
+    JButton[] TipoEscolha = new JButton[10];
+    
+    //JComboBox[] TipoEscolha = new JComboBox[10];
     
     public void AdicionarBotoes(){
         RegistroTabelas = new JSONArray();
@@ -175,15 +210,21 @@ public class Gerenciamento extends javax.swing.JFrame {
             Tabelas[i2].setModel(new javax.swing.table.DefaultTableModel(
                 null,
                 new String [] {
-                    "NOME DO CRIME", "VALOR DA MULTA", "PENA EM MESES"
+                    "NOME DO CRIME", "VALOR DA MULTA", "PENA EM MESES", "TIPO"
                 }
             ) {
                 Class[] types = new Class [] {
-                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                };
+                boolean[] canEdit = new boolean [] {
+                    true, true, true, false
                 };
 
                 public Class getColumnClass(int columnIndex) {
                     return types [columnIndex];
+                }
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit [columnIndex];
                 }
             });
             Tabelas[i2].putClientProperty("terminateEditOnFocusLost", true);
@@ -192,7 +233,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             for(int i = 0; i < novo_CrimesRegistro.length(); i++){
                 JSONObject o = novo_CrimesRegistro.getJSONObject(i);
                 if(o.getInt("categoria") == o2.getInt("id")){
-                    modelTable.addRow(new Object[]{o.getString("texto"), o.getInt("multa"), o.getInt("meses")});
+                    modelTable.addRow(new Object[]{o.getString("texto"), o.getInt("multa"), o.getInt("meses"), o.getString("tipo")});
                 }
             }
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -200,6 +241,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             Tabelas[i2].getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
             Tabelas[i2].getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
             Tabelas[i2].getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+            Tabelas[i2].getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
             
             ((DefaultTableCellRenderer)Tabelas[i2].getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
             
@@ -218,19 +260,70 @@ public class Gerenciamento extends javax.swing.JFrame {
                         //tce.stopCellEditing();
                 }
             });
+            TipoEscolha[i2] = new JButton();
+            TipoEscolha[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+            TipoEscolha[i2].setText("MUDAR TIPO");
+            TipoEscolha[i2].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+            
+            TipoEscolha[i2].addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    int index = Tabelas[As].getSelectedRow();
+                    if(index >= 0){
+                        String ValorAtualTabela = Tabelas[As].getValueAt(index, 3)+"";
+                        if(null != ValorAtualTabela)switch (ValorAtualTabela) {
+                            case "UNICO":
+                                ValorAtualTabela = "MULTIPLO";
+                                break;
+                            case "MULTIPLO":
+                                ValorAtualTabela = "UNICO";
+                                break;
+                            default:
+                                ValorAtualTabela = "UNICO";
+                                break;
+                        }
+                        Tabelas[As].setValueAt(ValorAtualTabela, index, 3);
+                    }
+                }
+            });
+            /*
+            TipoEscolha[i2] = new JComboBox();
+            TipoEscolha[i2].setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "UNICO", "QUANTIDADE" }));
+            
+            TipoEscolha[i2].addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    //TipoEscolha[As].getSelectedIndex();
+                    int index = Tabelas[As].getSelectedRow();
+                    if(index >= 0){
+                        String ValorAtualTabela = Tabelas[As].getValueAt(index, 3)+"";
+                        if(TipoEscolha[As].getSelectedItem() != ValorAtualTabela){
+                            //Tabelas[As].setValueAt(TipoEscolha[As].getSelectedItem(), index, 3);
+                            System.out.println("addActionListener");
+                        }
+                    }
+                    
+                    
+                }
+            });*/
+            
             Tabelas[i2].addKeyListener(new java.awt.event.KeyAdapter() {
                 public void keyPressed(java.awt.event.KeyEvent evt) {
                     int index = Tabelas[As].getSelectedRow();
                     
+                    if(index >= 0){
+                        //TipoEscolha[As].setSelectedItem(Tabelas[As].getValueAt(index, 3));
+                        //System.out.println("index: "+index+" / Tabelas[As].getValueAt(index, 3): "+Tabelas[As].getValueAt(index, 3));
+                    }
                     pressedKeys.add(evt.getKeyCode());
                     if (!pressedKeys.isEmpty()) {
                         if (pressedKeys.contains(KeyEvent.VK_SHIFT)) {
                             int row = Tabelas[As].getSelectedRow();
                             if(row >= 0){
+                                String NomeRow = Tabelas[As].getValueAt(row, 0)+"";
+                                if("".equals(NomeRow)) NomeRow = "Linha "+(row+1);
                                 if (pressedKeys.contains(KeyEvent.VK_UP)) {
                                     //System.out.println("SHIFT + UP");
                                     if(index > 0){
-                                        InfoDB1.setText(Tabelas[As].getValueAt(row, 0)+" movido para cima");
+                                        InfoDB1.setText(NomeRow+" movido para cima");
                                         model.moveRow(index, index, index - 1);
                                         PegarValoresTabela();
                                     }
@@ -239,13 +332,13 @@ public class Gerenciamento extends javax.swing.JFrame {
                                 if (pressedKeys.contains(KeyEvent.VK_DOWN)) {
                                     //System.out.println("SHIFT + DOWN");
                                     if(index < model.getRowCount() - 1){
-                                        InfoDB1.setText(Tabelas[As].getValueAt(row, 0)+" movido para baixo");
+                                        InfoDB1.setText(NomeRow+" movido para baixo");
                                         model.moveRow(index, index, index + 1);
                                         PegarValoresTabela();
                                     }
                                 }
                                 if (pressedKeys.contains(KeyEvent.VK_DELETE)) {
-                                    InfoDB1.setText(Tabelas[As].getValueAt(row, 0)+" foi removido");
+                                    InfoDB1.setText(NomeRow+" foi removido");
                                     model.removeRow( row );
                                     if(model.getRowCount() > 0){
                                         if(index < model.getRowCount() - 1 || index == model.getRowCount() - 1){
@@ -262,7 +355,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                                 //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
                                 if(Tabelas[As].getRowCount() < 30){
                                     InfoDB1.setText("Nova linha foi adicionada");
-                                    model.addRow(new Object[]{"", 0, 0});
+                                    model.addRow(new Object[]{"", 0, 0,"UNICO"});
                                     Tabelas[As].setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
                                 }
                             }
@@ -273,6 +366,18 @@ public class Gerenciamento extends javax.swing.JFrame {
                     pressedKeys.remove(evt.getKeyCode());
                 }
             });
+            
+            Tabelas[i2].addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int index = Tabelas[As].getSelectedRow();
+                    
+                    if(index >= 0){
+                        //TipoEscolha[As].setSelectedItem(Tabelas[As].getValueAt(index, 3));
+                        //System.out.println("index: "+index+" / Tabelas[As].getValueAt(index, 3): "+Tabelas[As].getValueAt(index, 3));
+                    }
+                }
+            });
+            
             ScrollPainel[i2].setViewportView(Tabelas[i2]);
             
             BotoesAdd[i2] = new JButton("ADICIONAR CRIME");
@@ -286,7 +391,7 @@ public class Gerenciamento extends javax.swing.JFrame {
 
             BotoesAdd[i2].addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    model.addRow(new Object[]{"", 0, 0});
+                    model.addRow(new Object[]{"", 0, 0, "UNICO"});
                 }
             });
             
@@ -344,12 +449,12 @@ public class Gerenciamento extends javax.swing.JFrame {
                     }
                 }
             });
-            
+        
             int index3 = Tabelas[i2].getSelectedRow();
             if(model.getRowCount() > 0){
                 if(index3 < 0) Tabelas[i2].setRowSelectionInterval(0, 0);
             }else{
-                model.addRow(new Object[]{"", 0, 0});
+                model.addRow(new Object[]{"", 0, 0, "UNICO"});
                 Tabelas[i2].setRowSelectionInterval(0, 0);
             }
             //Tabelas[i2].requestFocus();
@@ -371,6 +476,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(RenameTabBtc[i2])
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(TipoEscolha[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(BotoesAdd[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addContainerGap())
             );
@@ -381,11 +488,12 @@ public class Gerenciamento extends javax.swing.JFrame {
                     .addComponent(ScrollPainel[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(BotoesAdd[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(BotoesRem[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(BotoesAdd[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(BotoesRem[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             
-                        .addComponent(RenameTabBtc[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(RenameTabc[i2]))
+                        .addComponent(RenameTabBtc[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(RenameTabc[i2])
+                        .addComponent(TipoEscolha[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             
@@ -426,6 +534,10 @@ public class Gerenciamento extends javax.swing.JFrame {
                             getTemporario2.put("multa", Tabelas[ir].getValueAt(r, c));
                         case 2:
                             getTemporario2.put("meses", Tabelas[ir].getValueAt(r, c));
+                        case 3:
+                            String TipoValor = Tabelas[ir].getValueAt(r, c)+"";
+                            if("".equals(TipoValor)) TipoValor = "UNICO";
+                            getTemporario2.put("tipo", TipoValor);
                     }
                 }
                 getTemporario2.put("categoria", obj.getInt("id"));
@@ -480,6 +592,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         RenameTab = new javax.swing.JTextField();
         RenameTabBt = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
         PainelDetalhes = new javax.swing.JPanel();
         SalvarDados = new javax.swing.JButton();
         ResetarTudo = new javax.swing.JButton();
@@ -511,27 +624,39 @@ public class Gerenciamento extends javax.swing.JFrame {
         jTable1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"CRIME 1",  new Integer(1500),  new Integer(11111)},
-                {"CRIME 2",  new Integer(2500),  new Integer(2222222)},
-                {"CRIME 3",  new Integer(5000),  new Integer(333333333)},
-                {"CRIME 4",  new Integer(10000),  new Integer(444444444)}
+                {"CRIME 1",  new Integer(1500),  new Integer(11111), null},
+                {"CRIME 2",  new Integer(2500),  new Integer(2222222), null},
+                {"CRIME 3",  new Integer(5000),  new Integer(333333333), null},
+                {"CRIME 4",  new Integer(10000),  new Integer(444444444), null}
             },
             new String [] {
-                "NOME DO CRIME", "MULTA", "PENA EM MESES"
+                "NOME DO CRIME", "MULTA", "PENA EM MESES", "PREENCHIMENTO"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, true, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.setShowGrid(true);
         jTable1.setUpdateSelectionOnSort(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -559,6 +684,13 @@ public class Gerenciamento extends javax.swing.JFrame {
         RenameTabBt.setText("RENOMEAR CATEGORIA");
         RenameTabBt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "UNICO", "QUANTIDADE" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -574,6 +706,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(RenameTabBt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -584,11 +718,12 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RenameTabBt, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RenameTab))
-                .addContainerGap())
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(RenameTabBt, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(RenameTab)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab2", jPanel1);
@@ -604,7 +739,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         });
 
         ResetarTudo.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        ResetarTudo.setText("RESETAR TUDO");
+        ResetarTudo.setText("RESETAR");
         ResetarTudo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ResetarTudoActionPerformed(evt);
@@ -622,10 +757,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
-        InfoDB.setText(" ");
-
         InfoDB1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        InfoDB1.setText(" ");
 
         javax.swing.GroupLayout PainelDetalhesLayout = new javax.swing.GroupLayout(PainelDetalhes);
         PainelDetalhes.setLayout(PainelDetalhesLayout);
@@ -635,12 +767,12 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PainelDetalhesLayout.createSequentialGroup()
-                        .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(AddCategoria)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ResetarTudo, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(SalvarDados, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -659,11 +791,10 @@ public class Gerenciamento extends javax.swing.JFrame {
                         .addComponent(ResetarTudo, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(PainelDetalhesLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(AddCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(AddCategoria, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(InfoDB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -692,7 +823,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -763,6 +894,14 @@ public class Gerenciamento extends javax.swing.JFrame {
         InfoDB1.setText("Salvo com sucesso!");
     }//GEN-LAST:event_SalvarDadosActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTable1MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -812,6 +951,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     private javax.swing.JTextField TxtCategoria;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
