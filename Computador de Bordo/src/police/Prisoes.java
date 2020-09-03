@@ -50,6 +50,8 @@ public class Prisoes extends javax.swing.JFrame {
     JSONArray blacklistDBarray = new JSONArray();
     JSONArray procuradosDBarray = new JSONArray();
     
+    String CrimesDiscordFormat = "";
+    
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     public Prisoes() {
@@ -224,7 +226,7 @@ public class Prisoes extends javax.swing.JFrame {
                                   getToolkit().beep();
                                   e.consume();
                                 }
-                                System.out.println("TextoGet.length(): "+TextoGet.length());
+                                //System.out.println("TextoGet.length(): "+TextoGet.length());
                             }
                             public void keyReleased(java.awt.event.KeyEvent evt) {
                                 AttCrimes();
@@ -328,6 +330,7 @@ public class Prisoes extends javax.swing.JFrame {
         
         String CrimesExtenso = "N/A";
         int ContageCrimes = 0;
+        CrimesDiscordFormat = "";
         for(int i = 0; i < RegistroBotoes.length(); i++){
             JSONObject obj = RegistroBotoes.getJSONObject(i);
             int ir1 = obj.getInt("i1");
@@ -341,6 +344,7 @@ public class Prisoes extends javax.swing.JFrame {
                 }else{
                     CrimesExtenso += " + "+obj.getString("texto");
                 }
+                CrimesDiscordFormat="\n* "+obj.getString("texto");
                 ContageCrimes++;
             }
         }
@@ -351,15 +355,16 @@ public class Prisoes extends javax.swing.JFrame {
             String TextoInput = InputText[ir1][ir2].getText();
             if(!TextoInput.isEmpty() && !TextoInput.equals(obj.getString("texto"))){
                 int ValorInput = Integer.parseInt(TextoInput);
-                System.out.println("TextoInput: "+Integer.parseInt(TextoInput));
+                //System.out.println("TextoInput: "+Integer.parseInt(TextoInput));
                 if(ValorInput > 0){
                     MultaTotal+=(obj.getInt("multa")*ValorInput);
                     MesesTotal+=(obj.getInt("meses")*ValorInput);
                     if(ContageCrimes == 0){
-                    CrimesExtenso = obj.getString("texto")+"[x"+ValorInput+"]";
+                        CrimesExtenso = obj.getString("texto")+" (x"+ValorInput+")";
                     }else{
-                        CrimesExtenso += " + "+obj.getString("texto")+"[x"+ValorInput+"]";
+                        CrimesExtenso += " + "+obj.getString("texto")+" (x"+ValorInput+")";
                     }
+                    CrimesDiscordFormat="\n* "+obj.getString("texto")+" (x"+ValorInput+")";
                     ContageCrimes++;
                 }
             }
@@ -697,7 +702,7 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt = new javax.swing.JButton();
         ResetarBt = new javax.swing.JButton();
         SalvarBt1 = new javax.swing.JButton();
-        ResetarBt1 = new javax.swing.JButton();
+        CopiarDiscordBt = new javax.swing.JButton();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -1129,11 +1134,11 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt1.setText("REGISTRAR PROCURADO");
 
-        ResetarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        ResetarBt1.setText("COPIAR DISCORD");
-        ResetarBt1.addActionListener(new java.awt.event.ActionListener() {
+        CopiarDiscordBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        CopiarDiscordBt.setText("COPIAR DISCORD");
+        CopiarDiscordBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ResetarBt1ActionPerformed(evt);
+                CopiarDiscordBtActionPerformed(evt);
             }
         });
 
@@ -1145,7 +1150,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(ResetarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -1160,7 +1165,7 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ResetarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1253,9 +1258,9 @@ public class Prisoes extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtPlacaKeyPressed
 
-    private void ResetarBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarBt1ActionPerformed
+    private void CopiarDiscordBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarDiscordBtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ResetarBt1ActionPerformed
+    }//GEN-LAST:event_CopiarDiscordBtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1293,11 +1298,11 @@ public class Prisoes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton CopiarDiscordBt;
     private javax.swing.JPanel DetalhesPainel;
     private javax.swing.JPanel PainelDetalhes;
     private javax.swing.JPanel PesquisarPainel;
     private javax.swing.JButton ResetarBt;
-    private javax.swing.JButton ResetarBt1;
     private javax.swing.JButton SalvarBt;
     private javax.swing.JButton SalvarBt1;
     private javax.swing.JLabel TimeAgora;

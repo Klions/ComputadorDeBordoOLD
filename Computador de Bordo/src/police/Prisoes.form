@@ -796,7 +796,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="ResetarBt" min="-2" pref="160" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="ResetarBt1" min="-2" pref="160" max="-2" attributes="0"/>
+                  <Component id="CopiarDiscordBt" min="-2" pref="160" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="SalvarBt1" min="-2" pref="195" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -813,7 +813,7 @@
                       <Component id="SalvarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="ResetarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="SalvarBt1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-                      <Component id="ResetarBt1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="CopiarDiscordBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -848,7 +848,7 @@
             <Property name="text" type="java.lang.String" value="REGISTRAR PROCURADO"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="ResetarBt1">
+        <Component class="javax.swing.JButton" name="CopiarDiscordBt">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Arial Unicode MS" size="12" style="0"/>
@@ -856,7 +856,7 @@
             <Property name="text" type="java.lang.String" value="COPIAR DISCORD"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarBt1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CopiarDiscordBtActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
