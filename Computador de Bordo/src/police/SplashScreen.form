@@ -31,10 +31,8 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="EscolherCidadePainel" max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="ProgressoPainel" max="32767" attributes="0"/>
-                      <Component id="TituloPainel" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="ProgressoPainel" max="32767" attributes="0"/>
+                  <Component id="TituloPainel" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>

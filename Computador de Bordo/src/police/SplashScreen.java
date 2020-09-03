@@ -42,9 +42,12 @@ public class SplashScreen extends javax.swing.JFrame {
     public boolean Valendo=false;
     public int ContandoMargem=0;
     
+    boolean PegarDados=false;
+    
     JSONArray ServidoresRegistrados = new JSONArray();
     
     JSONArray vrp_users = new JSONArray();
+    JSONArray cb_users = new JSONArray();
     
     public SplashScreen() {
         initComponents();
@@ -129,40 +132,82 @@ public class SplashScreen extends javax.swing.JFrame {
         //if(config.VerificarAtt()) txtAtt.setText("ATUALIZAÇÃO DISPONÍVEL PARA: "+config.getVersao());
         return true;
     }
-    public void Timere (){
+    Timer timer = new Timer();
+    public void Timere(){
         int delay = 500;   // tempo de espera antes da 1ª execução da tarefa.
         int interval = 500;  // intervalo no qual a tarefa será executada.
-        Timer timer = new Timer();
-        Random gerador = new Random();
+        
+        
         timer.scheduleAtFixedRate(new TimerTask() {
           public void run() {
-            //System.out.print("CONTANDO: "+ValorProgresso+ " /////////// ");
-            
-            if(ValorProgresso>0){
-                if(ValorProgresso > ProgressoAtual){
-                    ProgressoAtual+=2+gerador.nextInt(10);
-                }else{
-                    ContandoFalhas++;
-                    //System.out.print("ContandoFalhas: "+ContandoFalhas);
-                }
-            }else{
-                ContandoMargem++;
-            }
-            if(ProgressoAtual>=100){
-                ProgressoAtual=100;
-                ContandoFalhas=0;
-                timer.cancel();
-                //progresso.setIndeterminate(true);
-            }
-            progresso.setValue(ProgressoAtual);
-            if(ContandoFalhas > 36){
-                texto.setText("CONEXÃO EXTREMAMENTE LENTA");
-                if(ContandoFalhas > 60) texto.setText("FINALIZANDO PROGRAMA POR FALTA DE CONEXÃO");
-                if(ContandoFalhas > 70) System.exit(0);
-            }
-            if(Fechar || ContandoMargem > 10)timer.cancel();
+            AttTimer();
           }
         }, delay, interval);
+    }
+    private void AttTimer(){
+        Random gerador = new Random();
+        if(ValorProgresso>0){
+            if(ValorProgresso > ProgressoAtual){
+                ProgressoAtual+=2+gerador.nextInt(10);
+            }else{
+                ContandoFalhas++;
+                //System.out.print("ContandoFalhas: "+ContandoFalhas);
+            }
+        }else{
+            ContandoMargem++;
+        }
+        if(ProgressoAtual>=100){
+            ProgressoAtual=100;
+            ContandoFalhas=0;
+            timer.cancel();
+            //progresso.setIndeterminate(true);
+        }
+        progresso.setValue(ProgressoAtual);
+        if(ContandoFalhas > 36){
+            texto.setText("CONEXÃO EXTREMAMENTE LENTA");
+            if(ContandoFalhas > 60) texto.setText("FINALIZANDO PROGRAMA POR FALTA DE CONEXÃO");
+            if(ContandoFalhas > 70) System.exit(0);
+        }
+        if(PegarDados){
+            PegarDados=false;
+            ProgressoPainel.setVisible(true);
+            EscolherCidadePainel.setVisible(false);
+            this.revalidate();
+            this.repaint();
+            this.pack();
+            ProgressoAtual=ValorProgresso;
+            ValorProgresso=80;
+            progresso.setValue(ProgressoAtual);
+            ContandoFalhas=0;
+            texto.setText("MONTANDO INTERFACE POLICIAL");
+            if(TestarConexaoCidade() && PegarContas()){
+                ProgressoAtual=ValorProgresso;
+                ValorProgresso=90;
+                progresso.setValue(ProgressoAtual);
+                texto.setText("FAZENDO ÚLTIMOS AJUSTES");
+
+                ProgressoAtual=ValorProgresso;
+                progresso.setValue(ProgressoAtual);
+                InicializadorMain.vrp_users = vrp_users;
+                InicializadorMain.cb_users = cb_users;
+                InicializadorMain.AttDbsStatic();
+                ProgressoAtual=100;
+                progresso.setValue(ProgressoAtual);
+                texto.setText("CONCLUINDO");
+
+                Login logins = new Login();
+                logins.setVisible(true);
+                Fechar=true;
+                this.dispose();
+            }else{
+                ProgressoAtual=0;
+                ValorProgresso=0;
+                texto.setText("ERRO NO BANCO DE DADOS DA CIDADE");
+                texto.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+                Fechar=true;
+            }
+        }
+        if(Fechar || ContandoMargem > 10)timer.cancel();
     }
     private static boolean netIsAvailable() {
         try {
@@ -214,7 +259,7 @@ public class SplashScreen extends javax.swing.JFrame {
     public boolean TestarConexaoCidade(){
         ConexaoDB conexao = new ConexaoDB();
         ResultSet resulteSet = null;
-        resulteSet = conexao.GetPersonalizadoCidade("select * from vrp_users ORDER BY id DESC");
+        resulteSet = conexao.GetPersonalizadoCidade("select * from vrp_users ORDER BY id");
         if(resulteSet == null) return false;
         try {
             while (resulteSet.next()) {
@@ -225,6 +270,28 @@ public class SplashScreen extends javax.swing.JFrame {
                 getTemporario2.put("whitelisted", resulteSet.getInt("whitelisted"));
                 getTemporario2.put("banned", resulteSet.getInt("banned"));
                 vrp_users.put(getTemporario2);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean PegarContas(){
+        ConexaoDB conexao = new ConexaoDB();
+        ResultSet resulteSet = null;
+        resulteSet = conexao.GetPersonalizadoCidade("select * from cb_users ORDER BY user_id");
+        if(resulteSet == null) return false;
+        try {
+            while (resulteSet.next()) {
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("user_id", resulteSet.getInt("user_id"));
+                getTemporario2.put("codigo", resulteSet.getString("codigo"));
+                getTemporario2.put("permissao", resulteSet.getInt("permissao"));
+                getTemporario2.put("ultimologin", resulteSet.getString("ultimologin"));
+                cb_users.put(getTemporario2);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -394,46 +461,17 @@ public class SplashScreen extends javax.swing.JFrame {
         int IndexSel = CidadesEscolha.getSelectedIndex();
         String IndexStr = CidadesEscolha.getSelectedItem()+"";
         if(IndexSel >= 0){
-            boolean AchouCity = false;
             String nomedacidade = "";
             for(int i = 0; i < ServidoresRegistrados.length(); i++){
                 JSONObject obj = ServidoresRegistrados.getJSONObject(i);
                 String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
                 if(FormatNome.equals(IndexStr)){
                     SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
-                    AchouCity = true;
                     nomedacidade = obj.getString("nome_cidade");
                 }
             }
-            
-            if(AchouCity){
-                ProgressoPainel.setVisible(true);
-                EscolherCidadePainel.setVisible(false);
-                this.revalidate();
-                this.repaint();
-                this.pack();
-                ProgressoAtual=ValorProgresso;
-                ValorProgresso=80;
-                ContandoFalhas=0;
-                texto.setText("MONTANDO INTERFACE POLICIAL");
-                if(TestarConexaoCidade()){
-                    ProgressoAtual=ValorProgresso;
-                    ValorProgresso=100;
-                    texto.setText("FAZENDO ÚLTIMOS AJUSTES");
-                    ProgressoAtual=100;
-                    texto.setText("CONCLUINDO");
-                    Login logins = new Login();
-                    logins.setVisible(true);
-                    Fechar=true;
-                    InicializadorMain.vrp_users = vrp_users;
-                    this.dispose();
-                }else{
-                    ProgressoAtual=0;
-                    ValorProgresso=0;
-                    texto.setText("ERRO NO BANCO DE DADOS DA CIDADE: "+nomedacidade.toUpperCase());
-                    texto.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-                    Fechar=true;
-                }
+            if(!"".equals(nomedacidade)){
+                PegarDados=true;
             }else{
                 PegarInfoServidor();
             }
@@ -442,6 +480,9 @@ public class SplashScreen extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_CidadeEscolhaBtActionPerformed
 
+    public void AttAAAA(){
+        
+    }
     public boolean SetarBancoServidor(String s_host, String s_banco, String s_user, String s_senha, int server_ide){
         InicializadorMain.host_server = s_host;
         InicializadorMain.banco_server = s_banco;
@@ -486,6 +527,14 @@ public class SplashScreen extends javax.swing.JFrame {
                 new SplashScreen().setVisible(true);
             }
         });
+    }
+    public static void wait(int ms)
+    {
+        try{
+            Thread.sleep(ms);
+        }catch(InterruptedException ex){
+            Thread.currentThread().interrupt();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

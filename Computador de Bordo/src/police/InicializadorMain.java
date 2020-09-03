@@ -7,13 +7,8 @@ package police;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 import org.json.JSONArray;
-import police.configs.DiscordMessage;
 import police.configs.Usuario;
 
 /**
@@ -34,14 +29,13 @@ public class InicializadorMain {
     public static JSONArray procuradosDBarray = new JSONArray();
     public static JSONArray hierarquiaDBarray = new JSONArray();
     
-    public static JSONArray usuarioMyDBarray = new JSONArray();
-    
     public static JSONArray vrp_users = new JSONArray();
+    public static JSONArray cb_users = new JSONArray();
     
-    public static String host_server =  ""; //"158.69.22.55";
-    public static String banco_server = "";//"vrp";
-    public static String user_server =  "";//"ferrazgado";
-    public static String pass_server =  "";//"gadoferraz";
+    public static String host_server =  "";
+    public static String banco_server = "";
+    public static String user_server =  "";
+    public static String pass_server =  "";
     
     public static int server_id =  0;
     
@@ -55,14 +49,15 @@ public class InicializadorMain {
         new Timer().scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run(){
-                Usuario usuarios = new Usuario();
-                usuariosDBarray = usuarios.AttDBUsuarios();
-                discordDBarray = usuarios.AttDBDiscord();
-                prisoesDBarray = usuarios.AttDBPrisoes();
-                procuradosDBarray = usuarios.AttDBProcurados();
-                hierarquiaDBarray = usuarios.AttDBHierarquia();
-                usuarioMyDBarray = usuarios.AttDBUsuarioMy();
-                System.out.println("Banco de dados ATUALIZADO.");
+                if(server_id > 0){
+                    Usuario usuarios = new Usuario();
+                    usuariosDBarray = usuarios.AttDBUsuarios();
+                    discordDBarray = usuarios.AttDBDiscord();
+                    prisoesDBarray = usuarios.AttDBPrisoes();
+                    procuradosDBarray = usuarios.AttDBProcurados();
+                    hierarquiaDBarray = usuarios.AttDBHierarquia();
+                    System.out.println("Banco de dados ATUALIZADO.");
+                }
             }
         },0,60000);
     }
@@ -92,6 +87,15 @@ public class InicializadorMain {
         blacklistDBarray = usuarios.AttBlackList();
         procuradosDBarray = usuarios.AttDBProcurados();
         hierarquiaDBarray = usuarios.AttDBHierarquia();
-        usuarioMyDBarray = usuarios.AttDBUsuarioMy();
+    }
+    
+    public static void AttDbsStatic(){
+        Usuario usuarios = new Usuario();
+        usuariosDBarray = usuarios.AttDBUsuarios();
+        discordDBarray = usuarios.AttDBDiscord();
+        prisoesDBarray = usuarios.AttDBPrisoes();
+        blacklistDBarray = usuarios.AttBlackList();
+        procuradosDBarray = usuarios.AttDBProcurados();
+        hierarquiaDBarray = usuarios.AttDBHierarquia();
     }
 }

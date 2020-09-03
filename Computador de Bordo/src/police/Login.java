@@ -44,6 +44,10 @@ public class Login extends javax.swing.JFrame {
    
     JSONArray usuariosDBarray = new JSONArray();
     JSONArray hierarquiaDBarray = new JSONArray();
+    
+    JSONArray vrp_users = new JSONArray();
+    JSONArray cb_users = new JSONArray();
+    
     Usuario usuarios = new Usuario();
     Config config = new Config();
     InicializadorMain police = new InicializadorMain();
@@ -59,8 +63,9 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         PainelLogin.setBackground(new java.awt.Color(13, 32, 64));
         att.setBackground(new java.awt.Color(222, 82, 82));
+        AttUsers();
         //AttDBUsuarios();
-        AttDBHierarquia();
+        //AttDBHierarquia();
         
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
         if(netIsAvailable()){
@@ -94,6 +99,10 @@ public class Login extends javax.swing.JFrame {
             Entrar.setEnabled(false);
         }
         pack();
+    }
+    public void AttUsers(){
+        vrp_users = InicializadorMain.vrp_users;
+        cb_users = InicializadorMain.cb_users;
     }
     
     public void AttDBUsuarios(){
@@ -186,13 +195,27 @@ public class Login extends javax.swing.JFrame {
         
         
         String passaporteI = Nome.getText();
-        String codigoI = Codigo.getText();
+        String senha = Codigo.getText();
         
-        if("".equals(passaporteI)  || "".equals(codigoI)){
+        if("".equals(passaporteI)  || "".equals(senha)){
             TextoErro("Campos vazios, digite os dados");
             return false;
         }
-        int servidor_id = VerificarConta(Integer.parseInt(passaporteI), codigoI);
+        int passaporte = Integer.parseInt(passaporteI);
+        JSONObject cbuser = cb_userPorID(passaporte);
+        if(cbuser != null){
+            if(passaporte == cbuser.getInt("user_id") && senha.equals(cbuser.getString("codigo"))){
+                TextoErro("FOOOOOI");
+            }else{
+                tentativas++;
+                TextoErro("Senha ou usuário inválido.");
+                return false;
+            }
+        }
+        
+        //String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
+
+        /*int servidor_id = VerificarConta(Integer.parseInt(passaporteI), codigoI);
         System.out.println("servidor_id: "+servidor_id);
         if(servidor_id > 0){
             if(servidor_id > 1){
@@ -215,11 +238,6 @@ public class Login extends javax.swing.JFrame {
                             AttDBHierarquia();
                             return false;
                         }
-                    /*}else{
-                        TextoErro("Erro ao consultar DB da Cidade.");
-                        System.out.println("Erro ao setar servidor da DB: "+PegarInfo);
-                        return false;
-                    }*/
                 }else{
                     TextoErro("Desculpe, me parece que você não possui mais acesso.");
                     AttDBHierarquia();
@@ -237,7 +255,7 @@ public class Login extends javax.swing.JFrame {
             //police.AttDBUsuariosSetDiscord();
             //AttDBUsuarios();
             return false;
-        }
+        }*/
         
         /*
         ResultSet resulteSet = null;
@@ -274,6 +292,22 @@ public class Login extends javax.swing.JFrame {
         //System.out.print(" / getDados: "+pageName);
         //usuario.savePreference("aaaaa");
         return true;
+    }
+    
+    public JSONObject cb_userPorID(int user_id){
+        System.out.print("cb_userPorID("+user_id+")");
+        for(int i = 0; i < cb_users.length(); i++){
+            JSONObject obj = cb_users.getJSONObject(i);
+            if(user_id == obj.getInt("user_id"))return obj;
+        }
+        return null;
+    }
+    public JSONObject vrp_userPorID(int user_id){
+        for(int i = 0; i < vrp_users.length(); i++){
+            JSONObject obj = vrp_users.getJSONObject(i);
+            if(user_id == obj.getInt("id"))return obj;
+        }
+        return null;
     }
     
     public int VerificarConta(int Login, String Senha){

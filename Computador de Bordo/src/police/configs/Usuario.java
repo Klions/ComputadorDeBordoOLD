@@ -174,32 +174,15 @@ public class Usuario {
         
         JSONArray usuariosInfo = new JSONArray();
         
-        ResultSet resulteSet2 = conexao.getDadosBanco("cb_identities", "id");
-        int contage2=0;
+        ResultSet resulteSet2 = conexao.getDadosBanco2("cb_users", "user_id");
         try {
             while (resulteSet2.next()) {
-                contage2++;
                 JSONObject getTempoInfo = new JSONObject();
-                //getTempoInfo.put("id", contage2);
-                getTempoInfo.put("id", resulteSet2.getString("id"));
-                getTempoInfo.put("id_usuario", resulteSet2.getString("user_id"));/*
-                getTemporario.put("nome", resulteSet2.getString("nome"));
-                getTemporario.put("sobrenome", resulteSet2.getString("sobrenome"));
-                getTemporario.put("registration", resulteSet2.getString("phone"));
-                getTemporario.put("phone", resulteSet2.getString("phone"));
-                getTemporario.put("age", resulteSet2.getString("age"));*/
-                getTempoInfo.put("lspd", resulteSet2.getInt("lspd"));
-                getTempoInfo.put("discord", resulteSet2.getString("discord"));
-                getTempoInfo.put("permissao", resulteSet2.getInt("permissao"));
+                getTempoInfo.put("id_usuario", resulteSet2.getInt("user_id"));
                 getTempoInfo.put("codigo", resulteSet2.getString("codigo"));
+                getTempoInfo.put("permissao", resulteSet2.getInt("permissao"));
                 getTempoInfo.put("ultimologin", resulteSet2.getString("ultimologin"));
                 usuariosInfo.put(getTempoInfo);
-                    
-                //System.out.println("+1 / ");
-                //getTemporario2.setJSONArray("animals", values);
-
-                //System.out.print("deu certo!!");
-                
             }
         } catch (SQLException ex) {
             Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
@@ -213,13 +196,10 @@ public class Usuario {
             try {
                 while (resulteSet.next()) {
                     JSONObject getTemporario = new JSONObject();
-                    //JSONObject o = usuariosInfo.getJSONObject(contage);
                     boolean setador=false;
                     for(int i = 0; i < usuariosInfo.length(); i++){
                         JSONObject o = usuariosInfo.getJSONObject(i);
                         if(o.getInt("id_usuario") == resulteSet.getInt("user_id")){
-                            getTemporario.put("lspd", o.getInt("lspd"));
-                            getTemporario.put("discord", o.getString("discord"));
                             getTemporario.put("permissao", o.getInt("permissao"));
                             getTemporario.put("codigo", o.getString("codigo"));
                             getTemporario.put("ultimologin", o.getString("ultimologin"));
@@ -227,8 +207,6 @@ public class Usuario {
                         }
                     }
                     if(!setador){
-                        getTemporario.put("lspd", 0);
-                        getTemporario.put("discord", "");
                         getTemporario.put("permissao", 0);
                         getTemporario.put("codigo", "");
                         getTemporario.put("ultimologin", 0);
@@ -271,7 +249,7 @@ public class Usuario {
         JSONArray usuariosDBarray = new JSONArray();
         JSONArray usuariosInfo = new JSONArray();
         JSONArray usuariosDBarrayPol = policia.AttDBUsuarios();
-        ResultSet resulteSet2 = conexao.getDadosBanco("cb_identities", "id");
+        ResultSet resulteSet2 = conexao.getDadosBanco2("cb_identities", "id");
         try {
             while (resulteSet2.next()) {
                 JSONObject getTempoInfo = new JSONObject();
@@ -333,33 +311,6 @@ public class Usuario {
         return usuariosDBarray;
     }
     
-    public JSONArray AttDBUsuarioMy(){
-        ConexaoDB conexao = new ConexaoDB();
-        JSONArray usuariosInfo = new JSONArray();
-        ResultSet resulteSet2 = conexao.getDadosBanco("cb_identities", "id");
-        try {
-            while(resulteSet2.next()){
-                JSONObject getTempoInfo = new JSONObject();
-                //getTempoInfo.put("id", contage2);
-                getTempoInfo.put("id_usuario", resulteSet2.getString("id"));/*
-                getTemporario.put("nome", resulteSet2.getString("nome"));
-                getTemporario.put("sobrenome", resulteSet2.getString("sobrenome"));
-                getTemporario.put("registration", resulteSet2.getString("phone"));
-                getTemporario.put("phone", resulteSet2.getString("phone"));
-                getTemporario.put("age", resulteSet2.getString("age"));*/
-                getTempoInfo.put("lspd", resulteSet2.getInt("lspd"));
-                getTempoInfo.put("discord", resulteSet2.getString("discord"));
-                getTempoInfo.put("permissao", resulteSet2.getInt("permissao"));
-                getTempoInfo.put("codigo", resulteSet2.getString("codigo"));
-                getTempoInfo.put("ultimologin", resulteSet2.getString("ultimologin"));
-                usuariosInfo.put(getTempoInfo);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return usuariosInfo;
-    }
-    
     public JSONArray AttBlackList(){
         ConexaoDB conexao = new ConexaoDB();
         JSONArray usuariosDBarray = new JSONArray();
@@ -385,7 +336,7 @@ public class Usuario {
         //PassaAddU
         ConexaoDB conexao = new ConexaoDB();
         JSONArray hierarquiaDBarray = new JSONArray();
-        ResultSet resulteSet = conexao.getDadosBanco("cb_hierarquia", "id");
+        ResultSet resulteSet = conexao.getDadosBanco2("cb_hierarquia", "id");
         int contage=0;
         try {
             while (resulteSet.next()) {
@@ -417,7 +368,7 @@ public class Usuario {
         //PassaAddU
         ConexaoDB conexao = new ConexaoDB();
         JSONArray prisaoDBarray = new JSONArray();
-        ResultSet resulteSet = conexao.getDadosBanco("cb_prisoes", "id");
+        ResultSet resulteSet = conexao.getDadosBanco2("cb_prisoes", "id");
         int contage=0;
         try {
             while (resulteSet.next()) {
@@ -511,7 +462,7 @@ public class Usuario {
         //PassaAddU
         ConexaoDB conexao = new ConexaoDB();
         JSONArray prisaoDBarray = new JSONArray();
-        ResultSet resulteSet = conexao.getDadosBanco("cb_procurados", "id");
+        ResultSet resulteSet = conexao.getDadosBanco2("cb_procurados", "id");
         int contage=0;
         try {
             while (resulteSet.next()) {
@@ -551,7 +502,7 @@ public class Usuario {
         //PassaAddU
         ConexaoDB conexao = new ConexaoDB();
         JSONArray prisaoDBarray = new JSONArray();
-        ResultSet resulteSet = conexao.getDadosBanco("cb_procurados", "id");
+        ResultSet resulteSet = conexao.getDadosBanco2("cb_procurados", "id");
         int contage=0;
         try {
             while (resulteSet.next()) {
