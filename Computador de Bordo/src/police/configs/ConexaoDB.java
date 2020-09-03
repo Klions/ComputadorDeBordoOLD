@@ -365,6 +365,33 @@ public class ConexaoDB {
         return null;
     }
     
+    public ResultSet GetPersonalizadoCidade(String query) {
+        try {
+            // This will load the MySQL driver, each DB has its own driver
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
+
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            // Result set get the result of the SQL query
+            resultSet = statement
+                    .executeQuery(query);
+            System.out.println("Conectado ao servidor: "+InicializadorMain.host_server);
+            return resultSet;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    
     public boolean getPossuiRegistro(String tabelad, String where, String where2) {
         try {
             // This will load the MySQL driver, each DB has its own driver

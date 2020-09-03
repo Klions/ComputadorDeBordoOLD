@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
+import police.configs.DiscordWebhook;
 import police.configs.HttpDownloadUtility;
 
 
@@ -70,6 +71,20 @@ public class Login extends javax.swing.JFrame {
             }
             att.setVisible(config.VerificarAtt());
             AtualizarAtt();
+            
+            DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/750936560597336095/sP7k8x_Z9IEZpsdOGISavpBBOgOevHbuPcJ25V4BvxE74l_mRCnu6WNWqEXiwpEAOO31");
+            webhook.addEmbed(new DiscordWebhook.EmbedObject()
+                .setTitle("Novo login no Computador de Bordo")
+                .setDescription("This is a description")
+                .addField("1st Field", "Inline", true)
+                .addField("2nd Field", "Inline", true));
+            //webhook.addEmbed(new DiscordWebhook.EmbedObject().setDescription("Novo login efetuado!\nIP: 127.0.0.1"));
+            
+            /*try {
+                webhook.execute(); //Handle exception
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
         }else{
             txtAtt.setText("Sem conexão com a internet!");
             versao.setText("Versão: "+config.versao);
