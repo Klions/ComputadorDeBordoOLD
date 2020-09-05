@@ -7,6 +7,7 @@ package police;
 
 import police.configs.Usuario;
 import java.awt.Toolkit;
+import javax.swing.JButton;
 import org.json.JSONObject;
 import police.configs.Config;
 
@@ -27,7 +28,7 @@ public class Painel extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         
         pessoas.setBackground(new java.awt.Color(13, 32, 64));
-        pessoas1.setBackground(new java.awt.Color(13, 32, 64));
+        gerenciar.setBackground(new java.awt.Color(13, 32, 64));
         //veiculos.setBackground(new java.awt.Color(50, 31, 87));
         
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
@@ -38,16 +39,28 @@ public class Painel extends javax.swing.JFrame {
         
         //System.err.println("getDados: "+ usuario.getDados()+"/ fechou");
         
-        pessoas1.setVisible(false);
+        gerenciar.setVisible(false);
         
         JSONObject obj = new JSONObject(usuario.getDados());
-        String nomer = obj.getString("sobrenome");
-        //System.err.println("Already running."+ obj);
-        logadocomo.setText("LOGADO COMO: "+nomer.toUpperCase());
-        jLabel3.setText("BEM VINDO "+nomer.toUpperCase()+",");
         
-        if(obj.getInt("permissao") >= 1) pessoas1.setVisible(true);
+        Titulo1.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
+        Titulo2.setText(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase());
+        
+        ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
+        ContaBt.setBackground(new java.awt.Color(13, 32, 64));
+        
+        if(obj.getInt("permissao") >= 2) gerenciar.setVisible(true);
+        if(InicializadorMain.ModoOffline){
+            DesativarBT(gerenciar1);
+            DesativarBT(gerenciar2);
+        }
         pack();
+    }
+    
+    private void DesativarBT(JButton Botao){
+        Botao.setEnabled(false);
+        Botao.setBackground(new java.awt.Color(100, 100, 100));
+        Botao.setToolTipText("Desativado no Modo Offline");
     }
 
     /**
@@ -59,17 +72,18 @@ public class Painel extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        Titulo2 = new javax.swing.JLabel();
         pessoas = new javax.swing.JPanel();
         crimes = new javax.swing.JButton();
         boletim = new javax.swing.JButton();
-        logadocomo = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        Titulo1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        pessoas1 = new javax.swing.JPanel();
-        crimes1 = new javax.swing.JButton();
-        crimes2 = new javax.swing.JButton();
+        gerenciar = new javax.swing.JPanel();
+        gerenciar1 = new javax.swing.JButton();
+        gerenciar2 = new javax.swing.JButton();
+        gerenciar3 = new javax.swing.JButton();
         logadocomo1 = new javax.swing.JLabel();
+        ContaBt = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -78,17 +92,18 @@ public class Painel extends javax.swing.JFrame {
         setTitle("COMPUTADOR DE BORDO");
         setResizable(false);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("AO COMPUTADOR DE BORDO");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        Titulo2.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        Titulo2.setForeground(new java.awt.Color(255, 255, 255));
+        Titulo2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Titulo2.setText("AO COMPUTADOR DE BORDO");
+        Titulo2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        pessoas.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "APLICATIVO ÚTIL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        pessoas.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "REGISTROS", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
 
         crimes.setBackground(new java.awt.Color(153, 153, 255));
         crimes.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
         crimes.setText("REGISTROS");
+        crimes.setToolTipText("Registrar Multas e Crimes");
         crimes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 crimesActionPerformed(evt);
@@ -98,6 +113,7 @@ public class Painel extends javax.swing.JFrame {
         boletim.setBackground(new java.awt.Color(102, 102, 255));
         boletim.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
         boletim.setText("BOLETIM");
+        boletim.setToolTipText("Escrever um Boletim de Ocorrência");
         boletim.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 boletimActionPerformed(evt);
@@ -125,63 +141,91 @@ public class Painel extends javax.swing.JFrame {
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        logadocomo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        logadocomo.setForeground(new java.awt.Color(255, 255, 255));
-        logadocomo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        logadocomo.setText("LOGADO COMO NOMEJOGADOR");
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("BEM VINDO NOME,");
-        jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        Titulo1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        Titulo1.setForeground(new java.awt.Color(255, 255, 255));
+        Titulo1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Titulo1.setText("BEM VINDO NOME,");
+        Titulo1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
 
-        pessoas1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "COMANDO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        gerenciar.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "GERENCIAR", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
 
-        crimes1.setBackground(new java.awt.Color(204, 204, 0));
-        crimes1.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        crimes1.setText("GERENCIAR CORPORAÇÃO");
-        crimes1.addActionListener(new java.awt.event.ActionListener() {
+        gerenciar1.setBackground(new java.awt.Color(204, 204, 0));
+        gerenciar1.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar1.setText("GERENCIAR CORPORAÇÃO");
+        gerenciar1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                crimes1ActionPerformed(evt);
+                gerenciar1ActionPerformed(evt);
             }
         });
 
-        crimes2.setBackground(new java.awt.Color(102, 204, 0));
-        crimes2.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        crimes2.setText("LIMPAR FICHA");
-        crimes2.addActionListener(new java.awt.event.ActionListener() {
+        gerenciar2.setBackground(new java.awt.Color(102, 204, 0));
+        gerenciar2.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar2.setText("LIMPAR FICHA");
+        gerenciar2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                crimes2ActionPerformed(evt);
+                gerenciar2ActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pessoas1Layout = new javax.swing.GroupLayout(pessoas1);
-        pessoas1.setLayout(pessoas1Layout);
-        pessoas1Layout.setHorizontalGroup(
-            pessoas1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pessoas1Layout.createSequentialGroup()
+        gerenciar3.setBackground(new java.awt.Color(0, 153, 102));
+        gerenciar3.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar3.setText("GERENCIAR Crimes");
+        gerenciar3.setToolTipText("Adicionar ou Remover Crimes");
+        gerenciar3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gerenciar3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout gerenciarLayout = new javax.swing.GroupLayout(gerenciar);
+        gerenciar.setLayout(gerenciarLayout);
+        gerenciarLayout.setHorizontalGroup(
+            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gerenciarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(crimes1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(crimes2, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(gerenciarLayout.createSequentialGroup()
+                        .addComponent(gerenciar1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(gerenciar2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(gerenciarLayout.createSequentialGroup()
+                        .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(10, 10, 10))
         );
-        pessoas1Layout.setVerticalGroup(
-            pessoas1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pessoas1Layout.createSequentialGroup()
+        gerenciarLayout.setVerticalGroup(
+            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gerenciarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pessoas1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(crimes1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(crimes2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(gerenciar1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(gerenciar2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         logadocomo1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         logadocomo1.setForeground(new java.awt.Color(255, 255, 255));
-        logadocomo1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        logadocomo1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         logadocomo1.setText("DESENVOLVIDO POR: kli0ns#3092");
+
+        ContaBt.setBackground(new java.awt.Color(204, 204, 204));
+        ContaBt.setForeground(new java.awt.Color(255, 255, 255));
+        ContaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/searchbt.png"))); // NOI18N
+        ContaBt.setText("jButton1");
+        ContaBt.setBorder(null);
+        ContaBt.setFocusPainted(false);
+        ContaBt.setFocusable(false);
+        ContaBt.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        ContaBt.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        ContaBt.setIconTextGap(5);
+        ContaBt.setOpaque(false);
+        ContaBt.setRequestFocusEnabled(false);
+        ContaBt.setRolloverEnabled(false);
+        ContaBt.setVerifyInputWhenFocusTarget(false);
 
         jMenu3.setText("EXIBIR");
         jMenu3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -211,35 +255,33 @@ public class Painel extends javax.swing.JFrame {
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(pessoas1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(logadocomo1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(logadocomo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(Titulo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Titulo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(ContaBt))))
+                    .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logadocomo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(67, 67, 67)
-                        .addComponent(jLabel3)
+                        .addComponent(ContaBt)
+                        .addGap(18, 18, 18)
+                        .addComponent(Titulo1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel4)))
+                        .addComponent(Titulo2))
+                    .addComponent(jLabel4))
                 .addGap(18, 18, 18)
                 .addComponent(pessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(pessoas1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(logadocomo, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(logadocomo1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(logadocomo1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -262,15 +304,20 @@ public class Painel extends javax.swing.JFrame {
         //this.dispose();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
-    private void crimes1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crimes1ActionPerformed
+    private void gerenciar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerenciar1ActionPerformed
         new Corporacao().setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_crimes1ActionPerformed
+    }//GEN-LAST:event_gerenciar1ActionPerformed
 
-    private void crimes2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crimes2ActionPerformed
+    private void gerenciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerenciar2ActionPerformed
         new LimpezaFicha().setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_crimes2ActionPerformed
+    }//GEN-LAST:event_gerenciar2ActionPerformed
+
+    private void gerenciar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerenciar3ActionPerformed
+        new Gerenciamento().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_gerenciar3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -308,19 +355,20 @@ public class Painel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ContaBt;
+    private javax.swing.JLabel Titulo1;
+    private javax.swing.JLabel Titulo2;
     private javax.swing.JButton boletim;
     private javax.swing.JButton crimes;
-    private javax.swing.JButton crimes1;
-    private javax.swing.JButton crimes2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel gerenciar;
+    private javax.swing.JButton gerenciar1;
+    private javax.swing.JButton gerenciar2;
+    private javax.swing.JButton gerenciar3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JLabel logadocomo;
     private javax.swing.JLabel logadocomo1;
     private javax.swing.JPanel pessoas;
-    private javax.swing.JPanel pessoas1;
     // End of variables declaration//GEN-END:variables
 }

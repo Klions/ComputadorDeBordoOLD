@@ -171,17 +171,9 @@ public class Prisoes extends javax.swing.JFrame {
                                AttCrimes();
                             }
                         });
-                        if(o.getString("texto").length() > 27){
-                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 8));
-                        }else if(o.getString("texto").length() > 24){
-                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 9));
-                        }else if(o.getString("texto").length() > 20){
-                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 10));
-                        }else if(o.getString("texto").length() > 15){
-                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 11));
-                        }else if(o.getString("texto").length() > 9){
-                            Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, 12));
-                        }
+                        
+                        Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
+                        
                         Botoes[i2][i].setBounds(3, 3, 214, 39);
                         container2.add( Botoes[i2][i] );
                     //=========================================
@@ -203,17 +195,7 @@ public class Prisoes extends javax.swing.JFrame {
                         
                         InputText[i2][i].setBounds(3, 3, 214, 39);
                         
-                        if(o.getString("texto").length() > 27){
-                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 8));
-                        }else if(o.getString("texto").length() > 24){
-                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 9));
-                        }else if(o.getString("texto").length() > 20){
-                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 10));
-                        }else if(o.getString("texto").length() > 15){
-                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 11));
-                        }else{
-                            InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, 12));
-                        }
+                        InputText[i2][i].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
                         
                         InputText[i2][i].addKeyListener(new KeyAdapter() {
                             public void keyTyped(KeyEvent e) {
@@ -248,17 +230,8 @@ public class Prisoes extends javax.swing.JFrame {
                                     //InputText[As2][As].setForeground(Color.GRAY);
                                     InputText[As2][As].setText(o.getString("texto"));
                                     
-                                    if(o.getString("texto").length() > 27){
-                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 8));
-                                    }else if(o.getString("texto").length() > 24){
-                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 9));
-                                    }else if(o.getString("texto").length() > 20){
-                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 10));
-                                    }else if(o.getString("texto").length() > 15){
-                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 11));
-                                    }else{
-                                        InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, 12));
-                                    }
+                                    InputText[As2][As].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
+                                    
                                 }
                             }
                         });
@@ -384,6 +357,19 @@ public class Prisoes extends javax.swing.JFrame {
             int ir2 = obj.getInt("i2");
             if(Botoes[ir1][ir2].isSelected()){
                 Botoes[ir1][ir2].setSelected(false);
+            }
+        }
+    }
+    
+    public void ResetarCampoTexto(){
+        for(int i = 0; i < RegistroInputs.length(); i++){
+            JSONObject obj = RegistroInputs.getJSONObject(i);
+            int ir1 = obj.getInt("i1");
+            int ir2 = obj.getInt("i2");
+            String TextoInput = InputText[ir1][ir2].getText();
+            if(!TextoInput.isEmpty() && !TextoInput.equals(obj.getString("texto"))){
+                InputText[ir1][ir2].setText(obj.getString("texto"));
+                InputText[ir1][ir2].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(obj.getString("texto").length())));
             }
         }
     }
@@ -627,8 +613,23 @@ public class Prisoes extends javax.swing.JFrame {
             guardar_procurado.setEnabled(false);
         }*/
     }
+    public int FontPorTamanho(int length){
+        if(length > 27){
+            return 8;
+        }else if(length > 24){
+            return 9;
+        }else if(length > 20){
+            return 10;
+        }else if(length > 15){
+            return 11;
+        }else{
+            return 12;
+        }
+    }
+    
     public void ResetarCrimes(){
         ResetarBotoes();
+        ResetarCampoTexto();
     }
     
     public void ResetarTudo(){
@@ -640,6 +641,7 @@ public class Prisoes extends javax.swing.JFrame {
         this.revalidate();
         this.repaint();
         this.pack();
+        AttCrimes();
     }
 
     /**
@@ -703,6 +705,12 @@ public class Prisoes extends javax.swing.JFrame {
         ResetarBt = new javax.swing.JButton();
         SalvarBt1 = new javax.swing.JButton();
         CopiarDiscordBt = new javax.swing.JButton();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -908,7 +916,7 @@ public class Prisoes extends javax.swing.JFrame {
         PesquisarPainelLayout.setVerticalGroup(
             PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PesquisarPainelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(26, 26, 26)
                 .addGroup(PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -920,7 +928,7 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPlaca, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         DetalhesPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BANCO DA POLÍCIA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
@@ -1117,7 +1125,7 @@ public class Prisoes extends javax.swing.JFrame {
             .addGroup(DetalhesPainelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         SalvarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -1169,6 +1177,42 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jMenu3.setText("FECHAR");
+
+        jMenuItem2.setText("VOLTAR PARA O PAINEL");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuBar2.add(jMenu3);
+
+        jMenu4.setText("EXIBIR");
+        jMenu4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jMenu4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jMenuItem1.setText("CRIMES E MULTAS");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem1);
+
+        jMenuItem3.setText("SOBRE");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem3);
+
+        jMenuBar2.add(jMenu4);
+
+        setJMenuBar(jMenuBar2);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1179,8 +1223,8 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
-                    .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
+                    .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
                     .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1190,11 +1234,11 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(PesquisarPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(PesquisarPainel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1261,6 +1305,25 @@ public class Prisoes extends javax.swing.JFrame {
     private void CopiarDiscordBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarDiscordBtActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_CopiarDiscordBtActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        new Painel().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        new VerCrimes().setVisible(true);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        InicializadorMain.sobre.setVisible(true);
+        /*if(!policia.sobre.isVisible()){
+            policia.sobre.setVisible(true);
+        }else{
+            policia.sobre.requestFocus();
+        }*/
+        //this.dispose();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1338,7 +1401,13 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
