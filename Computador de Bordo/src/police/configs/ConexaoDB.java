@@ -824,7 +824,7 @@ public class ConexaoDB {
             statement = connect.createStatement();
             // Result set get the result of the SQL query
             resultSet = statement
-                    .executeQuery("select * from "+tabelad+" WHERE server_id LIKE 1 ORDER BY id DESC"); //"+InicializadorMain.server_id+"
+                    .executeQuery("select * from "+tabelad+" WHERE server_id LIKE "+InicializadorMain.server_id+" ORDER BY id DESC"); //"+InicializadorMain.server_id+"
             System.out.println("Conectado ao servidor: "+host+" / tabela: "+tabelad+" - PegarValoresPorServerID()");
             return resultSet;
 

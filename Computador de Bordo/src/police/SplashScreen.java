@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
 import police.configs.DiscordMessage;
+import police.configs.Usuario;
 
 /**
  *
@@ -109,7 +110,7 @@ public class SplashScreen extends javax.swing.JFrame {
         }else{
             ProgressoAtual=100;
             ValorProgresso=100;
-            texto.setText("CONEXÃO FALHOU");
+            texto.setText("FALHA NA CONEXÃO");
         }
     }
     public boolean IniciarSobre(){
@@ -194,10 +195,10 @@ public class SplashScreen extends javax.swing.JFrame {
                 ProgressoAtual=100;
                 progresso.setValue(ProgressoAtual);
                 texto.setText("CONCLUINDO");
-
+                Fechar=true;
                 Login logins = new Login();
                 logins.setVisible(true);
-                Fechar=true;
+                
                 this.dispose();
             }else{
                 ProgressoAtual=0;
@@ -321,6 +322,7 @@ public class SplashScreen extends javax.swing.JFrame {
         CidadesEscolha = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         CidadeEscolhaBt = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("COMPUTADOR DE BORDO");
@@ -344,10 +346,10 @@ public class SplashScreen extends javax.swing.JFrame {
             TituloPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(TituloPainelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(TituloPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(atualizadot, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addGroup(TituloPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(atualizadot, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         TituloPainelLayout.setVerticalGroup(
             TituloPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -388,12 +390,25 @@ public class SplashScreen extends javax.swing.JFrame {
         CidadesEscolha.setNextFocusableComponent(CidadeEscolhaBt);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("ESCOLHA A CIDADE:");
 
+        CidadeEscolhaBt.setBackground(new java.awt.Color(255, 255, 255));
         CidadeEscolhaBt.setText("ENTRAR");
         CidadeEscolhaBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CidadeEscolhaBtActionPerformed(evt);
+            }
+        });
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("ENTRAR NO MODO OFFLINE");
+        jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setMargin(new java.awt.Insets(200, 14, 200, 14));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -404,6 +419,7 @@ public class SplashScreen extends javax.swing.JFrame {
             .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
                         .addComponent(CidadesEscolha, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -420,7 +436,9 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CidadesEscolha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CidadeEscolhaBt))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -432,10 +450,9 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addComponent(icone)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(ProgressoPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(TituloPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                    .addComponent(ProgressoPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(TituloPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -443,15 +460,16 @@ public class SplashScreen extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(icone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(TituloPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ProgressoPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(11, 11, 11)
-                        .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(icone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         pack();
@@ -468,6 +486,13 @@ public class SplashScreen extends javax.swing.JFrame {
                 if(FormatNome.equals(IndexStr)){
                     SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
                     nomedacidade = obj.getString("nome_cidade");
+                    
+                    JSONObject getTemporario2 = new JSONObject();
+                    getTemporario2.put("id", obj.getInt("id"));
+                    getTemporario2.put("nome_cidade", obj.getString("nome_cidade"));
+                    getTemporario2.put("nome_policia", obj.getString("nome_policia"));
+                    getTemporario2.put("nome_policia_abv", obj.getString("nome_policia_abv"));
+                    InicializadorMain.info_cidade = getTemporario2;
                 }
             }
             if(!"".equals(nomedacidade)){
@@ -480,9 +505,37 @@ public class SplashScreen extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_CidadeEscolhaBtActionPerformed
 
-    public void AttAAAA(){
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        JSONObject getTemporario2 = new JSONObject();
+        getTemporario2.put("id", 0);
+        getTemporario2.put("nome_cidade", "Modo Offline");
+        getTemporario2.put("nome_policia", "Polícia");
+        getTemporario2.put("nome_policia_abv", "POL");
+        InicializadorMain.info_cidade = getTemporario2;
+        InicializadorMain.ModoOffline = true;
         
-    }
+        JSONObject getTemporario = new JSONObject();
+        getTemporario.put("id", 0);
+        getTemporario.put("id_usuario", 0);
+        getTemporario.put("nome", "Modo");
+        getTemporario.put("sobrenome", "Offline");
+        getTemporario.put("registration", "000AAA00");
+        getTemporario.put("phone", "000-000");
+        getTemporario.put("age", "00");
+        getTemporario.put("permissao", 2);
+        getTemporario.put("codigo", "000");
+        getTemporario.put("ultimologin", 0);
+        Usuario usuarios = new Usuario();
+        usuarios.setDados(getTemporario);
+        
+        Fechar=true;
+        ProgressoAtual=100;
+        ContandoFalhas=0;
+        
+        new Painel().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public boolean SetarBancoServidor(String s_host, String s_banco, String s_user, String s_senha, int server_ide){
         InicializadorMain.host_server = s_host;
         InicializadorMain.banco_server = s_banco;
@@ -545,9 +598,10 @@ public class SplashScreen extends javax.swing.JFrame {
     private javax.swing.JPanel TituloPainel;
     private javax.swing.JLabel atualizadot;
     private javax.swing.JLabel icone;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     public javax.swing.JProgressBar progresso;
-    private javax.swing.JLabel texto;
+    public javax.swing.JLabel texto;
     private javax.swing.JLabel titulo;
     // End of variables declaration//GEN-END:variables
 }

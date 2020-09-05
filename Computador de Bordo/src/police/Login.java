@@ -8,7 +8,10 @@ package police;
 import police.configs.Usuario;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -18,6 +21,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -54,14 +58,14 @@ public class Login extends javax.swing.JFrame {
     
     int tentativas=1;
     public Login() {
-        
         checkIfRunning();
         initComponents();
         this.setLocationRelativeTo(null);
         Nome.requestFocus();
-        txtErro.setText(config.NomePolicia.toUpperCase());
+        txtErro.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         PainelLogin.setBackground(new java.awt.Color(13, 32, 64));
+        jPanel1.setBackground(new java.awt.Color(13, 32, 64));
         att.setBackground(new java.awt.Color(222, 82, 82));
         AttUsers();
         //AttDBUsuarios();
@@ -99,10 +103,13 @@ public class Login extends javax.swing.JFrame {
             Entrar.setEnabled(false);
         }
         pack();
+        UPDATE();
     }
     public void AttUsers(){
         vrp_users = InicializadorMain.vrp_users;
         cb_users = InicializadorMain.cb_users;
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;
     }
     
     public void AttDBUsuarios(){
@@ -197,7 +204,7 @@ public class Login extends javax.swing.JFrame {
         String passaporteI = Nome.getText();
         String senha = Codigo.getText();
         
-        if("".equals(passaporteI)  || "".equals(senha)){
+        if("".equals(passaporteI) || "".equals(senha)){
             TextoErro("Campos vazios, digite os dados");
             return false;
         }
@@ -205,7 +212,17 @@ public class Login extends javax.swing.JFrame {
         JSONObject cbuser = cb_userPorID(passaporte);
         if(cbuser != null){
             if(passaporte == cbuser.getInt("user_id") && senha.equals(cbuser.getString("codigo"))){
-                TextoErro("FOOOOOI");
+                JSONObject sal_info = PegarUsuario(passaporte);
+                if(sal_info != null){
+                    usuarios.setDados(sal_info);
+                    if(lembrar.isSelected()) SAVE();
+                    new Painel().setVisible(true);
+                    this.dispose();
+                }else{
+                    TextoErro("Erro ao pegar sua conta no Banco de Dados.");
+                    AttDBHierarquia();
+                    return false;
+                }
             }else{
                 tentativas++;
                 TextoErro("Senha ou usuário inválido.");
@@ -371,6 +388,41 @@ public class Login extends javax.swing.JFrame {
         }
         return false;
     }
+    
+    public void SAVE(){      //Save the UserName and Password (for one user)
+        try {
+            File file = new File(InicializadorMain.DestFile);
+            if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+            
+            bw.write(Nome.getText()); //write the name
+            bw.newLine(); //leave a new Line
+            bw.write(Codigo.getText()); //getPassword()
+            bw.close(); //close the BufferdWriter
+
+        } catch (IOException e) { e.printStackTrace(); }        
+    }//End Of Save
+    
+    public void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFile);
+            if(file.exists()){    //if this file exists
+
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                Nome.setText(scan.nextLine());  //append the text to name field
+                Codigo.setText(scan.nextLine()); //append the text to password field
+                scan.close();
+                Entrar.requestFocus();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -381,14 +433,6 @@ public class Login extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        txtErro = new javax.swing.JLabel();
-        PainelLogin = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        Nome = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        Entrar = new javax.swing.JButton();
-        Codigo = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         att = new javax.swing.JPanel();
         txtAtt = new javax.swing.JLabel();
@@ -397,95 +441,21 @@ public class Login extends javax.swing.JFrame {
         versao = new javax.swing.JLabel();
         mensagem = new javax.swing.JLabel();
         versaoatual = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        txtErro = new javax.swing.JLabel();
+        PainelLogin = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        Nome = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        Codigo = new javax.swing.JTextField();
+        lembrar = new javax.swing.JCheckBox();
+        Entrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ENTRAR");
         setBackground(new java.awt.Color(51, 51, 51));
         setResizable(false);
-
-        txtErro.setFont(new java.awt.Font("Segoe UI Light", 0, 24)); // NOI18N
-        txtErro.setForeground(new java.awt.Color(255, 255, 255));
-        txtErro.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        txtErro.setText("POLÍCIA MILITAR RAINBOW CITY");
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("PASSAPORTE:");
-
-        Nome.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        Nome.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                NomeKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                NomeKeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                NomeKeyTyped(evt);
-            }
-        });
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("CÓDIGO:");
-
-        Entrar.setBackground(new java.awt.Color(255, 255, 255));
-        Entrar.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        Entrar.setForeground(new java.awt.Color(51, 51, 51));
-        Entrar.setText("ENTRAR");
-        Entrar.setToolTipText("");
-        Entrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EntrarActionPerformed(evt);
-            }
-        });
-
-        Codigo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        Codigo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                CodigoKeyPressed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout PainelLoginLayout = new javax.swing.GroupLayout(PainelLogin);
-        PainelLogin.setLayout(PainelLoginLayout);
-        PainelLoginLayout.setHorizontalGroup(
-            PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PainelLoginLayout.createSequentialGroup()
-                .addGap(70, 70, 70)
-                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Nome)
-                    .addComponent(Codigo))
-                .addGap(70, 70, 70))
-            .addGroup(PainelLoginLayout.createSequentialGroup()
-                .addGap(94, 94, 94)
-                .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(94, Short.MAX_VALUE))
-        );
-        PainelLoginLayout.setVerticalGroup(
-            PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PainelLoginLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(Nome, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Codigo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
-                .addGap(9, 9, 9)
-                .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
 
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -560,40 +530,151 @@ public class Login extends javax.swing.JFrame {
         versaoatual.setText("Versão atual:");
         versaoatual.setEnabled(false);
 
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
+
+        txtErro.setFont(new java.awt.Font("Segoe UI Light", 0, 24)); // NOI18N
+        txtErro.setForeground(new java.awt.Color(255, 255, 255));
+        txtErro.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtErro.setText("POLÍCIA MILITAR RAINBOW CITY");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel2.setText("PASSAPORTE:");
+
+        Nome.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        Nome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                NomeKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                NomeKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                NomeKeyTyped(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel3.setText("CÓDIGO:");
+
+        Codigo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        Codigo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                CodigoKeyPressed(evt);
+            }
+        });
+
+        lembrar.setForeground(new java.awt.Color(255, 255, 255));
+        lembrar.setSelected(true);
+        lembrar.setText("LEMBRAR-ME");
+        lembrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lembrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        lembrar.setOpaque(false);
+
+        javax.swing.GroupLayout PainelLoginLayout = new javax.swing.GroupLayout(PainelLogin);
+        PainelLogin.setLayout(PainelLoginLayout);
+        PainelLoginLayout.setHorizontalGroup(
+            PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PainelLoginLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lembrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(PainelLoginLayout.createSequentialGroup()
+                        .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Nome, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                            .addComponent(Codigo))))
+                .addContainerGap())
+        );
+        PainelLoginLayout.setVerticalGroup(
+            PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PainelLoginLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(Nome, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Codigo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lembrar)
+                .addGap(14, 14, 14))
+        );
+
+        Entrar.setBackground(new java.awt.Color(255, 255, 255));
+        Entrar.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        Entrar.setForeground(new java.awt.Color(51, 51, 51));
+        Entrar.setText("ENTRAR");
+        Entrar.setToolTipText("");
+        Entrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EntrarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtErro, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addComponent(PainelLogin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(40, 40, 40))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(110, 110, 110)
+                .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtErro)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(PainelLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(versaoatual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 24, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(PainelLogin, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtErro, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(versaoatual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(att, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtErro)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(PainelLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
-                .addGap(2, 2, 2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(versaoatual)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -712,6 +793,8 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JCheckBox lembrar;
     private javax.swing.JLabel mensagem;
     private javax.swing.JLabel txtAtt;
     private javax.swing.JLabel txtErro;

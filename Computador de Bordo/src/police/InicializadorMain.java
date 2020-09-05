@@ -5,10 +5,12 @@
  */
 package police;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 import net.dv8tion.jda.api.JDA;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import police.configs.Usuario;
 
 /**
@@ -29,6 +31,8 @@ public class InicializadorMain {
     public static JSONArray procuradosDBarray = new JSONArray();
     public static JSONArray hierarquiaDBarray = new JSONArray();
     
+    public static JSONObject info_cidade = new JSONObject();
+    
     public static JSONArray vrp_users = new JSONArray();
     public static JSONArray cb_users = new JSONArray();
     
@@ -37,11 +41,16 @@ public class InicializadorMain {
     public static String user_server =  "";
     public static String pass_server =  "";
     
+    public static boolean ModoOffline = false;
+    
     public static int server_id =  0;
     
     public static String BuildCB = "0";
     
     public static Sobre sobre = new Sobre();
+    
+    public static String DestFile = System.getProperty("user.home")+"/Documents/cb-l.txt";
+    public static String DestFile2 = System.getProperty("user.home")+"/Documents/cb-c.txt";
     
     public static void main(String[] args) throws InterruptedException {
         SplashScreen splash = new SplashScreen();

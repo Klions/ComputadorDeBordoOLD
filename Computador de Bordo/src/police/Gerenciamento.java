@@ -9,20 +9,27 @@ import java.awt.Container;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
@@ -37,26 +44,36 @@ public class Gerenciamento extends javax.swing.JFrame {
     /**
      * Creates new form Prisoes
      */
-    JSONArray CrimesRegistro = new JSONArray();
-    JSONArray CategoriasCrimes = new JSONArray();
+    static JSONArray CrimesRegistro = new JSONArray();
+    static JSONArray CategoriasCrimes = new JSONArray();
     
-    JSONArray RegistroTabelas = new JSONArray();
+    static JSONArray RegistroTabelas = new JSONArray();
     
     
-    JSONArray novo_CrimesRegistro = new JSONArray();
-    JSONArray novo_CategoriasCrimes = new JSONArray();
+    static JSONArray novo_CrimesRegistro = new JSONArray();
+    static JSONArray novo_CategoriasCrimes = new JSONArray();
     
-    JSONArray GetCrimes = new JSONArray();
-    int contageGetCrimes = 0;
+    static JSONArray GetCrimes = new JSONArray();
+    static int contageGetCrimes = 0;
     
-    int TotalIdsTab = 0;
+    static int TotalIdsTab = 0;
     
-    int SalvarTime = 0;
+    static int SalvarTime = 0;
+    static String CrimesStore="";
+    static String CategoriasStore="";
+    
+    ExportarImportar Export = new ExportarImportar();
+    
+    private static int AttStore = 0;
     
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     public Gerenciamento() {
         initComponents();
+        if(InicializadorMain.ModoOffline) UPDATE();
+        getContentPane().setBackground(new java.awt.Color(13, 32, 64));
+        PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
+        Export.setLocationRelativeTo(null);
         PegarDB();
         //AdicionarBotoes();
         //jTable1.setTransferHandler(new TableRowTransferHandler(jTable1)); 
@@ -82,99 +99,75 @@ public class Gerenciamento extends javax.swing.JFrame {
     }
     
     
-    public void PegarDB(){
-        Usuario usuarios = new Usuario();
-        GetCrimes = usuarios.CrimesServerID();
-        for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+    public static void PegarDB(){
+        if(InicializadorMain.ModoOffline){
+            CategoriasCrimes = new JSONArray();
+            if(!"".equals(CategoriasStore) && CategoriasStore.length() > 10){
+                
+                CategoriasCrimes = new JSONArray(CategoriasStore);
+                System.out.println("PegarDB() CategoriasStore: "+CategoriasStore);
+            }else{
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("id", 1);
+                getTemporario2.put("nome_categoria", "Categoria Exemplo");
+                
+                CategoriasCrimes.put(getTemporario2);
+            }
             
-            JSONObject o2 = GetCrimes.getJSONObject(i2);
-            CategoriasCrimes = new JSONArray(o2.getString("categorias"));
-            CrimesRegistro = new JSONArray(o2.getString("crimes"));
-            contageGetCrimes = o2.getInt("id");
+            CrimesRegistro = new JSONArray();
+            if(!"".equals(CrimesStore) && CrimesStore.length() > 10){
+                CrimesRegistro = new JSONArray(CrimesStore);
+                System.out.println("PegarDB() CrimesStore: "+CrimesStore);
+            }else{
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("texto", "Crime Exemplo");
+                getTemporario2.put("multa", 1000);
+                getTemporario2.put("meses", 50);
+                getTemporario2.put("tipo", "UNICO");
+                getTemporario2.put("categoria", 1);
+                
+                CrimesRegistro.put(getTemporario2);
+            }
+            novo_CategoriasCrimes = CategoriasCrimes;
+            novo_CrimesRegistro = CrimesRegistro;
+            SalvarTime=10;
+        }else{
+            Usuario usuarios = new Usuario();
+            GetCrimes = usuarios.CrimesServerID();
+            for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+                JSONObject o2 = GetCrimes.getJSONObject(i2);
+                CategoriasCrimes = new JSONArray(o2.getString("categorias"));
+                CrimesRegistro = new JSONArray(o2.getString("crimes"));
+                contageGetCrimes = o2.getInt("id");
+            }
+            novo_CategoriasCrimes = CategoriasCrimes;
+            novo_CrimesRegistro = CrimesRegistro;
+            SalvarTime=20;
         }
-        novo_CategoriasCrimes = CategoriasCrimes;
-        novo_CrimesRegistro = CrimesRegistro;
-        
         AtualizarJanelas();
-        SalvarTime=20;
-        /*
-        JSONObject getTemporario10 = new JSONObject();
-        getTemporario10.put("id", 1);
-        getTemporario10.put("texto", "Crimes Leves");
-        
-        CategoriasCrimes.put(getTemporario10);
-        
-        getTemporario10 = new JSONObject();
-        getTemporario10.put("id", 2);
-        getTemporario10.put("texto", "Crimes Pesados");
-        CategoriasCrimes.put(getTemporario10);
-        
-        JSONObject getTemporario2 = new JSONObject();
-        getTemporario2.put("categoria", 2);
-        getTemporario2.put("id", 2);
-        getTemporario2.put("texto", "Tentativa de Homicídio À Autoridade");
-        getTemporario2.put("tipo", 1);
-        getTemporario2.put("multa", 1000);
-        getTemporario2.put("meses", 5);
-        CrimesRegistro.put(getTemporario2);
-        
-        getTemporario2 = new JSONObject();
-        getTemporario2.put("categoria", 1);
-        getTemporario2.put("id", 5);
-        getTemporario2.put("texto", "EITA PORA 2");
-        getTemporario2.put("tipo", 1);
-        getTemporario2.put("multa", 1000);
-        getTemporario2.put("meses", 5);
-        CrimesRegistro.put(getTemporario2);
-        
-        getTemporario2 = new JSONObject();
-        getTemporario2.put("categoria", 1);
-        getTemporario2.put("id", 4);
-        getTemporario2.put("texto", "EITA PORA 3");
-        getTemporario2.put("tipo", 1);
-        getTemporario2.put("multa", 1000);
-        getTemporario2.put("meses", 5);
-        CrimesRegistro.put(getTemporario2);
-        
-        getTemporario2 = new JSONObject();
-        getTemporario2.put("categoria", 1);
-        getTemporario2.put("id", 5);
-        getTemporario2.put("texto", "EITA PORA 4");
-        getTemporario2.put("tipo", 1);
-        getTemporario2.put("multa", 1000);
-        getTemporario2.put("meses", 5);
-        CrimesRegistro.put(getTemporario2);
-        
-        getTemporario2 = new JSONObject();
-        getTemporario2.put("categoria", 2);
-        getTemporario2.put("id", 5);
-        getTemporario2.put("texto", "PESADAAAAAAO");
-        getTemporario2.put("tipo", 1);
-        getTemporario2.put("multa", 1000);
-        getTemporario2.put("meses", 5);
-        CrimesRegistro.put(getTemporario2);
-        */
     }
-    //private javax.swing.JLabel Textos[];
-    //private javax.swing.JToggleButton Botoes[];
     
-    JScrollPane[] ScrollPainel = new JScrollPane[10];
-    JPanel[] PainelBase = new JPanel[10];
-    JPanel[][] Painel = new JPanel[10][10];
-    JLabel[] Textos = new JLabel[10];
-    public JTable[] Tabelas = new JTable[10];
-    JButton[] BotoesAdd = new JButton[10];
-    JButton[] BotoesRem = new JButton[10];
+    static int QntCategorias = 10;
+    static int QntCrimes = 100;
     
-    JTextField[] RenameTabc = new JTextField[10];
-    JButton[] RenameTabBtc = new JButton[10];
+    static JScrollPane[] ScrollPainel = new JScrollPane[QntCategorias];
+    static JPanel[] PainelBase = new JPanel[QntCategorias];
+    static JPanel[][] Painel = new JPanel[QntCategorias][QntCrimes];
+    //JLabel[] Textos = new JLabel[10];
+    public static JTable[] Tabelas = new JTable[QntCategorias];
+    static JButton[] BotoesAdd = new JButton[QntCategorias];
+    static JButton[] BotoesRem = new JButton[QntCategorias];
     
-    JButton[] TipoEscolha = new JButton[10];
+    static JTextField[] RenameTabc = new JTextField[QntCategorias];
+    static JButton[] RenameTabBtc = new JButton[QntCategorias];
+    
+    static JButton[] TipoEscolha = new JButton[QntCategorias];
     
     //JComboBox[] TipoEscolha = new JComboBox[10];
     
-    public void AdicionarBotoes(){
+    public static void AdicionarBotoes(){
         RegistroTabelas = new JSONArray();
+        
         for(int i2 = 0; i2 < novo_CategoriasCrimes.length(); i2++){
             JSONObject o2 = novo_CategoriasCrimes.getJSONObject(i2);
             
@@ -191,6 +184,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                 jPanel1Layout2.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGap(0, 386, Short.MAX_VALUE)
             );
+            
+            PainelBase[i2].setBackground(new java.awt.Color(13, 32, 64));
             
             jTabbedPane1.addTab(o2.getString("nome_categoria"), PainelBase[i2]);
             JSONObject PegarDadosBt = o2;
@@ -248,12 +243,13 @@ public class Gerenciamento extends javax.swing.JFrame {
             
             Tabelas[i2].addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
-                    TableCellEditor tce = Tabelas[As].getCellEditor();
-                    if(tce == null) PegarValoresTabela();
+                    //TableCellEditor tce = Tabelas[As].getCellEditor();
+                    //if(tce == null) PegarValoresTabela();
                         //tce.stopCellEditing();
                 }
             });
             TipoEscolha[i2] = new JButton();
+            TipoEscolha[i2].setBackground(new java.awt.Color(255, 255, 255));
             TipoEscolha[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
             TipoEscolha[i2].setText("MUDAR TIPO");
             TipoEscolha[i2].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -376,6 +372,9 @@ public class Gerenciamento extends javax.swing.JFrame {
             BotoesAdd[i2] = new JButton("ADICIONAR CRIME");
             BotoesRem[i2] = new JButton("REMOVER CATEGORIA");
             
+            BotoesAdd[i2].setBackground(new java.awt.Color(255, 255, 255));
+            BotoesRem[i2].setBackground(new java.awt.Color(255, 255, 255));
+            
             BotoesAdd[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
             BotoesRem[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
             
@@ -404,7 +403,29 @@ public class Gerenciamento extends javax.swing.JFrame {
                         //jTabbedPane1.remove(2);
                         InfoDB1.setText("Categoria "+NomeCategoria+" removida");
                         novo_CategoriasCrimes.remove(As);
-                        PegarValoresTabela();
+                        
+                        if(novo_CategoriasCrimes.length() <= 0){
+                            novo_CategoriasCrimes = new JSONArray();
+                            JSONObject getTemporario2 = new JSONObject();
+                            getTemporario2.put("id", 1);
+                            getTemporario2.put("nome_categoria", "Categoria Exemplo");
+                            novo_CategoriasCrimes.put(getTemporario2);
+                            
+                            CrimesRegistro = new JSONArray();
+                            novo_CrimesRegistro = new JSONArray();
+                            getTemporario2 = new JSONObject();
+                            getTemporario2.put("texto", "Crime Exemplo");
+                            getTemporario2.put("multa", 1000);
+                            getTemporario2.put("meses", 50);
+                            getTemporario2.put("tipo", "UNICO");
+                            getTemporario2.put("categoria", 1);
+
+                            novo_CrimesRegistro.put(getTemporario2);
+                            
+                            showMessageDialog(null,"Foi adicionada uma categoria padrão, pois você removeu a última restante","Tabela retornou ao padrão",JOptionPane.PLAIN_MESSAGE);
+                        }else{
+                            PegarValoresTabela();
+                        }
                         AtualizarJanelas();
                     }
                 }
@@ -413,6 +434,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             RenameTabc[i2] = new JTextField(o2.getString("nome_categoria"));
             RenameTabBtc[i2] = new JButton("ADICIONAR CRIME");
             
+            RenameTabBtc[i2].setBackground(new java.awt.Color(255, 255, 255));
             RenameTabBtc[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
             RenameTabBtc[i2].setText("RENOMEAR CATEGORIA");
             RenameTabBtc[i2].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -496,16 +518,15 @@ public class Gerenciamento extends javax.swing.JFrame {
         }
     }
     
-    public void AtualizarJanelas(){
+    public static void AtualizarJanelas(){
         int AtualTab = jTabbedPane1.getSelectedIndex();
         while (jTabbedPane1.getTabCount() > 0)
             jTabbedPane1.remove(0);
         AdicionarBotoes();
         if(AtualTab > 0 && AtualTab < jTabbedPane1.getTabCount()) jTabbedPane1.setSelectedIndex(AtualTab);
-        
     }
     
-    public void PegarValoresTabela(){
+    public static void PegarValoresTabela(){
         novo_CrimesRegistro = new JSONArray();
         int tCrimes = 0;
         int tCategorias = 0;
@@ -542,6 +563,13 @@ public class Gerenciamento extends javax.swing.JFrame {
         }
         //System.out.println("novo_CrimesRegistro: "+novo_CrimesRegistro.toString());
         InfoDB.setText("Total de "+tCrimes+" crimes em "+tCategorias+" categorias registradas.");
+        
+        /*
+        if(InicializadorMain.ModoOffline){
+            CategoriasStore = novo_CategoriasCrimes.toString();
+            CrimesStore = novo_CrimesRegistro.toString();
+        }
+        */
     }
 
     public void AddKey(java.awt.event.KeyEvent evt, JTable tabela) {
@@ -564,6 +592,86 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         }
     }
+    
+    public void SAVE(){      //Save the UserName and Password (for one user)
+        try {
+            File file = new File(InicializadorMain.DestFile2);
+            if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+            Base64.Encoder enc = Base64.getEncoder();
+            
+            bw.write(enc.encodeToString(novo_CategoriasCrimes.toString().getBytes())); //write the name
+            bw.newLine(); //leave a new Line
+            bw.write(enc.encodeToString(novo_CrimesRegistro.toString().getBytes())); //getPassword()
+            bw.close(); //close the BufferdWriter
+
+        } catch (IOException e) { e.printStackTrace(); }        
+    }//End Of Save
+    
+    public void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFile2);
+            if(file.exists()){    //if this file exists
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                Base64.Decoder dec = Base64.getDecoder();
+                String DecoderStre = DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    CategoriasStore = DecoderStre;
+                }else{
+                    showMessageDialog(null,"Ocorreu um erro ao pegar as categorias salvas. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                }
+                
+                DecoderStre = DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    CrimesStore = DecoderStre;
+                }else{
+                    showMessageDialog(null,"Ocorreu um erro ao pegar os crimes salvos. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                }
+                scan.close();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
+    
+    public static String DecodeBase64(String StrDec){
+        Base64.Decoder dec = Base64.getDecoder();
+        byte[] bites = null;
+        try {
+            bites = dec.decode(StrDec);
+        } catch (IllegalArgumentException e) { e.printStackTrace(); }     
+        if(bites != null) return new String(bites);
+        return "";
+    }
+    
+    public static boolean ImportarDados(String Valores){
+        if(Valores.contains("\n")){
+            String[] Valor = Valores.split("\n");
+            String DecoderStre = DecodeBase64(Valor[0]);
+            if(!"".equals(DecoderStre)){
+                CategoriasStore = DecoderStre;
+            }else{
+                return false;
+            }
+            
+            DecoderStre = DecodeBase64(Valor[1]);
+            if(!"".equals(DecoderStre)){
+                CrimesStore = DecoderStre;
+            }else{
+                return false;
+            }
+            System.out.println("ImportarDados() CategoriasStore: "+CategoriasStore+" / CrimesStore: "+CrimesStore);
+            AttStore = 2;
+            PegarDB();
+            return true;
+        }
+        return false;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -576,6 +684,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jLabel1 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
@@ -594,6 +703,14 @@ public class Gerenciamento extends javax.swing.JFrame {
         TxtCategoria = new javax.swing.JTextField();
         InfoDB = new javax.swing.JLabel();
         InfoDB1 = new javax.swing.JLabel();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        importar = new javax.swing.JMenuItem();
+        exportar = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -601,9 +718,14 @@ public class Gerenciamento extends javax.swing.JFrame {
         jMenu2.setText("Edit");
         jMenuBar1.add(jMenu2);
 
+        jMenuItem1.setText("jMenuItem1");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(13, 32, 64));
+        setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("GERENCIADOR DE CRIMES");
 
@@ -660,6 +782,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTable1);
 
+        jButton4.setBackground(new java.awt.Color(255, 255, 255));
         jButton4.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jButton4.setText("ADICIONAR CRIME");
         jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -669,10 +792,12 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
+        jButton5.setBackground(new java.awt.Color(255, 255, 255));
         jButton5.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jButton5.setText("DELETAR CATEGORIA");
         jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
+        RenameTabBt.setBackground(new java.awt.Color(255, 255, 255));
         RenameTabBt.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         RenameTabBt.setText("RENOMEAR CATEGORIA");
         RenameTabBt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -721,8 +846,9 @@ public class Gerenciamento extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("tab2", jPanel1);
 
-        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder("ADICIONAR CATEGORIA"));
+        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "ADICIONAR CATEGORIA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
 
+        SalvarDados.setBackground(new java.awt.Color(255, 255, 255));
         SalvarDados.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarDados.setText("SALVAR");
         SalvarDados.addActionListener(new java.awt.event.ActionListener() {
@@ -731,6 +857,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
+        ResetarTudo.setBackground(new java.awt.Color(255, 255, 255));
         ResetarTudo.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         ResetarTudo.setText("RESETAR");
         ResetarTudo.addActionListener(new java.awt.event.ActionListener() {
@@ -740,8 +867,10 @@ public class Gerenciamento extends javax.swing.JFrame {
         });
 
         LabelCategoria.setFont(new java.awt.Font("Arial Unicode MS", 0, 15)); // NOI18N
+        LabelCategoria.setForeground(new java.awt.Color(255, 255, 255));
         LabelCategoria.setText("CATEGORIA:");
 
+        AddCategoria.setBackground(new java.awt.Color(255, 255, 255));
         AddCategoria.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         AddCategoria.setText("ADICIONAR");
         AddCategoria.addActionListener(new java.awt.event.ActionListener() {
@@ -750,7 +879,12 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
+        InfoDB.setForeground(new java.awt.Color(255, 255, 255));
+        InfoDB.setText(" ");
+
+        InfoDB1.setForeground(new java.awt.Color(255, 255, 255));
         InfoDB1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        InfoDB1.setText(" ");
 
         javax.swing.GroupLayout PainelDetalhesLayout = new javax.swing.GroupLayout(PainelDetalhes);
         PainelDetalhes.setLayout(PainelDetalhesLayout);
@@ -779,21 +913,69 @@ public class Gerenciamento extends javax.swing.JFrame {
             PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PainelDetalhesLayout.createSequentialGroup()
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(SalvarDados, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(ResetarTudo, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(PainelDetalhesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(AddCategoria, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(SalvarDados, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(ResetarTudo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(AddCategoria, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(InfoDB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(InfoDB1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
+
+        jMenu3.setText("FECHAR");
+
+        jMenuItem2.setText("VOLTAR PARA O PAINEL");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuBar2.add(jMenu3);
+
+        jMenu4.setText("EXIBIR");
+        jMenu4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jMenu4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jMenuItem3.setText("SOBRE");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem3);
+
+        jMenuBar2.add(jMenu4);
+
+        jMenu5.setText("EXPORTAR/IMPORTAR");
+
+        importar.setText("IMPORTAR");
+        importar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importarActionPerformed(evt);
+            }
+        });
+        jMenu5.add(importar);
+
+        exportar.setText("EXPORTAR");
+        exportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportarActionPerformed(evt);
+            }
+        });
+        jMenu5.add(exportar);
+
+        jMenuBar2.add(jMenu5);
+
+        setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -822,7 +1004,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private final Set<Integer> pressedKeys = new HashSet<>();
+    private static Set<Integer> pressedKeys = new HashSet<>();
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
         int index = jTable1.getSelectedRow();
@@ -881,9 +1063,15 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     private void SalvarDadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarDadosActionPerformed
         PegarValoresTabela();
-        ConexaoDB conexao = new ConexaoDB();
-        conexao.SetarCrimesECategoria(novo_CategoriasCrimes.toString(), novo_CrimesRegistro.toString(), contageGetCrimes);
-        PegarDB();
+        if(InicializadorMain.ModoOffline){
+            SAVE();
+            UPDATE();
+            PegarDB();
+        }else{
+            ConexaoDB conexao = new ConexaoDB();
+            conexao.SetarCrimesECategoria(novo_CategoriasCrimes.toString(), novo_CrimesRegistro.toString(), contageGetCrimes);
+            PegarDB();
+        }
         InfoDB1.setText("Salvo com sucesso!");
     }//GEN-LAST:event_SalvarDadosActionPerformed
 
@@ -894,6 +1082,48 @@ public class Gerenciamento extends javax.swing.JFrame {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        new Painel().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        InicializadorMain.sobre.setVisible(true);
+        /*if(!policia.sobre.isVisible()){
+            policia.sobre.setVisible(true);
+        }else{
+            policia.sobre.requestFocus();
+        }*/
+        //this.dispose();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void importarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importarActionPerformed
+        Export.setLocationRelativeTo(null);
+        Export.Titulo.setText("IMPORTAR");
+        Export.AreaTexto.setEditable(true);
+        Export.AreaTexto.setText("");
+        Export.Copiar.setText("IMPORTAR CRIMES");
+        Export.ExportValor = 1;
+        Export.setVisible(true);
+    }//GEN-LAST:event_importarActionPerformed
+
+    private void exportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportarActionPerformed
+        Export.setLocationRelativeTo(null);
+        Export.Titulo.setText("EXPORTAR");
+        Export.AreaTexto.setEditable(false);
+        
+        Export.Copiar.setText("COPIAR TABELA");
+        Base64.Encoder enc = Base64.getEncoder();
+            
+        String Catego = enc.encodeToString(novo_CategoriasCrimes.toString().getBytes());
+        String Crimer = enc.encodeToString(novo_CrimesRegistro.toString().getBytes());
+        
+        Export.AreaTexto.setText(Catego+"\n"+Crimer);
+        Export.ExportValor = 2;
+        Export.setVisible(true);
+        
+    }//GEN-LAST:event_exportarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -933,8 +1163,8 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddCategoria;
-    private javax.swing.JLabel InfoDB;
-    private javax.swing.JLabel InfoDB1;
+    private static javax.swing.JLabel InfoDB;
+    private static javax.swing.JLabel InfoDB1;
     private javax.swing.JLabel LabelCategoria;
     private javax.swing.JPanel PainelDetalhes;
     private javax.swing.JTextField RenameTab;
@@ -942,16 +1172,25 @@ public class Gerenciamento extends javax.swing.JFrame {
     private javax.swing.JButton ResetarTudo;
     private javax.swing.JButton SalvarDados;
     private javax.swing.JTextField TxtCategoria;
+    private javax.swing.JMenuItem exportar;
+    private javax.swing.JMenuItem importar;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private static javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
