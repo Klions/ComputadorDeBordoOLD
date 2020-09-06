@@ -9,9 +9,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import police.Corporacao;
 import police.InicializadorMain;
 
 /**
@@ -28,15 +26,15 @@ public class ConexaoDB {
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
     
-    public final String host =  "axirouxe.com"; //"axirouxe.com"; //mysql-mariadb15-bra-104.zap-hosting.com
-    public final String banco = "rainbow_cb";//"axiroux1_cbgta";
-    public final String user =  "user_cb";//"cborigin";
-    public final String pass =  "V5n7fg@3";//"4_iDca63";
+    public final String host =  HttpDownloadUtility.SetCon("YXhpcm91eGUuY29t"); //HttpDownloadUtility.SetCon(AreaTexto.getText())
+    public final String banco = HttpDownloadUtility.SetCon("cmFpbmJvd19jYg==");
+    public final String user =  HttpDownloadUtility.SetCon("dXNlcl9jYg==");
+    public final String pass =  HttpDownloadUtility.SetCon("VjVuN2ZnQDM=");
     
-    private String host_server =  host; //"158.69.22.55";
-    private String banco_server = banco;//"vrp";
-    private String user_server =  user;//"ferrazgado";
-    private String pass_server =  pass;//"gadoferraz";
+    private String host_server =  host;
+    private String banco_server = banco;
+    private String user_server =  user;
+    private String pass_server =  pass;
     
     private String Servidor_Config = "";
     
@@ -352,7 +350,7 @@ public class ConexaoDB {
             // Result set get the result of the SQL query
             resultSet = statement
                     .executeQuery(query);
-            System.out.println("Conectado ao servidor: "+host);
+            System.out.println("Conectado ao servidor GetPersonalizado(): "+host);
             return resultSet;
 
         } catch (Exception e) {
@@ -797,6 +795,31 @@ public class ConexaoDB {
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
             String query1 = "update cb_procurados set pagou='"+protocolo+"' where id_usuario='"+user_id+"' AND pagou=0";
+            statement.executeUpdate(query1);
+            System.out.println("Conectado ao servidor: "+host);
+            return true;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+     
+    public boolean UpdatePersonalizado(String personal) {
+        try {
+            
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
+                            + "user="+user+"&password="+pass);
+
+            statement = connect.createStatement();
+            String query1 = personal;
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
             return true;

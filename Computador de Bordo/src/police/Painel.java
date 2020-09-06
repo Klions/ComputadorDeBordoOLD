@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import javax.swing.JButton;
 import org.json.JSONObject;
 import police.configs.Config;
+import police.configs.SNWindows;
 
 /**
  *
@@ -215,7 +216,7 @@ public class Painel extends javax.swing.JFrame {
         ContaBt.setBackground(new java.awt.Color(204, 204, 204));
         ContaBt.setForeground(new java.awt.Color(255, 255, 255));
         ContaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/searchbt.png"))); // NOI18N
-        ContaBt.setText("jButton1");
+        ContaBt.setText("CARREGANDO...");
         ContaBt.setBorder(null);
         ContaBt.setFocusPainted(false);
         ContaBt.setFocusable(false);
@@ -226,6 +227,11 @@ public class Painel extends javax.swing.JFrame {
         ContaBt.setRequestFocusEnabled(false);
         ContaBt.setRolloverEnabled(false);
         ContaBt.setVerifyInputWhenFocusTarget(false);
+        ContaBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ContaBtActionPerformed(evt);
+            }
+        });
 
         jMenu3.setText("EXIBIR");
         jMenu3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -318,6 +324,11 @@ public class Painel extends javax.swing.JFrame {
         new Gerenciamento().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_gerenciar3ActionPerformed
+
+    private void ContaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ContaBtActionPerformed
+        new ViewUsuario().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_ContaBtActionPerformed
 
     /**
      * @param args the command line arguments

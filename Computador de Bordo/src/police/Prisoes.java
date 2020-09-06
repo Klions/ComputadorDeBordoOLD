@@ -6,14 +6,19 @@
 package police;
 
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JLabel;
@@ -52,11 +57,29 @@ public class Prisoes extends javax.swing.JFrame {
     
     String CrimesDiscordFormat = "";
     
+    static String CrimesStore2="";
+    static String CategoriasStore2="";
+    
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     public Prisoes() {
         initComponents();
         DetalhesPainel.setVisible(false);
+        
+        getContentPane().setBackground(new java.awt.Color(13, 32, 64));
+        PesquisarPainel.setBackground(new java.awt.Color(13, 32, 64));
+        DetalhesPainel.setBackground(new java.awt.Color(13, 32, 64));
+        PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
+        PesquisarPainel.setBackground(new java.awt.Color(13, 32, 64));
+        jPanel2.setBackground(new java.awt.Color(13, 32, 64));
+        jPanel3.setBackground(new java.awt.Color(13, 32, 64));
+        this.setLocationRelativeTo(null);
+        
+        if(InicializadorMain.ModoOffline){
+            PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CADASTRAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+            PesquisarBt.setText("CADASTRAR");
+            PegarValoresOffline();
+        }
         this.revalidate();
         this.repaint();
         this.pack();
@@ -76,8 +99,69 @@ public class Prisoes extends javax.swing.JFrame {
         },0,1000);
     }
     
+    public void PegarValoresOffline(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFile2);
+            if(file.exists()){    //if this file exists
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                Base64.Decoder dec = Base64.getDecoder();
+                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    CategoriasStore2 = DecoderStre;
+                }
+                
+                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    CrimesStore2 = DecoderStre;
+                }
+                scan.close();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
     
     public void SetarBotoes(){
+        if(InicializadorMain.ModoOffline){
+            CategoriasCrimes = new JSONArray();
+            if(!"".equals(CategoriasStore2) && CategoriasStore2.length() > 10){
+                CategoriasCrimes = new JSONArray(CategoriasStore2);
+            }else{
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("id", 1);
+                getTemporario2.put("nome_categoria", "Categoria Exemplo");
+                
+                CategoriasCrimes.put(getTemporario2);
+            }
+            
+            CrimesRegistro = new JSONArray();
+            if(!"".equals(CrimesStore2) && CrimesStore2.length() > 10){
+                CrimesRegistro = new JSONArray(CrimesStore2);
+            }else{
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("texto", "Crime Exemplo");
+                getTemporario2.put("multa", 1000);
+                getTemporario2.put("meses", 50);
+                getTemporario2.put("tipo", "UNICO");
+                getTemporario2.put("categoria", 1);
+                
+                CrimesRegistro.put(getTemporario2);
+            }
+        }else{
+            Usuario usuarios = new Usuario();
+            GetCrimes = usuarios.CrimesServerID();
+            for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+                JSONObject o2 = GetCrimes.getJSONObject(i2);
+                CategoriasCrimes = new JSONArray(o2.getString("categorias"));
+                CrimesRegistro = new JSONArray(o2.getString("crimes"));
+            }
+        }
+        AtualizarJanelas();
+        /*
         Usuario usuarios = new Usuario();
         GetCrimes = usuarios.CrimesServerID();
         for(int i2 = 0; i2 < GetCrimes.length(); i2++){
@@ -87,11 +171,12 @@ public class Prisoes extends javax.swing.JFrame {
             CrimesRegistro = new JSONArray(o2.getString("crimes"));
         }
         AtualizarJanelas();
+        */
     }
     //private javax.swing.JLabel Textos[];
     //private javax.swing.JToggleButton Botoes[];
-    int QntCategorias = 10;
-    int QntCrimes = 100;
+    final int QntCategorias = 50;
+    final int QntCrimes = 300;
     
     JScrollPane[] ScrollPainel = new JScrollPane[QntCategorias];
     JPanel[] PainelBase = new JPanel[QntCategorias];
@@ -106,7 +191,7 @@ public class Prisoes extends javax.swing.JFrame {
             JSONObject o2 = CategoriasCrimes.getJSONObject(i2);
             
             PainelBase[i2] = new JPanel();
-            ScrollPainel[i2] = new JScrollPane();
+            
             javax.swing.GroupLayout jPanel1Layout2 = new javax.swing.GroupLayout(PainelBase[i2]);
             PainelBase[i2].setLayout(jPanel1Layout2);
             jPanel1Layout2.setHorizontalGroup(
@@ -117,22 +202,34 @@ public class Prisoes extends javax.swing.JFrame {
                 jPanel1Layout2.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGap(0, 386, Short.MAX_VALUE)
             );
+            ScrollPainel[i2] = new JScrollPane(PainelBase[i2], JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             ScrollPainel[i2].setViewportView(PainelBase[i2]);
             jTabbedPane1.addTab(o2.getString("nome_categoria"), ScrollPainel[i2]);
             
-            
+            ScrollPainel[i2].getVerticalScrollBar().setUnitIncrement(30);
             int PadraoX = 15;
             int EspacamentoX = 20;
             int EspacamentoY = 10;
             int LimiteQuadro = 4;
             int ContagemLimite = 0;
 
-            int TamanhoPainel = (jPanel1.getWidth()/LimiteQuadro);
+            int TamanhoPainel = (jPanel4.getWidth()/LimiteQuadro)-5;
             int Linha = 0;
             
+            int NLinha = (CrimesRegistro.length()/3);
+            int TamanhoTabela = 200+(50*NLinha)+45;
+            
             Container container = PainelBase[i2];
-            container.setLayout(null);
+            
+            javax.swing.GroupLayout jPanel1Layout3 = new javax.swing.GroupLayout(PainelBase[i2]);
+            container.setLayout(jPanel1Layout3);
+            jPanel1Layout3.setHorizontalGroup(
+                jPanel1Layout3.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 200, Short.MAX_VALUE)
+            );
+            
             
             for(int i = 0; i < CrimesRegistro.length(); i++){
                 final int As = i;
@@ -158,7 +255,7 @@ public class Prisoes extends javax.swing.JFrame {
                         PegarDadosBt.put("i1", i2);
                         PegarDadosBt.put("i2", i);
                         RegistroBotoes.put(PegarDadosBt);
-
+                        
                         Botoes[i2][i] = new JToggleButton(o.getString("texto"));
                         Botoes[i2][i].setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/falso.png"))); // NOI18N
                         Botoes[i2][i].setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -248,6 +345,12 @@ public class Prisoes extends javax.swing.JFrame {
                        
                 }
             }
+            if(ContagemLimite == 0)Linha--;
+            jPanel1Layout3.setVerticalGroup(
+                jPanel1Layout3.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 40+(50*Linha)+45, Short.MAX_VALUE) //386
+            );
+            this.pack();
         }
          /*   
         
@@ -406,6 +509,17 @@ public class Prisoes extends javax.swing.JFrame {
         }
         return new JSONObject();
     }
+    public JSONObject UsuarioPorPhone(String registro){
+        registro = registro.toLowerCase();
+        for(int i = 0; i < usuariosDBarray.length(); i++){
+            JSONObject obj = usuariosDBarray.getJSONObject(i);
+            String RegistrationUsuario = obj.getString("phone").toLowerCase();
+            if(RegistrationUsuario.contains(registro)){
+                return obj;
+            }
+        }
+        return new JSONObject();
+    }
     
     public int ProcuradoPorID(int user_id){
         int nivel_procurado = 0;
@@ -427,24 +541,35 @@ public class Prisoes extends javax.swing.JFrame {
     }
     
     public void DigitandoCampo(int Campo){
-        switch(Campo) {
-            case 0:
-                txtID.setText(null);
-                txtNome.setText(null);
-                txtPlaca.setText(null);
-                break;
-            case 1:
-                txtNome.setText(null);
-                txtPlaca.setText(null);
-                break;
-            case 2:
-                txtID.setText(null);
-                txtPlaca.setText(null);
-                break;
-            case 3:
-                txtID.setText(null);
-                txtNome.setText(null);
-                break;
+        if(!InicializadorMain.ModoOffline || Campo == 0){
+            switch(Campo) {
+                case 0:
+                    txtID.setText(null);
+                    txtNome.setText(null);
+                    txtPlaca.setText(null);
+                    txtTelefone.setText(null);
+                    break;
+                case 1:
+                    txtNome.setText(null);
+                    txtPlaca.setText(null);
+                    txtTelefone.setText(null);
+                    break;
+                case 2:
+                    txtID.setText(null);
+                    txtPlaca.setText(null);
+                    txtTelefone.setText(null);
+                    break;
+                case 3:
+                    txtID.setText(null);
+                    txtNome.setText(null);
+                    txtTelefone.setText(null);
+                    break;
+                case 4:
+                    txtID.setText(null);
+                    txtNome.setText(null);
+                    txtPlaca.setText(null);
+                    break;
+            }
         }
     }
     
@@ -455,40 +580,74 @@ public class Prisoes extends javax.swing.JFrame {
     public void PegarUsuario(){
         ResetarCrimes();
         JSONObject Usuario = new JSONObject();
-        String TxtPegarBusca = txtID.getText();
-        if(TxtPegarBusca.length() > 0){
-            Usuario = UsuarioPorID(Integer.parseInt(TxtPegarBusca));
-            if(!Usuario.has("id_usuario")){
-                Alerta("O passaporte '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
-                return;
-            }
+        
+        if(InicializadorMain.ModoOffline){
+            String Cad1 = txtID.getText();
+            String Cad2 = txtNome.getText();
+            String Cad3 = txtPlaca.getText();
+            String Cad4 = txtTelefone.getText();
+            if(Cad1.length() <= 0){Alerta("Necessário digitar o passaporte!", "Ocorreu algum erro"); return ;}
+            if(Cad2.length() <= 5){Alerta("Necessário digitar o nome! Está muito curto.", "Ocorreu algum erro"); return ;}
+            if(Cad3.length() <= 0)Cad3 = "N/A";
+            if(Cad4.length() <= 0)Cad4 = "N/A";
+            Usuario.put("id_usuario", Cad1);
+            Usuario.put("nome_completo", Cad2);
+            Usuario.put("nome", Cad2);
+            Usuario.put("sobrenome", Cad2);
+            Usuario.put("registration", Cad3);
+            Usuario.put("phone", Cad4);
+            Usuario.put("age", "00");
+            
+            
         }else{
-            TxtPegarBusca = txtNome.getText();
+            String TxtPegarBusca = txtID.getText();
             if(TxtPegarBusca.length() > 0){
-                if(TxtPegarBusca.length() < 4){
-                    Alerta("O nome '"+TxtPegarBusca+"' é muito pequeno para procurarmos! Coloque mais de 3 caracteres", "Ocorreu algum erro");
-                    return;
-                }
-                Usuario = UsuarioPorNome(TxtPegarBusca);
+                Usuario = UsuarioPorID(Integer.parseInt(TxtPegarBusca));
                 if(!Usuario.has("id_usuario")){
-                    Alerta("O nome '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
+                    Alerta("O passaporte '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
                     return;
                 }
             }else{
-                TxtPegarBusca = txtPlaca.getText();
+                TxtPegarBusca = txtNome.getText();
                 if(TxtPegarBusca.length() > 0){
-                    if(TxtPegarBusca.length() < 6){
-                        Alerta("O registro '"+TxtPegarBusca+"' é muito pequeno para procurarmos! Coloque mais de 5 caracteres", "Ocorreu algum erro");
+                    if(TxtPegarBusca.length() < 4){
+                        Alerta("O nome '"+TxtPegarBusca+"' é muito pequeno para procurarmos! Coloque mais de 3 caracteres.", "Ocorreu algum erro");
                         return;
                     }
-                    Usuario = UsuarioPorRegistration(TxtPegarBusca);
+                    Usuario = UsuarioPorNome(TxtPegarBusca);
                     if(!Usuario.has("id_usuario")){
-                        Alerta("A placa '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
+                        Alerta("O nome '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
                         return;
                     }
                 }else{
-                    Alerta("Necessário digitar algo para buscarmos!", "Ocorreu algum erro");
-                    return;
+                    TxtPegarBusca = txtPlaca.getText();
+                    if(TxtPegarBusca.length() > 0){
+                        if(TxtPegarBusca.length() < 6){
+                            Alerta("O registro '"+TxtPegarBusca+"' é muito pequeno para procurarmos! Coloque mais de 5 caracteres.", "Ocorreu algum erro");
+                            return;
+                        }
+                        Usuario = UsuarioPorRegistration(TxtPegarBusca);
+                        if(!Usuario.has("id_usuario")){
+                            Alerta("A placa '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
+                            return;
+                        }
+                    }else{
+                        TxtPegarBusca = txtTelefone.getText();
+                        if(TxtPegarBusca.length() > 0){
+                            if(TxtPegarBusca.length() < 4){
+                                Alerta("O telefone '"+TxtPegarBusca+"' é muito pequeno para procurarmos! Siga o exemplo: 000-000 ou 0000-0000.", "Ocorreu algum erro");
+                                return;
+                            }
+                            Usuario = UsuarioPorPhone(TxtPegarBusca);
+                            if(!Usuario.has("id_usuario")){
+                                Alerta("O telefone '"+TxtPegarBusca+"' não foi encontrado no banco da cidade!", "Ocorreu algum erro");
+                                return;
+                            }
+                        }else{
+                            Alerta("Necessário digitar algo para buscarmos!", "Ocorreu algum erro");
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -502,8 +661,9 @@ public class Prisoes extends javax.swing.JFrame {
         //PassaPreso=Usuario.getInt("id_usuario");
         //String discord = o.getString("discord");
         String nome = Usuario.getString("nome")+" "+Usuario.getString("sobrenome");
+        if(Usuario.has("nome_completo")) nome = Usuario.getString("nome_completo");
+        
         if(" ".equals(nome))nome="Sem Registro";
-        String passaporte = Usuario.getString("id_usuario");
         String identidade = Usuario.getString("registration");
         
         //SETAGENS DE TEXTOS INFO
@@ -659,7 +819,7 @@ public class Prisoes extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         PainelDetalhes = new javax.swing.JPanel();
         info_CrimesS = new javax.swing.JTextField();
         info_Pena1S = new javax.swing.JLabel();
@@ -670,16 +830,6 @@ public class Prisoes extends javax.swing.JFrame {
         info_Pena1 = new javax.swing.JLabel();
         info_Pena2 = new javax.swing.JLabel();
         info_Pena2S = new javax.swing.JLabel();
-        PesquisarPainel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        txtID = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        txtNome = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        txtPlaca = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
         DetalhesPainel = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         des_Nome = new javax.swing.JLabel();
@@ -705,6 +855,12 @@ public class Prisoes extends javax.swing.JFrame {
         ResetarBt = new javax.swing.JButton();
         SalvarBt1 = new javax.swing.JButton();
         CopiarDiscordBt = new javax.swing.JButton();
+        PesquisarPainel = new javax.swing.JPanel();
+        txtID = new javax.swing.JTextField();
+        PesquisarBt = new javax.swing.JButton();
+        txtNome = new javax.swing.JTextField();
+        txtPlaca = new javax.swing.JTextField();
+        txtTelefone = new javax.swing.JTextField();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -722,27 +878,30 @@ public class Prisoes extends javax.swing.JFrame {
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("REGISTRO DE PRISÕES");
 
         jTabbedPane1.setToolTipText("");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 923, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 386, Short.MAX_VALUE)
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 334, Short.MAX_VALUE)
         );
 
-        jScrollPane1.setViewportView(jPanel1);
+        jScrollPane1.setViewportView(jPanel4);
 
         jTabbedPane1.addTab("Crimes 1", jScrollPane1);
 
-        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder("INFORMAÇÕES PENAL"));
+        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "INFORMAÇÕES PENAL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
 
         info_CrimesS.setEditable(false);
         info_CrimesS.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -767,6 +926,7 @@ public class Prisoes extends javax.swing.JFrame {
         info_ComandoS.setForeground(new java.awt.Color(153, 153, 255));
         info_ComandoS.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
+        TimeAgora.setForeground(new java.awt.Color(255, 255, 255));
         TimeAgora.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         TimeAgora.setText(" ");
 
@@ -829,106 +989,6 @@ public class Prisoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TimeAgora)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder("PESQUISAR INDIVÍDUO"));
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel2.setText("PASSAPORTE:");
-
-        txtID.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        txtID.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtID.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtIDKeyPressed(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtIDKeyTyped(evt);
-            }
-        });
-
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("OU");
-
-        txtNome.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        txtNome.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtNome.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtNomeKeyPressed(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtNomeKeyTyped(evt);
-            }
-        });
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel4.setText("NOME:");
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel5.setText("PLACA DO VEÍCULO:");
-
-        txtPlaca.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        txtPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtPlaca.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtPlacaKeyPressed(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtPlacaKeyTyped(evt);
-            }
-        });
-
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("OU");
-
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/searchbt.png"))); // NOI18N
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout PesquisarPainelLayout = new javax.swing.GroupLayout(PesquisarPainel);
-        PesquisarPainel.setLayout(PesquisarPainelLayout);
-        PesquisarPainelLayout.setHorizontalGroup(
-            PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PesquisarPainelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtNome)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtPlaca, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton3)
-                .addContainerGap())
-        );
-        PesquisarPainelLayout.setVerticalGroup(
-            PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PesquisarPainelLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtID, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPlaca, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         DetalhesPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BANCO DA POLÍCIA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
@@ -1055,8 +1115,8 @@ public class Prisoes extends javax.swing.JFrame {
                         .addComponent(des_RegistroS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(des_Passagem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(des_Procurado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(des_Procurado)
+                    .addComponent(des_Passagem, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(des_ProcuradoS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1064,7 +1124,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(verpreso)
-                    .addComponent(procuradoBt))
+                    .addComponent(procuradoBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -1072,8 +1132,7 @@ public class Prisoes extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(des_MultaS, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(vermulta)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(vermulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(des_Info, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1128,9 +1187,11 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
+        SalvarBt.setBackground(new java.awt.Color(255, 255, 255));
         SalvarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt.setText("REGISTRAR PRISÃO");
 
+        ResetarBt.setBackground(new java.awt.Color(255, 255, 255));
         ResetarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         ResetarBt.setText("RESETAR");
         ResetarBt.addActionListener(new java.awt.event.ActionListener() {
@@ -1139,9 +1200,11 @@ public class Prisoes extends javax.swing.JFrame {
             }
         });
 
+        SalvarBt1.setBackground(new java.awt.Color(255, 255, 255));
         SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt1.setText("REGISTRAR PROCURADO");
 
+        CopiarDiscordBt.setBackground(new java.awt.Color(255, 255, 255));
         CopiarDiscordBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         CopiarDiscordBt.setText("COPIAR DISCORD");
         CopiarDiscordBt.addActionListener(new java.awt.event.ActionListener() {
@@ -1174,6 +1237,120 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PESQUISAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+
+        txtID.setBackground(new java.awt.Color(13, 32, 64));
+        txtID.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtID.setForeground(new java.awt.Color(255, 255, 255));
+        txtID.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtID.setToolTipText("Passaporte/ID do indivíduo");
+        txtID.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "PASSAPORTE", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        txtID.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        txtID.setOpaque(false);
+        txtID.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtIDKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtIDKeyTyped(evt);
+            }
+        });
+
+        PesquisarBt.setBackground(new java.awt.Color(13, 32, 64));
+        PesquisarBt.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        PesquisarBt.setForeground(new java.awt.Color(255, 255, 255));
+        PesquisarBt.setText("PESQUISAR");
+        PesquisarBt.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        PesquisarBt.setContentAreaFilled(false);
+        PesquisarBt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        PesquisarBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PesquisarBtActionPerformed(evt);
+            }
+        });
+
+        txtNome.setBackground(new java.awt.Color(13, 32, 64));
+        txtNome.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtNome.setForeground(new java.awt.Color(255, 255, 255));
+        txtNome.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtNome.setToolTipText("Nome do indivíduo");
+        txtNome.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "NOME", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        txtNome.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        txtNome.setOpaque(false);
+        txtNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtNomeKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNomeKeyTyped(evt);
+            }
+        });
+
+        txtPlaca.setBackground(new java.awt.Color(13, 32, 64));
+        txtPlaca.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtPlaca.setForeground(new java.awt.Color(255, 255, 255));
+        txtPlaca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtPlaca.setToolTipText("Placa/Registro (RG) do Indivíduo");
+        txtPlaca.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "REGISTRO OU PLACA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        txtPlaca.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        txtPlaca.setOpaque(false);
+        txtPlaca.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPlacaKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPlacaKeyTyped(evt);
+            }
+        });
+
+        txtTelefone.setBackground(new java.awt.Color(13, 32, 64));
+        txtTelefone.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtTelefone.setForeground(new java.awt.Color(255, 255, 255));
+        txtTelefone.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtTelefone.setToolTipText("Telefone/Celular do Indivíduo");
+        txtTelefone.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "TELEFONE", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        txtTelefone.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        txtTelefone.setOpaque(false);
+        txtTelefone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtTelefoneKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtTelefoneKeyTyped(evt);
+            }
+        });
+
+        javax.swing.GroupLayout PesquisarPainelLayout = new javax.swing.GroupLayout(PesquisarPainel);
+        PesquisarPainel.setLayout(PesquisarPainelLayout);
+        PesquisarPainelLayout.setHorizontalGroup(
+            PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PesquisarPainelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtPlaca, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(PesquisarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        PesquisarPainelLayout.setVerticalGroup(
+            PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PesquisarPainelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PesquisarPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPlaca, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(PesquisarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1222,10 +1399,10 @@ public class Prisoes extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
-                    .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
-                    .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, 947, Short.MAX_VALUE)
-                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1233,12 +1410,12 @@ public class Prisoes extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(PesquisarPainel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(PesquisarPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1261,46 +1438,9 @@ public class Prisoes extends javax.swing.JFrame {
         //AbrirMenuVerPrisoes(2);
     }//GEN-LAST:event_procuradoBtActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        PegarUsuario();
-    }//GEN-LAST:event_jButton3ActionPerformed
-
     private void ResetarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarBtActionPerformed
         ResetarTudo();
     }//GEN-LAST:event_ResetarBtActionPerformed
-
-    private void txtIDKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIDKeyTyped
-        DigitandoCampo(1);
-    }//GEN-LAST:event_txtIDKeyTyped
-
-    private void txtNomeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomeKeyTyped
-        DigitandoCampo(2);
-    }//GEN-LAST:event_txtNomeKeyTyped
-
-    private void txtPlacaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPlacaKeyTyped
-        DigitandoCampo(3);
-    }//GEN-LAST:event_txtPlacaKeyTyped
-
-    private void txtIDKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIDKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            DigitandoCampo(1);
-            PegarUsuario();
-        }
-    }//GEN-LAST:event_txtIDKeyPressed
-
-    private void txtNomeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomeKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            DigitandoCampo(2);
-            PegarUsuario();
-        }
-    }//GEN-LAST:event_txtNomeKeyPressed
-
-    private void txtPlacaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPlacaKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            DigitandoCampo(3);
-            PegarUsuario();
-        }
-    }//GEN-LAST:event_txtPlacaKeyPressed
 
     private void CopiarDiscordBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarDiscordBtActionPerformed
         // TODO add your handling code here:
@@ -1325,6 +1465,67 @@ public class Prisoes extends javax.swing.JFrame {
         //this.dispose();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
+    private void txtIDKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIDKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            DigitandoCampo(1);
+            PegarUsuario();
+        }
+    }//GEN-LAST:event_txtIDKeyPressed
+
+    private void txtIDKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIDKeyTyped
+        DigitandoCampo(1);
+        SomenteNumeros(evt);
+    }//GEN-LAST:event_txtIDKeyTyped
+
+    private void txtNomeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomeKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            DigitandoCampo(2);
+            PegarUsuario();
+        }
+    }//GEN-LAST:event_txtNomeKeyPressed
+
+    private void txtNomeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomeKeyTyped
+        DigitandoCampo(2);
+    }//GEN-LAST:event_txtNomeKeyTyped
+
+    private void txtPlacaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPlacaKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            DigitandoCampo(3);
+            PegarUsuario();
+        }
+    }//GEN-LAST:event_txtPlacaKeyPressed
+
+    private void txtPlacaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPlacaKeyTyped
+        DigitandoCampo(3);
+    }//GEN-LAST:event_txtPlacaKeyTyped
+
+    private void PesquisarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PesquisarBtActionPerformed
+        PegarUsuario();
+    }//GEN-LAST:event_PesquisarBtActionPerformed
+
+    private void txtTelefoneKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefoneKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            DigitandoCampo(4);
+            PegarUsuario();
+        }
+    }//GEN-LAST:event_txtTelefoneKeyPressed
+
+    private void txtTelefoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefoneKeyTyped
+        DigitandoCampo(4);
+    }//GEN-LAST:event_txtTelefoneKeyTyped
+
+    public boolean SomenteNumeros(KeyEvent evt){
+        char c = evt.getKeyChar();
+        if (!((c >= '0') && (c <= '9') ||
+            (c == KeyEvent.VK_BACK_SPACE) ||
+            (c == KeyEvent.VK_DELETE) ||
+            (c == KeyEvent.VK_LEFT) ||
+            (c == KeyEvent.VK_RIGHT)) ) {
+            //getToolkit().beep();
+            evt.consume();
+        }
+        return true;
+    }
     /**
      * @param args the command line arguments
      */
@@ -1364,6 +1565,7 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JButton CopiarDiscordBt;
     private javax.swing.JPanel DetalhesPainel;
     private javax.swing.JPanel PainelDetalhes;
+    private javax.swing.JButton PesquisarBt;
     private javax.swing.JPanel PesquisarPainel;
     private javax.swing.JButton ResetarBt;
     private javax.swing.JButton SalvarBt;
@@ -1392,13 +1594,7 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JLabel info_Pena1S;
     private javax.swing.JLabel info_Pena2;
     private javax.swing.JLabel info_Pena2S;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -1408,15 +1604,16 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton procuradoBt;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtPlaca;
+    private javax.swing.JTextField txtTelefone;
     private javax.swing.JButton vermulta;
     private javax.swing.JButton verpreso;
     // End of variables declaration//GEN-END:variables
