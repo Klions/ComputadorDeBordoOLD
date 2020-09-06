@@ -5,12 +5,12 @@
  */
 package police;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 import net.dv8tion.jda.api.JDA;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import police.configs.SNWindows;
 import police.configs.Usuario;
 
 /**
@@ -65,8 +65,9 @@ public class InicializadorMain {
                     prisoesDBarray = usuarios.AttDBPrisoes();
                     procuradosDBarray = usuarios.AttDBProcurados();
                     hierarquiaDBarray = usuarios.AttDBHierarquia();
-                    System.out.println("Banco de dados ATUALIZADO.");
+                    //System.out.println("Banco de dados ATUALIZADO.");
                 }
+                SNWindows.getSerialALL();
             }
         },0,60000);
     }

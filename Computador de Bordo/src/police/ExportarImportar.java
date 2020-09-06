@@ -10,6 +10,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
+import police.configs.HttpDownloadUtility;
 
 /**
  *
@@ -25,6 +26,7 @@ public class ExportarImportar extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
     }
     public int ExportValor = 0;
+    public String TextoExportar = "";
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,19 +91,15 @@ public class ExportarImportar extends javax.swing.JFrame {
 
     private void CopiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarActionPerformed
         if(ExportValor == 1){
-            if(Gerenciamento.ImportarDados(AreaTexto.getText())){
-                this.setVisible(false);
-                Gerenciamento.PegarDB();
-            }else{
+            if(!Gerenciamento.ImportarDados(AreaTexto.getText())){
                 showMessageDialog(null,"Ocorreu um erro ao importar a tabela que inseriu. Tente novamente.","ERRO NA "+Titulo.getText(),JOptionPane.PLAIN_MESSAGE);
             }
         }else if(ExportValor == 2){
-            String myString = AreaTexto.getText();
-            StringSelection stringSelection = new StringSelection(myString);
+            StringSelection stringSelection = new StringSelection(TextoExportar);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
-            this.setVisible(false);
         }
+        this.setVisible(false);
     }//GEN-LAST:event_CopiarActionPerformed
 
     /**

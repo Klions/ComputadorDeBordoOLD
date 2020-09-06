@@ -5,12 +5,19 @@
  */
 package police.configs;
 
+import java.awt.RenderingHints.Key;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  *
@@ -75,11 +82,50 @@ public class HttpDownloadUtility {
             httpConn.disconnect();
             return true;
         } else {
-            
             System.out.println("Nenhum arquivo para baixar. Servidor retornando ao erro: " + responseCode);
             httpConn.disconnect();
             return false;
         }
-        
+    }
+    
+    public static String GetCon(String Conect){
+        String ALGO = "AES";
+        byte[] keyValue = 
+        new byte[] { 'H', 't', 'v', 'b', 'a', 'w', 'e',
+        'i', 'n', 'v', 'a','l', 't', 'k', 'y', 'e' };
+        Base64.Encoder enc = Base64.getEncoder();
+        Key pass = generateKey(Conect);
+        // cipher class to provide the encryption and intialize
+        Cipher c = null;
+        try {
+            c = Cipher.getInstance(ALGO);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(HttpDownloadUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchPaddingException ex) {
+            Logger.getLogger(HttpDownloadUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        byte[] encVal = null;
+        String encryptedValue = Base64.getEncoder().encodeToString(new byte[] { 'i', 'n', 'v', 'a','l', 't', 'k', 'y', 'e',
+            'H', 't', 'v', 'b', 'a', 'w', 'e',
+        });
+        return enc.encodeToString(Conect.getBytes());
+    }
+    public static String SetCon(String Conect){
+        String alore = DecodeBase64(Conect);
+        return alore;
+    }
+    public static String DecodeBase64(String StrDec){
+        Base64.Decoder dec = Base64.getDecoder();
+        byte[] bites = null;
+        try {
+            bites = dec.decode(StrDec);
+        } catch (IllegalArgumentException e) { e.printStackTrace(); }     
+        if(bites != null) return new String(bites);
+        return "";
+    }
+    private static Key generateKey(String key) {
+        Key pass=null;
+        key = pass+"";
+        return pass;
     }
 }

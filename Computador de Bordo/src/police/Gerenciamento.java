@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -33,6 +34,7 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
+import police.configs.SNWindows;
 import police.configs.Usuario;
 
 /**
@@ -64,23 +66,31 @@ public class Gerenciamento extends javax.swing.JFrame {
     
     ExportarImportar Export = new ExportarImportar();
     
-    private static int AttStore = 0;
     
+    public static int tCrimes = 0;
+    public static int tCategorias = 0;
+    
+    private static Set<Integer> pressedKeys = new HashSet<>();
+    
+    static int Nivel_Ass = 0;
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     public Gerenciamento() {
         initComponents();
+        JFrame EsteFrame = this;
+        //Timere.cancel();
         if(InicializadorMain.ModoOffline) UPDATE();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
+        this.setLocationRelativeTo(null);
         PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
         Export.setLocationRelativeTo(null);
         PegarDB();
-        //AdicionarBotoes();
-        //jTable1.setTransferHandler(new TableRowTransferHandler(jTable1)); 
         
-        new Timer().scheduleAtFixedRate(new TimerTask(){
-            @Override
-            public void run(){
+        Timer timer = new Timer(); 
+        TimerTask tt = new TimerTask() { 
+  
+            public void run() 
+            { 
                 if(SalvarTime > 0){
                     SalvarDados.setEnabled(false);
                     ResetarTudo.setEnabled(false);
@@ -94,8 +104,12 @@ public class Gerenciamento extends javax.swing.JFrame {
                     SalvarDados.setText("SALVAR");
                     ResetarTudo.setText("RESETAR");
                 }
-            }
-        },0,1000);
+                if(!EsteFrame.isVisible()){
+                    timer.cancel();
+                }
+            }; 
+        }; 
+        timer.schedule(tt, 1000, 1000); 
     }
     
     
@@ -103,9 +117,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
             if(!"".equals(CategoriasStore) && CategoriasStore.length() > 10){
-                
                 CategoriasCrimes = new JSONArray(CategoriasStore);
-                System.out.println("PegarDB() CategoriasStore: "+CategoriasStore);
             }else{
                 JSONObject getTemporario2 = new JSONObject();
                 getTemporario2.put("id", 1);
@@ -117,7 +129,6 @@ public class Gerenciamento extends javax.swing.JFrame {
             CrimesRegistro = new JSONArray();
             if(!"".equals(CrimesStore) && CrimesStore.length() > 10){
                 CrimesRegistro = new JSONArray(CrimesStore);
-                System.out.println("PegarDB() CrimesStore: "+CrimesStore);
             }else{
                 JSONObject getTemporario2 = new JSONObject();
                 getTemporario2.put("texto", "Crime Exemplo");
@@ -130,7 +141,6 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
             novo_CategoriasCrimes = CategoriasCrimes;
             novo_CrimesRegistro = CrimesRegistro;
-            SalvarTime=10;
         }else{
             Usuario usuarios = new Usuario();
             GetCrimes = usuarios.CrimesServerID();
@@ -142,13 +152,14 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
             novo_CategoriasCrimes = CategoriasCrimes;
             novo_CrimesRegistro = CrimesRegistro;
-            SalvarTime=20;
         }
+        SalvarTime=20;
         AtualizarJanelas();
+        PegarValoresTabela();
     }
     
-    static int QntCategorias = 10;
-    static int QntCrimes = 100;
+    final static int QntCategorias = 50;
+    final static int QntCrimes = 300;
     
     static JScrollPane[] ScrollPainel = new JScrollPane[QntCategorias];
     static JPanel[] PainelBase = new JPanel[QntCategorias];
@@ -166,7 +177,19 @@ public class Gerenciamento extends javax.swing.JFrame {
     //JComboBox[] TipoEscolha = new JComboBox[10];
     
     public static void AdicionarBotoes(){
+        Nivel_Ass = SNWindows.getNivelSerialPC();
+        final int nivel_ass = Nivel_Ass;
         RegistroTabelas = new JSONArray();
+        System.out.println("AdicionarBotoes()");
+        boolean Bloqueado = false;
+        if(InicializadorMain.ModoOffline){
+            if(novo_CategoriasCrimes.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || novo_CrimesRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
+                Bloqueado = true;
+                TxtCategoria.setEnabled(false);
+                AddCategoria.setEnabled(false);
+                showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente.", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
+            }
+        }
         
         for(int i2 = 0; i2 < novo_CategoriasCrimes.length(); i2++){
             JSONObject o2 = novo_CategoriasCrimes.getJSONObject(i2);
@@ -338,14 +361,21 @@ public class Gerenciamento extends javax.swing.JFrame {
                                             Tabelas[As].setRowSelectionInterval(index-1, index-1);
                                         }
                                     }
+                                    PegarTotalTabela();
                                 }
                             }
                             if (pressedKeys.contains(KeyEvent.VK_INSERT)) {
                                 //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
-                                if(Tabelas[As].getRowCount() < 30){
+                                
+                                //SNWindows.CorAssinatura[nivel_ass][0]
+                                if(tCrimes < SNWindows.CategAssinatura[nivel_ass][1]){
                                     InfoDB1.setText("Nova linha foi adicionada");
                                     model.addRow(new Object[]{"", 0, 0,"UNICO"});
                                     Tabelas[As].setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
+                                    PegarTotalTabela();
+                                }else{
+                                    pressedKeys = new HashSet<>();
+                                    showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_ass]+"' permite adicionar até "+SNWindows.CategAssinatura[nivel_ass][1]+" crimes.", "Erro ao inserir novo crime",JOptionPane.PLAIN_MESSAGE);
                                 }
                             }
                         }
@@ -381,11 +411,20 @@ public class Gerenciamento extends javax.swing.JFrame {
             BotoesAdd[i2].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
             BotoesRem[i2].setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-            BotoesAdd[i2].addActionListener(new java.awt.event.ActionListener() {
+            /*BotoesAdd[i2].addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    model.addRow(new Object[]{"", 0, 0, "UNICO"});
+                    //Tabelas[As].getRowCount()
+                    if(tCrimes < SNWindows.CategAssinatura[nivel_ass][1]){
+                        InfoDB1.setText("Nova linha foi adicionada");
+                        model.addRow(new Object[]{"", 0, 0,"UNICO"});
+                        Tabelas[As].setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
+                        PegarTotalTabela();
+                    }else{
+                        showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_ass]+"' permite adicionar até "+SNWindows.CategAssinatura[nivel_ass][1]+" crimes.", "Erro ao inserir novo crime",JOptionPane.PLAIN_MESSAGE);
+                    }
+                    //model.addRow(new Object[]{"", 0, 0, "UNICO"});
                 }
-            });
+            });*/
             
             BotoesRem[i2].addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -427,6 +466,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                             PegarValoresTabela();
                         }
                         AtualizarJanelas();
+                        PegarTotalTabela();
                     }
                 }
             });
@@ -469,8 +509,10 @@ public class Gerenciamento extends javax.swing.JFrame {
             if(model.getRowCount() > 0){
                 if(index3 < 0) Tabelas[i2].setRowSelectionInterval(0, 0);
             }else{
-                model.addRow(new Object[]{"", 0, 0, "UNICO"});
-                Tabelas[i2].setRowSelectionInterval(0, 0);
+                if(tCrimes < SNWindows.CategAssinatura[nivel_ass][1]){
+                    model.addRow(new Object[]{"", 0, 0, "UNICO"});
+                    Tabelas[i2].setRowSelectionInterval(0, 0);
+                }
             }
             //Tabelas[i2].requestFocus();
             
@@ -511,7 +553,14 @@ public class Gerenciamento extends javax.swing.JFrame {
                         .addComponent(TipoEscolha[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
-            
+            if(Bloqueado){
+                Tabelas[i2].setEnabled(false);
+                RenameTabBtc[i2].setEnabled(false);
+                RenameTabc[i2].setEnabled(false);
+                TipoEscolha[i2].setEnabled(false);
+                BotoesRem[i2].setEnabled(false);
+                BotoesAdd[i2].setEnabled(false);
+            }
             if(TotalIdsTab < o2.getInt("id")){
                 TotalIdsTab = o2.getInt("id");
             }
@@ -519,6 +568,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }
     
     public static void AtualizarJanelas(){
+        PegarTotalTabela();
         int AtualTab = jTabbedPane1.getSelectedIndex();
         while (jTabbedPane1.getTabCount() > 0)
             jTabbedPane1.remove(0);
@@ -528,22 +578,21 @@ public class Gerenciamento extends javax.swing.JFrame {
     
     public static void PegarValoresTabela(){
         novo_CrimesRegistro = new JSONArray();
-        int tCrimes = 0;
-        int tCategorias = 0;
+        int semnome = 0;
         for(int i = 0; i < RegistroTabelas.length(); i++){
             JSONObject obj = RegistroTabelas.getJSONObject(i);
             int ir = obj.getInt("i");
             int row = Tabelas[ir].getRowCount();
             int column = Tabelas[ir].getColumnCount();
-            tCategorias++;
             for (int r = 0; r  < row; r++) {
-                tCrimes++;
                 JSONObject getTemporario2 = new JSONObject();
                 for (int c = 0; c  < column; c++) {
                     //System.out.println("Tabelas[ir].getValueAt(r, c): "+Tabelas[ir].getValueAt(r, c));
                     switch(c){
                         case 0:
-                            getTemporario2.put("texto", Tabelas[ir].getValueAt(r, c));
+                            String Nome_Crime = Tabelas[ir].getValueAt(r, c)+"";
+                            if("".equals(Nome_Crime)){ Nome_Crime = "Sem Nome";semnome++;}
+                            getTemporario2.put("texto", Nome_Crime);
                         case 1:
                             getTemporario2.put("multa", Tabelas[ir].getValueAt(r, c));
                         case 2:
@@ -562,14 +611,23 @@ public class Gerenciamento extends javax.swing.JFrame {
             //novo_CategoriasCrimes = new JSONArray();
         }
         //System.out.println("novo_CrimesRegistro: "+novo_CrimesRegistro.toString());
-        InfoDB.setText("Total de "+tCrimes+" crimes em "+tCategorias+" categorias registradas.");
-        
-        /*
-        if(InicializadorMain.ModoOffline){
-            CategoriasStore = novo_CategoriasCrimes.toString();
-            CrimesStore = novo_CrimesRegistro.toString();
+        PegarTotalTabela();
+        if(semnome > 0)InfoDB.setText(semnome+" crimes foram renomeados para 'Sem Nome'");
+    }
+    
+    public static void PegarTotalTabela(){
+        tCategorias = 0;
+        tCrimes = 0;
+        for(int i = 0; i < RegistroTabelas.length(); i++){
+            JSONObject obj = RegistroTabelas.getJSONObject(i);
+            int ir = obj.getInt("i");
+            int row = Tabelas[ir].getRowCount();
+            tCategorias++;
+            for (int r = 0; r  < row; r++) {
+                tCrimes++;
+            }
         }
-        */
+        InfoDB.setText("Total de "+tCrimes+" crimes em "+tCategorias+" categorias registradas.");
     }
 
     public void AddKey(java.awt.event.KeyEvent evt, JTable tabela) {
@@ -609,7 +667,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         } catch (IOException e) { e.printStackTrace(); }        
     }//End Of Save
     
-    public void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
+    public static void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
         try {
             File file = new File(InicializadorMain.DestFile2);
             if(file.exists()){    //if this file exists
@@ -665,8 +723,6 @@ public class Gerenciamento extends javax.swing.JFrame {
             }else{
                 return false;
             }
-            System.out.println("ImportarDados() CategoriasStore: "+CategoriasStore+" / CrimesStore: "+CrimesStore);
-            AttStore = 2;
             PegarDB();
             return true;
         }
@@ -1004,7 +1060,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private static Set<Integer> pressedKeys = new HashSet<>();
+    
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
         int index = jTable1.getSelectedRow();
@@ -1034,16 +1090,22 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     private void AddCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCategoriaActionPerformed
         String NomeCategoria = TxtCategoria.getText();
-        if(NomeCategoria.length() > 2 && NomeCategoria.length() < 25){
-            PegarValoresTabela();
-            JSONObject getTemporario10 = new JSONObject();
-            TotalIdsTab++;
-            getTemporario10.put("id", TotalIdsTab);
-            getTemporario10.put("nome_categoria", NomeCategoria);
+        if(jTabbedPane1.getTabCount() <= SNWindows.CategAssinatura[Nivel_Ass][0]){
+            if(NomeCategoria.length() >= 3 && NomeCategoria.length() <= 30){
+                PegarValoresTabela();
+                JSONObject getTemporario10 = new JSONObject();
+                TotalIdsTab++;
+                getTemporario10.put("id", TotalIdsTab);
+                getTemporario10.put("nome_categoria", NomeCategoria);
 
-            novo_CategoriasCrimes.put(getTemporario10);
-            TxtCategoria.setText(null);
-            AtualizarJanelas();
+                novo_CategoriasCrimes.put(getTemporario10);
+                TxtCategoria.setText(null);
+                AtualizarJanelas();
+            }else{
+                showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao renomear categoria",JOptionPane.PLAIN_MESSAGE);
+            }
+        }else{
+            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias.", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
         }
     }//GEN-LAST:event_AddCategoriaActionPerformed
 
@@ -1052,8 +1114,25 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void ResetarTudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarTudoActionPerformed
-        // VINCULAR COM O BANCO DE DADOS
-        //AtualizarJanelas();
+
+        if(InicializadorMain.ModoOffline){
+            UPDATE();
+            if(novo_CategoriasCrimes.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || novo_CrimesRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
+                Object[] options = { "Resetar TUDO", "Resetar Alterações" }; 
+                int Escolha=JOptionPane.showOptionDialog(this,
+                        "Você deseja resetar tudo ou resetar as alterações?\nAo resetar tudo será zerada toda a tabela.", 
+                        "Vai um Master Reset?", 
+                        JOptionPane.DEFAULT_OPTION, 
+                        JOptionPane.WARNING_MESSAGE, 
+                        null, 
+                        options, 
+                        options[0]);
+                if(Escolha==JOptionPane.YES_OPTION){
+                    CategoriasStore="";
+                    CrimesStore="";
+                }
+            }
+        }
         PegarDB();
     }//GEN-LAST:event_ResetarTudoActionPerformed
 
@@ -1084,6 +1163,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        //Timere.cancel();
         new Painel().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -1113,6 +1193,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         Export.Titulo.setText("EXPORTAR");
         Export.AreaTexto.setEditable(false);
         
+        
         Export.Copiar.setText("COPIAR TABELA");
         Base64.Encoder enc = Base64.getEncoder();
             
@@ -1120,6 +1201,8 @@ public class Gerenciamento extends javax.swing.JFrame {
         String Crimer = enc.encodeToString(novo_CrimesRegistro.toString().getBytes());
         
         Export.AreaTexto.setText(Catego+"\n"+Crimer);
+        
+        Export.TextoExportar = Catego+"\n"+Crimer;
         Export.ExportValor = 2;
         Export.setVisible(true);
         
@@ -1162,7 +1245,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton AddCategoria;
+    private static javax.swing.JButton AddCategoria;
     private static javax.swing.JLabel InfoDB;
     private static javax.swing.JLabel InfoDB1;
     private javax.swing.JLabel LabelCategoria;
@@ -1171,7 +1254,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     private javax.swing.JButton RenameTabBt;
     private javax.swing.JButton ResetarTudo;
     private javax.swing.JButton SalvarDados;
-    private javax.swing.JTextField TxtCategoria;
+    private static javax.swing.JTextField TxtCategoria;
     private javax.swing.JMenuItem exportar;
     private javax.swing.JMenuItem importar;
     private javax.swing.JButton jButton4;
