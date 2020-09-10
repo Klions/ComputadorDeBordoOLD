@@ -87,6 +87,7 @@ public class ViewUsuario extends javax.swing.JFrame {
         String obs = JOptionPane.showInputDialog(this, "Qual seria o novo valor?"+Numbr, "Modificar valor", JOptionPane.PLAIN_MESSAGE);
         if((obs.length() > 0 && obs.length() < 20 && "".equals(Numbr)) || (!"".equals(Numbr) && isNumeric(obs) && obs.length() < 6)){
             Usuario.setDadosParcial(Valor, obs);
+            Usuario.setContaPC();
         }
         RecarregarValoresTabela();
     }

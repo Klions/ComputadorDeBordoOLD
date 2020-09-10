@@ -52,7 +52,13 @@ public class Boletim extends javax.swing.JFrame {
         //copiado.setVisible(false);
         this.setLocationRelativeTo(null);
         //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
-        this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        //this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        }
         AtualizarCrimes();
         id.requestFocus();
 

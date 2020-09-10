@@ -543,9 +543,10 @@ public class SplashScreen extends javax.swing.JFrame {
         getTemporario.put("permissao", 2);
         getTemporario.put("codigo", "000");
         getTemporario.put("ultimologin", 0);
-        Usuario usuarios = new Usuario();
-        usuarios.setDados(getTemporario);
+        //Usuario usuarios = new Usuario();
+        Usuario.setDados(getTemporario);
         
+        Usuario.getContaPC();
         Fechar=true;
         ProgressoAtual=100;
         ContandoFalhas=0;

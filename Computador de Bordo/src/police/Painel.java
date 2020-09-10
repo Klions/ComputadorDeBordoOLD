@@ -56,26 +56,28 @@ public class Painel extends javax.swing.JFrame {
         Titulo1.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
         Titulo2.setText(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase());
         
-        if(InicializadorMain.ModoOffline){
-            ContaBt.setText("Sem Registro");
-        }else{
-            ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
-        }
-                
         ContaBt.setBackground(new java.awt.Color(13, 32, 64));
         int perm = obj.getInt("permissao");
-        if(perm >= 1) corporacao.setVisible(true);
-        if(perm >= 2) gerenciar.setVisible(true);
+        
         if(InicializadorMain.ModoOffline){
+            //ContaBt.setText("Sem Registro");
             DesativarBT(gerenciar1);
             DesativarBT(gerenciar2);
+            DesativarBT(boletim);
+            
+            gerenciar.setVisible(true);
+        }else{
+            if(perm >= 1) corporacao.setVisible(true);
+            if(perm >= 2) gerenciar.setVisible(true);
         }
+        ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
+        sobre.setText("COMPUTADOR DE BORDO v"+Config.versao);
         pack();
     }
     
     private void DesativarBT(JButton Botao){
         Botao.setEnabled(false);
-        Botao.setBackground(new java.awt.Color(255, 72, 72));
+        Botao.setBackground(new java.awt.Color(0, 48, 73));
         Botao.setToolTipText("Desativado no Modo Offline");
     }
 
@@ -97,7 +99,7 @@ public class Painel extends javax.swing.JFrame {
         corporacao = new javax.swing.JPanel();
         gerenciar1 = new javax.swing.JButton();
         gerenciar2 = new javax.swing.JButton();
-        logadocomo1 = new javax.swing.JLabel();
+        sobre = new javax.swing.JLabel();
         ContaBt = new javax.swing.JButton();
         gerenciar = new javax.swing.JPanel();
         gerenciar3 = new javax.swing.JButton();
@@ -209,10 +211,10 @@ public class Painel extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        logadocomo1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        logadocomo1.setForeground(new java.awt.Color(255, 255, 255));
-        logadocomo1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        logadocomo1.setText("DESENVOLVIDO POR: kli0ns#3092");
+        sobre.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        sobre.setForeground(new java.awt.Color(255, 255, 255));
+        sobre.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        sobre.setText(" ");
 
         ContaBt.setBackground(new java.awt.Color(204, 204, 204));
         ContaBt.setForeground(new java.awt.Color(255, 255, 255));
@@ -299,7 +301,7 @@ public class Painel extends javax.swing.JFrame {
                                 .addComponent(ContaBt))))
                     .addComponent(corporacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(logadocomo1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(sobre, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -321,7 +323,7 @@ public class Painel extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(gerenciar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(logadocomo1)
+                .addComponent(sobre)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -414,7 +416,7 @@ public class Painel extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JLabel logadocomo1;
     private javax.swing.JPanel pessoas;
+    private javax.swing.JLabel sobre;
     // End of variables declaration//GEN-END:variables
 }

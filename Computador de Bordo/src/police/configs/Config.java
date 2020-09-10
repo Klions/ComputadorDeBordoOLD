@@ -16,7 +16,7 @@ import police.InicializadorMain;
  */
 public class Config {
     public static int build_atual = 20200817;
-    public static String versao = "1.0 [BETA]";
+    public static String versao = "1.0.0";
     public static String linkB = "https://rainbowcity.com.br/LSPD.exe";
     
     //CONFIGURAÇÃOS PERSONALIZADAS PARA CADA TIPO DE POLICIA

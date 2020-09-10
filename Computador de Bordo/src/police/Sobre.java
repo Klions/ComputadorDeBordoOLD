@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import police.configs.Config;
 import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
 
 /**
  *
@@ -129,17 +130,22 @@ public class Sobre extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel7.setText("DESENVOLVEDOR");
+        jLabel7.setText("DISCORD");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText(":");
 
-        buildt1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        buildt1.setForeground(new java.awt.Color(255, 255, 255));
+        buildt1.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        buildt1.setForeground(new java.awt.Color(204, 204, 255));
         buildt1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        buildt1.setText("kli0ns#7497 [discord]");
+        buildt1.setText("CLIQUE AQUI");
+        buildt1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buildt1MouseClicked(evt);
+            }
+        });
 
         txtAtt.setFont(new java.awt.Font("Arial Narrow", 0, 18)); // NOI18N
         txtAtt.setForeground(new java.awt.Color(255, 255, 255));
@@ -243,6 +249,10 @@ public class Sobre extends javax.swing.JFrame {
         IniciarSobre();
         verificara++;
     }//GEN-LAST:event_verificarattActionPerformed
+
+    private void buildt1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buildt1MouseClicked
+        HttpDownloadUtility.openURL("https://discord.gg/nFNqvDs");
+    }//GEN-LAST:event_buildt1MouseClicked
 
     /**
      * @param args the command line arguments
