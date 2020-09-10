@@ -6,6 +6,7 @@
 package police;
 
 import java.awt.Container;
+import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -20,6 +21,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,6 +36,7 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
+import police.configs.GetImages;
 import police.configs.SNWindows;
 import police.configs.Usuario;
 
@@ -79,6 +82,13 @@ public class Gerenciamento extends javax.swing.JFrame {
         initComponents();
         JFrame EsteFrame = this;
         //Timere.cancel();
+        
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        }
+        
         if(InicializadorMain.ModoOffline) UPDATE();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         this.setLocationRelativeTo(null);
@@ -777,6 +787,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("GERENCIAR CRIMES");
         setBackground(new java.awt.Color(13, 32, 64));
         setResizable(false);
 
@@ -1090,7 +1101,7 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     private void AddCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCategoriaActionPerformed
         String NomeCategoria = TxtCategoria.getText();
-        if(jTabbedPane1.getTabCount() <= SNWindows.CategAssinatura[Nivel_Ass][0]){
+        if(jTabbedPane1.getTabCount() < SNWindows.CategAssinatura[Nivel_Ass][0]){
             if(NomeCategoria.length() >= 3 && NomeCategoria.length() <= 30){
                 PegarValoresTabela();
                 JSONObject getTemporario10 = new JSONObject();
@@ -1185,6 +1196,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         Export.AreaTexto.setText("");
         Export.Copiar.setText("IMPORTAR CRIMES");
         Export.ExportValor = 1;
+        Export.AreaTexto.grabFocus();
         Export.setVisible(true);
     }//GEN-LAST:event_importarActionPerformed
 

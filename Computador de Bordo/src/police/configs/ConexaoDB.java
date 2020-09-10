@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import police.InicializadorMain;
 
@@ -65,7 +66,7 @@ public class ConexaoDB {
         user_server = prefs.get(user_server, "padrao");
         pass_server = prefs.get(pass_server, "padrao");
         Servidor_Config = prefs.get(Servidor_Config, "padrao");
-        System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
+        //System.out.println("host_server: "+host_server+" / banco_server: "+banco_server+" / user_server: "+user_server+" / pass_server: "+pass_server);
         return true;
     }
     public String GetConexaoServer(){
@@ -433,13 +434,13 @@ public class ConexaoDB {
             /*String cnome = jsonob.getString("nome");
             String cnome1 = jsonob.getString("sobrenome");*/
             String ccodigo = jsonob.getString("codigo");
-            String cdiscord = jsonob.getString("discord");
+            //String cdiscord = jsonob.getString("discord");
             
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -447,7 +448,7 @@ public class ConexaoDB {
             /*resultSet = statement
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
-            String query1 = "update "+tabelad+" set codigo='"+ccodigo+"', discord='"+cdiscord+"' where id="+cid;
+            String query1 = "update "+tabelad+" set codigo='"+ccodigo+"' where user_id="+cid;
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
             return true;
@@ -925,40 +926,22 @@ public class ConexaoDB {
     }
     
     public void ConfigCarregar() throws SQLException {
-        // ResultSet is initially before the first data set
-        //ArrayList<String> Conf = new ArrayList();
-        
-        ResultSet config = readDataBase("cb_config");
-        while (config.next()) {
-            // It is possible to get the columns via name
-            // also possible to get the columns via the column number
-            // which starts at 1
-            // e.g. resultSet.getSTring(2);
-            String versao =     config.getString("versao");
-            String build =      config.getString("build");
-            Integer need =       config.getInt("need");
-            String link =       config.getString("link");
-            String mensagem =   config.getString("mensagem");
-            
-            //Date date = resultSet.getDate("datum");
-            /*Conf.add(build);
-            Conf.add(versao);
-            Conf.add(need.toString());
-            Conf.add(link);
-            Conf.add(mensagem);*/
-            
-            Config configu = new Config();
-            configu.setBuild(build);
-            configu.setVersao(versao);
-            configu.setNeed(need.toString());
-            configu.setLink(link);
-            configu.setMensagem(mensagem);
-            
-            System.out.println("versao: " + versao);
-            System.out.println("build: " + build);
-            System.out.println("need: " + need);
-            System.out.println("link: " + link);
-            System.out.println("mensagem: " + mensagem);
+        ResultSet resulteSet = GetPersonalizado("select * from cb_config ORDER BY id DESC");
+        try {
+            while (resulteSet.next()) {
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("id", resulteSet.getInt("id"));
+                getTemporario2.put("build", resulteSet.getInt("build"));
+                getTemporario2.put("versao", resulteSet.getString("versao"));
+                getTemporario2.put("need", resulteSet.getInt("need"));
+                getTemporario2.put("link", resulteSet.getString("link"));
+                getTemporario2.put("mensagem", resulteSet.getString("mensagem"));
+                getTemporario2.put("data", resulteSet.getString("data"));
+                //JSONArray arrayTempo = new JSONArray();
+                //arrayTempo.put(getTemporario2);
+                Config.cb_config = getTemporario2;
+            }
+        } catch (SQLException ex) {
         }
         close();
     }

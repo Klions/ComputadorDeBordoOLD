@@ -194,7 +194,7 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel4" alignment="0" max="32767" attributes="0"/>
+                      <Component id="icone" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtErro" pref="380" max="32767" attributes="0"/>
                       <Component id="PainelLogin" alignment="0" max="32767" attributes="0"/>
                   </Group>
@@ -211,7 +211,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                  <Component id="icone" min="-2" pref="150" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="txtErro" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -224,11 +224,11 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel4">
+        <Component class="javax.swing.JLabel" name="icone">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/police/imagens/RC.png"/>
+              <Image iconType="3" name="/police/imagens/CB.png"/>
             </Property>
           </Properties>
         </Component>
@@ -241,7 +241,7 @@
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="POL&#xcd;CIA MILITAR RAINBOW CITY"/>
+            <Property name="text" type="java.lang.String" value="POL&#xcd;CIA MILITAR"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JPanel" name="PainelLogin">

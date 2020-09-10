@@ -9,10 +9,12 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
+import javax.swing.ImageIcon;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.Config;
+import police.configs.GetImages;
 
 
 /**
@@ -49,8 +51,8 @@ public class Boletim extends javax.swing.JFrame {
         
         //copiado.setVisible(false);
         this.setLocationRelativeTo(null);
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
-
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         AtualizarCrimes();
         id.requestFocus();
 

@@ -6,7 +6,9 @@
 package police;
 
 import java.awt.Toolkit;
+import javax.swing.ImageIcon;
 import police.configs.Config;
+import police.configs.GetImages;
 
 /**
  *
@@ -18,12 +20,13 @@ public class Sobre extends javax.swing.JFrame {
      * Creates new form VerCrimes
      */
     int verificara=0;
-    Config config = new Config();
     //ConexaoDB conexao = new ConexaoDB();
     public Sobre() {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource('imagens/CB.png')));
+        //this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         patt.setBackground(new java.awt.Color(30, 11, 67));
@@ -33,8 +36,8 @@ public class Sobre extends javax.swing.JFrame {
     
         
     public boolean IniciarSobre(){
-        String versao = config.versao;
-        int build = config.build;
+        String versao = Config.versao;
+        int build = Config.build_atual;
         
         versaot.setText(versao);
         buildt.setText(build+"");
@@ -49,7 +52,7 @@ public class Sobre extends javax.swing.JFrame {
         String Att = Dia+"/"+Mes+"/"+ano;
         atualizadot.setText("(ATUALIZADO EM: "+Att+")");
         
-        if(config.VerificarAtt()) txtAtt.setText("ATUALIZAÇÃO DISPONÍVEL PARA: "+config.getVersao());
+        if(Config.VerificarAtt()) txtAtt.setText("ATUALIZAÇÃO DISPONÍVEL PARA: "+Config.getVersao());
         if(verificara > 3) verificaratt.setEnabled(false);
         return true;
     }

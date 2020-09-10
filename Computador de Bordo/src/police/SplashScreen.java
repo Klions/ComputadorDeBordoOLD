@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
+import javax.swing.ImageIcon;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.json.JSONArray;
@@ -25,6 +26,8 @@ import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
 import police.configs.DiscordMessage;
+import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
 import police.configs.Usuario;
 
@@ -56,8 +59,9 @@ public class SplashScreen extends javax.swing.JFrame {
         EscolherCidadePainel.setVisible(false);
         pack();
         this.setLocationRelativeTo(null);
-        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/mclost_1.png")));
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/RC.png")));
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        //this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        
         //BACKGROUND ICONS
         
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
@@ -77,7 +81,7 @@ public class SplashScreen extends javax.swing.JFrame {
         
         JDA jdab = null;
         try {
-            jdab = new JDABuilder("Njc2MTI5MDkyMTkzNzQ2OTUy.XkmjLg.h4ovOM7x8gUa6P2hGmy5NskEkA4")         // The token of the account that is logging in.
+            jdab = new JDABuilder(HttpDownloadUtility.SetCon("TlRReE1USXhNekl3TmpjeE5URXdOVEk0LlhGVWtnQS5nY3V4TW1zNTdkYk5LZmQ5ZTdsZFBlVFVBQTA="))
                     .addEventListeners(new DiscordMessage())  // An instance of a class that will handle events.
                     .build();
         } catch (LoginException ex) {
@@ -96,11 +100,17 @@ public class SplashScreen extends javax.swing.JFrame {
         ValorProgresso=50;
         texto.setText("TESTANDO CONEXÃO");
         if(netIsAvailable()){
+            try {
+                CarregarMysql();
+            } catch (SQLException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
             ProgressoAtual=ValorProgresso;
             ValorProgresso=65;
             texto.setText("VERIFICANDO INTEGRIDADE DOS REGISTROS");
 
             if(PegarInfoServidor()){
+                ContandoFalhas = 0;
                 ProgressoPainel.setVisible(false);
                 EscolherCidadePainel.setVisible(true);
                 this.revalidate();
@@ -115,11 +125,14 @@ public class SplashScreen extends javax.swing.JFrame {
             texto.setText("FALHA NA CONEXÃO");
         }
     }
+    
+    public static void CarregarMysql() throws SQLException{
+        ConexaoDB conexao = new ConexaoDB();
+        conexao.ConfigCarregar();
+    }
     public boolean IniciarSobre(){
-        Config config;
-        config = new Config();
-        String versao = config.versao;
-        int build = config.build;
+        String versao = Config.versao;
+        int build = Config.build_atual;
         
         int ano = build / 10000;
         int mes = (build / 100)%100;
@@ -242,6 +255,7 @@ public class SplashScreen extends javax.swing.JFrame {
                 getTemporario2.put("db_banco", resulteSet.getString("db_banco"));
                 getTemporario2.put("db_user", resulteSet.getString("db_user"));
                 getTemporario2.put("db_senha", resulteSet.getString("db_senha"));
+                getTemporario2.put("url_logo", resulteSet.getString("url_logo"));
                 ServidoresRegistrados.put(getTemporario2);
             }
         } catch (SQLException ex) {
@@ -330,7 +344,7 @@ public class SplashScreen extends javax.swing.JFrame {
         setTitle("COMPUTADOR DE BORDO");
         setResizable(false);
 
-        icone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
+        icone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/CB.png"))); // NOI18N
 
         titulo.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         titulo.setForeground(new java.awt.Color(255, 255, 255));
@@ -363,6 +377,8 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        ProgressoPainel.setPreferredSize(new java.awt.Dimension(359, 122));
+
         texto.setForeground(new java.awt.Color(255, 255, 255));
         texto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         texto.setText("...");
@@ -381,11 +397,11 @@ public class SplashScreen extends javax.swing.JFrame {
         ProgressoPainelLayout.setVerticalGroup(
             ProgressoPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ProgressoPainelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(38, 38, 38)
                 .addComponent(progresso, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(texto)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         CidadesEscolha.setMaximumRowCount(20);
@@ -449,7 +465,7 @@ public class SplashScreen extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(icone)
+                .addComponent(icone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -484,6 +500,7 @@ public class SplashScreen extends javax.swing.JFrame {
                 JSONObject obj = ServidoresRegistrados.getJSONObject(i);
                 String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
                 if(FormatNome.equals(IndexStr)){
+                    GetImages.PegarImagensCB(obj.getString("url_logo"));
                     SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
                     nomedacidade = obj.getString("nome_cidade");
                     
@@ -492,6 +509,7 @@ public class SplashScreen extends javax.swing.JFrame {
                     getTemporario2.put("nome_cidade", obj.getString("nome_cidade"));
                     getTemporario2.put("nome_policia", obj.getString("nome_policia"));
                     getTemporario2.put("nome_policia_abv", obj.getString("nome_policia_abv"));
+                    getTemporario2.put("url_logo", obj.getString("url_logo"));
                     InicializadorMain.info_cidade = getTemporario2;
                 }
             }
@@ -517,11 +535,11 @@ public class SplashScreen extends javax.swing.JFrame {
         JSONObject getTemporario = new JSONObject();
         getTemporario.put("id", 0);
         getTemporario.put("id_usuario", 0);
-        getTemporario.put("nome", "Modo");
-        getTemporario.put("sobrenome", "Offline");
+        getTemporario.put("nome", "Sem");
+        getTemporario.put("sobrenome", "Registro");
         getTemporario.put("registration", "000AAA00");
         getTemporario.put("phone", "000-000");
-        getTemporario.put("age", "00");
+        getTemporario.put("age", "18");
         getTemporario.put("permissao", 2);
         getTemporario.put("codigo", "000");
         getTemporario.put("ultimologin", 0);

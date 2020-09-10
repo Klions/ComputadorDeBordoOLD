@@ -7,9 +7,11 @@ package police;
 
 import police.configs.Usuario;
 import java.awt.Toolkit;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import org.json.JSONObject;
 import police.configs.Config;
+import police.configs.GetImages;
 import police.configs.SNWindows;
 
 /**
@@ -28,11 +30,17 @@ public class Painel extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         
-        pessoas.setBackground(new java.awt.Color(13, 32, 64));
-        gerenciar.setBackground(new java.awt.Color(13, 32, 64));
+        //pessoas.setBackground(new java.awt.Color(13, 32, 64));
+        //corporacao.setBackground(new java.awt.Color(13, 32, 64));
         //veiculos.setBackground(new java.awt.Color(50, 31, 87));
         
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+            icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
+        }
         
         Carregar();
     }
@@ -40,17 +48,24 @@ public class Painel extends javax.swing.JFrame {
         
         //System.err.println("getDados: "+ usuario.getDados()+"/ fechou");
         
+        corporacao.setVisible(false);
         gerenciar.setVisible(false);
         
-        JSONObject obj = new JSONObject(usuario.getDados());
+        JSONObject obj = usuario.getDados();
         
         Titulo1.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
         Titulo2.setText(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase());
         
-        ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
+        if(InicializadorMain.ModoOffline){
+            ContaBt.setText("Sem Registro");
+        }else{
+            ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
+        }
+                
         ContaBt.setBackground(new java.awt.Color(13, 32, 64));
-        
-        if(obj.getInt("permissao") >= 2) gerenciar.setVisible(true);
+        int perm = obj.getInt("permissao");
+        if(perm >= 1) corporacao.setVisible(true);
+        if(perm >= 2) gerenciar.setVisible(true);
         if(InicializadorMain.ModoOffline){
             DesativarBT(gerenciar1);
             DesativarBT(gerenciar2);
@@ -60,7 +75,7 @@ public class Painel extends javax.swing.JFrame {
     
     private void DesativarBT(JButton Botao){
         Botao.setEnabled(false);
-        Botao.setBackground(new java.awt.Color(100, 100, 100));
+        Botao.setBackground(new java.awt.Color(255, 72, 72));
         Botao.setToolTipText("Desativado no Modo Offline");
     }
 
@@ -78,13 +93,14 @@ public class Painel extends javax.swing.JFrame {
         crimes = new javax.swing.JButton();
         boletim = new javax.swing.JButton();
         Titulo1 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        gerenciar = new javax.swing.JPanel();
+        icone = new javax.swing.JLabel();
+        corporacao = new javax.swing.JPanel();
         gerenciar1 = new javax.swing.JButton();
         gerenciar2 = new javax.swing.JButton();
-        gerenciar3 = new javax.swing.JButton();
         logadocomo1 = new javax.swing.JLabel();
         ContaBt = new javax.swing.JButton();
+        gerenciar = new javax.swing.JPanel();
+        gerenciar3 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -100,6 +116,7 @@ public class Painel extends javax.swing.JFrame {
         Titulo2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         pessoas.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "REGISTROS", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        pessoas.setOpaque(false);
 
         crimes.setBackground(new java.awt.Color(153, 153, 255));
         crimes.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
@@ -148,9 +165,10 @@ public class Painel extends javax.swing.JFrame {
         Titulo1.setText("BEM VINDO NOME,");
         Titulo1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
+        icone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/CB.png"))); // NOI18N
 
-        gerenciar.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "GERENCIAR", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        corporacao.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CORPORAÇÃO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        corporacao.setOpaque(false);
 
         gerenciar1.setBackground(new java.awt.Color(204, 204, 0));
         gerenciar1.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
@@ -170,41 +188,24 @@ public class Painel extends javax.swing.JFrame {
             }
         });
 
-        gerenciar3.setBackground(new java.awt.Color(0, 153, 102));
-        gerenciar3.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        gerenciar3.setText("GERENCIAR Crimes");
-        gerenciar3.setToolTipText("Adicionar ou Remover Crimes");
-        gerenciar3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gerenciar3ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout gerenciarLayout = new javax.swing.GroupLayout(gerenciar);
-        gerenciar.setLayout(gerenciarLayout);
-        gerenciarLayout.setHorizontalGroup(
-            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(gerenciarLayout.createSequentialGroup()
+        javax.swing.GroupLayout corporacaoLayout = new javax.swing.GroupLayout(corporacao);
+        corporacao.setLayout(corporacaoLayout);
+        corporacaoLayout.setHorizontalGroup(
+            corporacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(corporacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(gerenciarLayout.createSequentialGroup()
-                        .addComponent(gerenciar1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(gerenciar2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(gerenciarLayout.createSequentialGroup()
-                        .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(gerenciar1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addComponent(gerenciar2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10))
         );
-        gerenciarLayout.setVerticalGroup(
-            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(gerenciarLayout.createSequentialGroup()
+        corporacaoLayout.setVerticalGroup(
+            corporacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(corporacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(corporacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(gerenciar1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(gerenciar2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -215,7 +216,7 @@ public class Painel extends javax.swing.JFrame {
 
         ContaBt.setBackground(new java.awt.Color(204, 204, 204));
         ContaBt.setForeground(new java.awt.Color(255, 255, 255));
-        ContaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/searchbt.png"))); // NOI18N
+        ContaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/user.png"))); // NOI18N
         ContaBt.setText("CARREGANDO...");
         ContaBt.setBorder(null);
         ContaBt.setFocusPainted(false);
@@ -232,6 +233,36 @@ public class Painel extends javax.swing.JFrame {
                 ContaBtActionPerformed(evt);
             }
         });
+
+        gerenciar.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "GERENCIAR", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 255, 255))); // NOI18N
+        gerenciar.setOpaque(false);
+
+        gerenciar3.setBackground(new java.awt.Color(0, 153, 102));
+        gerenciar3.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar3.setText("GERENCIAR Crimes");
+        gerenciar3.setToolTipText("Adicionar ou Remover Crimes");
+        gerenciar3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gerenciar3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout gerenciarLayout = new javax.swing.GroupLayout(gerenciar);
+        gerenciar.setLayout(gerenciarLayout);
+        gerenciarLayout.setHorizontalGroup(
+            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gerenciarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        gerenciarLayout.setVerticalGroup(
+            gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gerenciarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         jMenu3.setText("EXIBIR");
         jMenu3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -258,7 +289,7 @@ public class Painel extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pessoas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(icone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(Titulo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -266,8 +297,9 @@ public class Painel extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(ContaBt))))
+                    .addComponent(corporacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(logadocomo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(logadocomo1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -281,14 +313,16 @@ public class Painel extends javax.swing.JFrame {
                         .addComponent(Titulo1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(Titulo2))
-                    .addComponent(jLabel4))
+                    .addComponent(icone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(pessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(logadocomo1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(corporacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(gerenciar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(logadocomo1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -370,12 +404,13 @@ public class Painel extends javax.swing.JFrame {
     private javax.swing.JLabel Titulo1;
     private javax.swing.JLabel Titulo2;
     private javax.swing.JButton boletim;
+    private javax.swing.JPanel corporacao;
     private javax.swing.JButton crimes;
     private javax.swing.JPanel gerenciar;
     private javax.swing.JButton gerenciar1;
     private javax.swing.JButton gerenciar2;
     private javax.swing.JButton gerenciar3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel icone;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem3;

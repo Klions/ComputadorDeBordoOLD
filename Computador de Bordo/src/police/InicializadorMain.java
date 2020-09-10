@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import net.dv8tion.jda.api.JDA;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import police.configs.GetImages;
 import police.configs.SNWindows;
 import police.configs.Usuario;
 
@@ -45,16 +46,13 @@ public class InicializadorMain {
     
     public static int server_id =  0;
     
-    public static String BuildCB = "0";
-    
     public static Sobre sobre = new Sobre();
     
-    public static String DestFile = System.getProperty("user.home")+"/Documents/cb-l.txt";
-    public static String DestFile2 = System.getProperty("user.home")+"/Documents/cb-c.txt";
+    public static String DestFile = SNWindows.DestPasta+"/cb-l.txt";
+    public static String DestFile2 = SNWindows.DestPasta+"/cb-c.txt";
     
     public static void main(String[] args) throws InterruptedException {
         SplashScreen splash = new SplashScreen();
-        
         new Timer().scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run(){
@@ -69,7 +67,7 @@ public class InicializadorMain {
                 }
                 SNWindows.getSerialALL();
             }
-        },0,60000);
+        },0,2*60000);
     }
     public JSONArray AttDBUsuarios(){
         return usuariosDBarray;
@@ -97,6 +95,7 @@ public class InicializadorMain {
         blacklistDBarray = usuarios.AttBlackList();
         procuradosDBarray = usuarios.AttDBProcurados();
         hierarquiaDBarray = usuarios.AttDBHierarquia();
+        Usuario.AtualizarDiscords();
     }
     
     public static void AttDbsStatic(){
@@ -107,5 +106,6 @@ public class InicializadorMain {
         blacklistDBarray = usuarios.AttBlackList();
         procuradosDBarray = usuarios.AttDBProcurados();
         hierarquiaDBarray = usuarios.AttDBHierarquia();
+        Usuario.AtualizarDiscords();
     }
 }
