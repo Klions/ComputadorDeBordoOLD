@@ -28,25 +28,31 @@ import police.InicializadorMain;
 public class SNWindows {
     public static String SerialNumber = "";
     public static String SerialNumber2 = "";
-    public static String DestFileSer = System.getProperty("user.home")+"/Documents/cb-ser.txt";
+    public static String DestPasta = System.getProperty("user.home")+"/Documents/.cb";
+    public static String DestFileSer = DestPasta+"/cb-ser.txt";
     public static JSONArray cb_serial = new JSONArray();
+    public static JSONArray cb_serial_cidade = new JSONArray();
+    
     
     public static String[] TipoAssinatura = {
         "Gratuita",
         "Bronze",
         "Prata",
-        "Ouro"
+        "Ouro",
+        "Platina"
     };
     public static int[][] CorAssinatura = {
         {255,153,153},
         {235,199,158},
         {192,192,192},
-        {255,215,0}
+        {255,215,0},
+        {229,228,226}
     };
     public static int[][] CategAssinatura = {
         {4,25},
-        {8,50},
-        {15,100},
+        {6,40},
+        {7,60},
+        {10,120},
         {30,200}
     };
     public static final void getSerialNumber(){
@@ -74,6 +80,9 @@ public class SNWindows {
         SerialNumber = MachineID;
     }
     public static void getSerialOnPC(){
+        File pasta = new File(DestPasta);
+        if(!pasta.exists()) pasta.mkdirs();
+            
         try {
             File file = new File(DestFileSer);
             if(file.exists()){
@@ -116,8 +125,7 @@ public class SNWindows {
         getSerialOnPC();
         cb_serial = new JSONArray();
         ConexaoDB conexao = new ConexaoDB();
-        ResultSet resulteSet = null;
-        resulteSet = conexao.GetPersonalizado("select * from cb_serial ORDER BY id DESC");
+        ResultSet resulteSet = conexao.GetPersonalizado("select * from cb_serial ORDER BY id DESC");
         try {
             while (resulteSet.next()) {
                 JSONObject getTemporario2 = new JSONObject();
@@ -127,7 +135,26 @@ public class SNWindows {
                 getTemporario2.put("pc_ativou", resulteSet.getString("pc_ativou"));
                 getTemporario2.put("data_ativou", resulteSet.getString("data_ativou"));
                 cb_serial.put(getTemporario2);
-                System.out.println("getSerialALL(): "+resulteSet.getString("serial"));
+                //System.out.println("getSerialALL(): "+resulteSet.getString("serial"));
+            }
+        } catch (SQLException ex) {
+        }
+        
+        ResultSet resulteSet2 = conexao.GetPersonalizado("select * from cb_serial_cidade ORDER BY id DESC");
+        try {
+            while (resulteSet.next()) {
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("id", resulteSet.getInt("id"));
+                getTemporario2.put("server_id", resulteSet.getInt("server_id"));
+                getTemporario2.put("serial", resulteSet.getString("serial"));
+                getTemporario2.put("nivel", resulteSet.getInt("nivel"));
+                getTemporario2.put("data", resulteSet.getString("data"));
+                getTemporario2.put("data_ativou", resulteSet.getString("data_ativou"));
+                getTemporario2.put("comprovante_id", resulteSet.getInt("comprovante_id"));
+                getTemporario2.put("expira", resulteSet.getInt("expira"));
+                getTemporario2.put("discord_id", resulteSet.getString("discord_id"));
+                cb_serial_cidade.put(getTemporario2);
+                //System.out.println("getSerialALL(): "+resulteSet.getString("serial"));
             }
         } catch (SQLException ex) {
         }
@@ -135,27 +162,41 @@ public class SNWindows {
     }
     
     public static boolean getSerialOn(String Serial){
-        for(int i = 0; i < cb_serial.length(); i++){
-            JSONObject obj = cb_serial.getJSONObject(i);
-            if(Serial.equals(obj.getString("serial"))){
-                if(obj.getInt("data_ativou") <= 0) return true;
+        if(InicializadorMain.ModoOffline){
+            for(int i = 0; i < cb_serial.length(); i++){
+                JSONObject obj = cb_serial.getJSONObject(i);
+                if(Serial.equals(obj.getString("serial"))){
+                    if(obj.getInt("data_ativou") <= 0) return true;
+                }
+            }
+        }else{
+            for(int i = 0; i < cb_serial_cidade.length(); i++){
+                JSONObject obj = cb_serial_cidade.getJSONObject(i);
+                if(Serial.equals(obj.getString("serial"))){
+                    if(obj.getInt("data_ativou") <= 0) return true;
+                }
             }
         }
         return false;
     }
     
     public static int getNivelSerialPC(){
-        for(int i = 0; i < cb_serial.length(); i++){
-            JSONObject obj = cb_serial.getJSONObject(i);
-            if(SerialNumber.equals(obj.getString("pc_ativou"))){
-                if(!"0".equals(obj.getString("data_ativou"))) return obj.getInt("nivel");
+        if(InicializadorMain.ModoOffline){
+            for(int i = 0; i < cb_serial.length(); i++){
+                JSONObject obj = cb_serial.getJSONObject(i);
+                if(SerialNumber.equals(obj.getString("pc_ativou"))){
+                    if(!"0".equals(obj.getString("data_ativou"))) return obj.getInt("nivel");
+                }
+            }
+        }else{
+            for(int i = 0; i < cb_serial_cidade.length(); i++){
+                JSONObject obj = cb_serial_cidade.getJSONObject(i);
+                if(InicializadorMain.server_id == obj.getInt("server_id")){
+                    if(!"0".equals(obj.getString("data_ativou"))) return obj.getInt("nivel");
+                }
             }
         }
-        if(!InicializadorMain.ModoOffline) return 3;
         return 0;
-    }
-    public static int getNivelSerialCidade(){
-        return 3;
     }
     
     public static boolean SetSerialALL(String Serial){

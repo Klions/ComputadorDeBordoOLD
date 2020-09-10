@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONArray;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
 import police.configs.DiscordWebhook;
+import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 
 
@@ -53,7 +55,6 @@ public class Login extends javax.swing.JFrame {
     JSONArray cb_users = new JSONArray();
     
     Usuario usuarios = new Usuario();
-    Config config = new Config();
     InicializadorMain police = new InicializadorMain();
     
     int tentativas=1;
@@ -71,14 +72,15 @@ public class Login extends javax.swing.JFrame {
         //AttDBUsuarios();
         //AttDBHierarquia();
         
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+            icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
+        }
+        
         if(netIsAvailable()){
-            try {
-                CarregarMysql();
-            } catch (SQLException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            att.setVisible(config.VerificarAtt());
+            att.setVisible(Config.VerificarAtt());
             AtualizarAtt();
             
             DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/750936560597336095/sP7k8x_Z9IEZpsdOGISavpBBOgOevHbuPcJ25V4BvxE74l_mRCnu6WNWqEXiwpEAOO31");
@@ -96,8 +98,8 @@ public class Login extends javax.swing.JFrame {
             }*/
         }else{
             txtAtt.setText("Sem conexão com a internet!");
-            versao.setText("Versão: "+config.versao);
-            build.setText("Build: "+config.build);
+            versao.setText("Versão: "+Config.versao);
+            build.setText("Build: "+Config.build_atual);
             download.setEnabled(false);
             mensagem.setText("Desculpe, mas sua conexão está ruim ou está nula.");
             Entrar.setEnabled(false);
@@ -152,22 +154,19 @@ public class Login extends javax.swing.JFrame {
             return false;
         }
     }
-    public static void CarregarMysql() throws SQLException{
-        ConexaoDB conexao = new ConexaoDB();
-        conexao.ConfigCarregar();
-    }
+    
     public void AtualizarAtt(){
-        versao.setText("VERSÃO: "+config.getVersao());
-        build.setText("BUILD: "+config.getBuild());
-        mensagem.setText(config.getMensagem());
-        versaoatual.setText("Versão Atual: "+config.versao+" / Build: "+config.build);
+        versao.setText("VERSÃO: "+Config.getVersao());
+        build.setText("BUILD: "+Config.getBuild());
+        mensagem.setText(Config.getMensagem());
+        versaoatual.setText("Versão Atual: "+Config.versao+" / Build: "+Config.build_atual);
         
-        if(config.VerificarAtt()){
-            Entrar.setEnabled(!config.getNeed());
+        if(Config.VerificarAtt()){
+            Entrar.setEnabled(!Config.getNeed());
         }else{
             Entrar.setEnabled(true);
         }
-        if(config.getNeed()) txtAtt.setText("ATUALIZAÇÃO NECESSÁRIA");
+        if(Config.getNeed()) txtAtt.setText("ATUALIZAÇÃO NECESSÁRIA");
     }
     public void TextoErro(String Texto){
         txtErro.setText(Texto);
@@ -214,7 +213,7 @@ public class Login extends javax.swing.JFrame {
             if(passaporte == cbuser.getInt("user_id") && senha.equals(cbuser.getString("codigo"))){
                 JSONObject sal_info = PegarUsuario(passaporte);
                 if(sal_info != null){
-                    usuarios.setDados(sal_info);
+                    Usuario.setDados(sal_info);
                     if(lembrar.isSelected()) SAVE();
                     new Painel().setVisible(true);
                     this.dispose();
@@ -442,7 +441,7 @@ public class Login extends javax.swing.JFrame {
         mensagem = new javax.swing.JLabel();
         versaoatual = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        icone = new javax.swing.JLabel();
         txtErro = new javax.swing.JLabel();
         PainelLogin = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -530,13 +529,13 @@ public class Login extends javax.swing.JFrame {
         versaoatual.setText("Versão atual:");
         versaoatual.setEnabled(false);
 
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/RC.png"))); // NOI18N
+        icone.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        icone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/CB.png"))); // NOI18N
 
         txtErro.setFont(new java.awt.Font("Segoe UI Light", 0, 24)); // NOI18N
         txtErro.setForeground(new java.awt.Color(255, 255, 255));
         txtErro.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        txtErro.setText("POLÍCIA MILITAR RAINBOW CITY");
+        txtErro.setText("POLÍCIA MILITAR");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -627,7 +626,7 @@ public class Login extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(40, 40, 40)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(icone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtErro, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addComponent(PainelLogin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(40, 40, 40))
@@ -640,7 +639,7 @@ public class Login extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4)
+                .addComponent(icone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtErro)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -685,7 +684,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_EntrarActionPerformed
 
     private void downloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadActionPerformed
-        String fileURL = config.linkB;//"https://newlandsrp.tk/LSPD.exe";
+        String fileURL = Config.linkB;//"https://newlandsrp.tk/LSPD.exe";
         String NovoNome = "LSPD";
         String path=null;
         try {
@@ -728,8 +727,8 @@ public class Login extends javax.swing.JFrame {
 
     private void CodigoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CodigoKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if(config.VerificarAtt()){
-                if(config.getNeed()){
+            if(Config.VerificarAtt()){
+                if(Config.getNeed()){
                     txtAtt.setText("ATUALIZAÇÃO NECESSÁRIA!!!!");
                 }else{
                     LogarConta();
@@ -789,9 +788,9 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel att;
     private javax.swing.JLabel build;
     private javax.swing.JButton download;
+    private javax.swing.JLabel icone;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox lembrar;

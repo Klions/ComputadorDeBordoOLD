@@ -9,17 +9,14 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -210,18 +207,18 @@ public class Corporacao extends javax.swing.JFrame {
         membros.getColumnModel().getColumn(0).setPreferredWidth(50);
         membros.getColumnModel().getColumn(1).setPreferredWidth(40);
         membros.getColumnModel().getColumn(2).setPreferredWidth(20);
-        membros.getColumnModel().getColumn(3).setPreferredWidth(40);
+        //membros.getColumnModel().getColumn(3).setPreferredWidth(40);
         
         
         membros.getColumnModel().getColumn(0).setHeaderRenderer(centerRenderer);
         membros.getColumnModel().getColumn(1).setHeaderRenderer(centerRenderer);
         membros.getColumnModel().getColumn(2).setHeaderRenderer(centerRenderer);
-        membros.getColumnModel().getColumn(3).setHeaderRenderer(centerRenderer);
+        //membros.getColumnModel().getColumn(3).setHeaderRenderer(centerRenderer);
         
         membros.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
         membros.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
         membros.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
-        membros.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+        //membros.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
         
         //TabelaAtt();
         
@@ -238,7 +235,6 @@ public class Corporacao extends javax.swing.JFrame {
         //System.out.println("usuariosDBarray: "+usuariosDBarray.toString()+" ?°/ ");
         for(int i = 0; i < usuariosDBarray.length(); i++){
             JSONObject o = usuariosDBarray.getJSONObject(i);
-            //if(o.getInt("lspd") >= 1){
             int pass = o.getInt("id_usuario");
             int pter=0;
             boolean lspd=false;
@@ -255,17 +251,18 @@ public class Corporacao extends javax.swing.JFrame {
                 }
             }
             if(lspd){
-                String discord = o.getString("discord");
-                String nome = o.getString("nome")+" "+o.getString("sobrenome");
+                //String discord = Usuario.DiscordPorID(pass);
+                
                 //System.out.println("o.DBarray: "+o.toString()+" ?°/ ");
-                if(discord.length() >= 10){
+                /*if(discord.length() >= 10){
                     discord="SIM";
                 }else{
                     discord="NÃO";
-                }
+                }*/
+                String nome = o.getString("nome")+" "+o.getString("sobrenome");
                 if(pter != 99 && pter != 16){
                     String patenter = usuarios.Patentes(pter);
-                    model.addRow(new Object[]{nome, patenter, pass, discord});
+                    model.addRow(new Object[]{nome, patenter, pass});
                 }
             }
             //}
@@ -285,48 +282,67 @@ public class Corporacao extends javax.swing.JFrame {
             String nome=DiscordTag.getString("nome");
             String codigo=DiscordTag.getString("codigo");
             
-            String nome_patente=DiscordTag.getString("nome_patente");
-            int OqueFez=DiscordTag.getInt("oqfez");
-            String OqFez,OqFez2;
-            switch (OqueFez) {
-                case 1:
-                    OqFez="Você foi recrutado";
-                    OqFez2=":police_officer: Recrutado para a "+config.Abv_NomePolicia+" como "+nome_patente+".";
-                    break;
-                case 2:
-                    OqFez="Você foi recrutado";
-                    OqFez2=":police_officer: Recrutado para a "+config.Abv_NomePolicia+" como ";
-                    break;
-                default:
-                    OqFez="Mudança de Acesso";
-                    OqFez2=":id: Foi modificado o seu código de acesso do **Computador de Bordo**.";
-                    break;
+            String discord=DiscordTag.getString("discord");//Usuario.DiscordPorID(passaporte);
+            if(!"".equals(discord)){
+                String n_cidade = InicializadorMain.info_cidade.getString("nome_cidade");
+                String n_policia = InicializadorMain.info_cidade.getString("nome_policia");
+                String n_policiaabv = InicializadorMain.info_cidade.getString("nome_policia_abv").toUpperCase();
+                String url_logo = InicializadorMain.info_cidade.getString("url_logo");
+                
+                String nome_patente=DiscordTag.getString("nome_patente");
+                int OqueFez=DiscordTag.getInt("oqfez");
+                String OqFez,OqFez2;
+                switch (OqueFez) {
+                    case 1:
+                        OqFez="Você foi recrutado";
+                        OqFez2="Recrutado para a "+n_policiaabv+" como "+nome_patente+".";
+                        break;
+                    case 2:
+                        OqFez="Você foi recrutado";
+                        OqFez2="Recrutado para a "+n_policiaabv+" como ";
+                        break;
+                    default:
+                        OqFez="Mudança de Acesso";
+                        OqFez2="Foi modificado o seu código de acesso do **Computador de Bordo**.";
+                        break;
+                }
+
+                User usuar = jda.getUserById(discord);
+
+                EmbedBuilder eb = new EmbedBuilder();
+                
+                
+                eb.setAuthor(n_cidade+" "+n_policiaabv+" - Mudança de Acesso ", "https://imgur.com/vBK8vRk.png");
+                eb.setFooter("Computador de Bordo • "+n_cidade, "https://imgur.com/vBK8vRk.png");
+                        
+                eb.setColor(new Color(0x0D2040));
+                eb.setDescription(OqFez2+
+                    "\n\n**Nome Completo:** "+nome+
+                    "\n**Passaporte:** "+passaporte+
+                    "\n**Código:** "+codigo);
+
+                //eb.addField(":regional_indicator_i: :regional_indicator_n: :regional_indicator_f: :regional_indicator_o:   :regional_indicator_c: :regional_indicator_i: :regional_indicator_d: :regional_indicator_a: :regional_indicator_d: :regional_indicator_a: :regional_indicator_o:", "Você pode recursar a "+Apree+" com um advogado pelo número do procotolo.", false);
+                /*eb.addField("Nome Completo", ":page_facing_up: "+nome, true);
+                eb.addField("Passaporte", ":bookmark_tabs: "+passaporte, true);
+                eb.addField("Código", ":id: "+codigo, true);
+                eb.addField(" ", " ", false);
+                eb.addField("Acesse agora mesmo o computador de bordo!", ":speech_balloon: Baixe direto pelo link: "+config.linkB, false);
+                */
+                //eb.setFooter("Computador de Bordo [ver. "+config.versao+"]", null);
+                Instant instant = Instant.from(ZonedDateTime.now());
+                eb.setTimestamp(instant);
+                eb.setThumbnail(url_logo);
+
+                usuar.openPrivateChannel().queue((channel) ->
+                {
+                    channel.sendMessage(eb.build()).queue();
+                });
+            }else{
+                showMessageDialog(null,
+                    "Não conseguimos localizar o Discord de "+nome+".",
+                    "Discord não encontrado!",
+                    JOptionPane.ERROR_MESSAGE);
             }
-            String discord=DiscordTag.getString("discord");
-            User usuar = jda.getUserById(discord);
-            
-            EmbedBuilder eb = new EmbedBuilder();
-        
-            eb.setTitle("Newlands "+config.Abv_NomePolicia+" - "+OqFez, null);
-            eb.setColor(new Color(0x0D2040));
-            eb.setDescription(OqFez2);
-            
-            //eb.addField(":regional_indicator_i: :regional_indicator_n: :regional_indicator_f: :regional_indicator_o:   :regional_indicator_c: :regional_indicator_i: :regional_indicator_d: :regional_indicator_a: :regional_indicator_d: :regional_indicator_a: :regional_indicator_o:", "Você pode recursar a "+Apree+" com um advogado pelo número do procotolo.", false);
-            eb.addField("Nome Completo", ":page_facing_up: "+nome, true);
-            eb.addField("Passaporte", ":bookmark_tabs: "+passaporte, true);
-            eb.addField("Código", ":id: "+codigo, true);
-            eb.addField(" ", " ", false);
-            eb.addField("Acesse agora mesmo o computador de bordo!", ":speech_balloon: Baixe direto pelo link: "+config.linkB, false);
-            
-            eb.setFooter("Computador de Bordo [ver. "+config.versao+"]", null);
-            Instant instant = Instant.from(ZonedDateTime.now());
-            eb.setTimestamp(instant);
-            eb.setThumbnail(config.img_DiscordPolicia);
-        
-        usuar.openPrivateChannel().queue((channel) ->
-        {
-            channel.sendMessage(eb.build()).queue();
-        });
     }
     
     public void MensagemHierarquia(JSONObject dados){
@@ -384,7 +400,7 @@ public class Corporacao extends javax.swing.JFrame {
             int paser = Integer.parseInt(PassSelecionado);
             if(paser==o.getInt("id_usuario")){
                 int pass = o.getInt("id_usuario");
-                String discord = o.getString("discord");
+                String discord = Usuario.DiscordPorID(pass);;
                 String nome = o.getString("nome");
                 String sobrenome = o.getString("sobrenome");
                 String codigo = o.getString("codigo");
@@ -434,14 +450,11 @@ public class Corporacao extends javax.swing.JFrame {
                 cnome.setText(nome);
                 cnome1.setText(sobrenome);
                 
-                ccodigo.setText(codigo);
-                cdiscord.setText(discord);
+                //ccodigo.setText(codigo);
+                ccodigo.setText("•••••");
+                //cdiscord.setText(discord);
 
-                String fbir = "";
-                if(o.getInt("lspd") == 2){
-                    fbir="(FBI)";
-                }
-                nomeptt.setText(nome+" "+fbir);
+                nomeptt.setText(nome);
 
                 String PttInsi2="";
                 switch (PatenteInsigna) {
@@ -663,21 +676,21 @@ public class Corporacao extends javax.swing.JFrame {
             JSONObject my_obj = new JSONObject();
             String nome = cnome.getText();
             String sobrenome = cnome1.getText();
-            String discord = cdiscord.getText();
+            //String discord = cdiscord.getText();
             String codigo = ccodigo.getText();
             my_obj.put("passaporte", pass);
             my_obj.put("nome", nome+" "+sobrenome);
             my_obj.put("codigo", codigo);
-            my_obj.put("discord", discord);
+            my_obj.put("discord", Usuario.DiscordPorID(Integer.parseInt(pass)));
             my_obj.put("nome_patente", "");
             my_obj.put("oqfez", 0);
-            if(conexao.AtualizarDatabaseDado("cb_identities", my_obj)){
+            if(conexao.AtualizarDatabaseDado("cb_users", my_obj)){
                 int dialogButton = JOptionPane.YES_NO_OPTION;
-                if(newcodigo && discord.length()> 5){
+                if(newcodigo){
                     int dialogResult = JOptionPane.showConfirmDialog(this, "Deseja enviar o novo código para "+nome+" "+sobrenome+" ?", "Envio de código no discord", dialogButton);
                     if(dialogResult == 0) {
                         MensagemDiscord(my_obj);
-                        System.out.print("Mensagem enviada para: "+discord+" /// ");
+                        //System.out.print("Mensagem enviada para: "+discord+" /// ");
                     } else {
                         System.out.println("Opção de não.");
                     } 
@@ -687,7 +700,6 @@ public class Corporacao extends javax.swing.JFrame {
                 usuariosDBarray = InicializadorMain.usuariosDBarray;
                 discordDBarray = InicializadorMain.discordDBarray;
                 //usuariosDBarray = policia.AttDBUsuarios();
-                AttDBUsuarioMy();
                 AttDBHierarquia();
                 TabelaAtt();
                 AtualizarInfo();
@@ -739,7 +751,6 @@ public class Corporacao extends javax.swing.JFrame {
         if(!isLSPD){
             JSONObject AddLSPD = new JSONObject();
             AddLSPD.put("passaporte", PassaAddU);
-            AddLSPD.put("lspd", 1);
             AddLSPD.put("nome", NomeU);
             //AddLSPD.put("discord", DiscordAddU);
             String Codegor = randomAlphaNumeric(4);
@@ -755,13 +766,13 @@ public class Corporacao extends javax.swing.JFrame {
             for(int i = 0; i < usuariosDBarray.length(); i++){
                 JSONObject user = usuariosDBarray.getJSONObject(i);
                 int pass = user.getInt("id_usuario");
-                
+                /*
                 if(pass == passause){
                     if(!"".equals(user.getString("discord"))){
                         //Discordae=user.getString("discord");
                         temconta=1;
                     }
-                }
+                }*/
             }
             for(int idis = 0; idis < discordDBarray.length(); idis++){
                 JSONObject disc = discordDBarray.getJSONObject(idis);
@@ -785,7 +796,6 @@ public class Corporacao extends javax.swing.JFrame {
                     System.out.println("Opção de não.");
                 } 
             }
-            AttDBUsuarioMy();
             AttDBHierarquia();
             MensagemHierarquia(AddLSPD);
         }else{
@@ -805,10 +815,6 @@ public class Corporacao extends javax.swing.JFrame {
         //policia.AttDBUsuariosSet();
         usuariosDBarray = InicializadorMain.usuariosDBarray;//policia.AttDBUsuarios();
     }
-    public void AttDBUsuarioMy(){
-        //usuarioMyDBarray = usuarios.AttDBUsuarioMy();
-        usuariosDBarray = InicializadorMain.usuarioMyDBarray;//policia.AttDBUsuarios();
-    }
     
     public void AttDBHierarquia(){
         hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;//usuarios.AttDBHierarquia();
@@ -819,7 +825,7 @@ public class Corporacao extends javax.swing.JFrame {
         //cnome.setEnabled(true);
         //cnome1.setEnabled(true);
         //ccodigo.setEnabled(true);
-        cdiscord.setEnabled(true);
+        //cdiscord.setEnabled(true);
         editar.setVisible(false);
         salvar.setEnabled(true);
         desfazer.setVisible(true);
@@ -832,7 +838,7 @@ public class Corporacao extends javax.swing.JFrame {
         //cnome.setEnabled(false);
         //cnome1.setEnabled(false);
         //ccodigo.setEnabled(false);
-        cdiscord.setEnabled(false);
+        //cdiscord.setEnabled(false);
         editar.setVisible(true);
         salvar.setEnabled(false);
         desfazer.setVisible(false);
@@ -941,8 +947,6 @@ public class Corporacao extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         ccodigo = new javax.swing.JTextField();
-        jLabel18 = new javax.swing.JLabel();
-        cdiscord = new javax.swing.JTextField();
         salvar = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         editar = new javax.swing.JButton();
@@ -1501,14 +1505,6 @@ public class Corporacao extends javax.swing.JFrame {
         ccodigo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         ccodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel18.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel18.setText("DISCORD:");
-
-        cdiscord.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        cdiscord.setEnabled(false);
-
         salvar.setBackground(new java.awt.Color(255, 255, 255));
         salvar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         salvar.setText("SALVAR");
@@ -1570,16 +1566,11 @@ public class Corporacao extends javax.swing.JFrame {
                     .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(salvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
+                        .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cdiscord)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(ccodigo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btCodigo))))
+                        .addComponent(ccodigo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btCodigo))
                     .addComponent(editar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -1617,17 +1608,13 @@ public class Corporacao extends javax.swing.JFrame {
                         .addComponent(ccodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btCodigo))
                     .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cdiscord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(30, 30, 30)
                 .addComponent(editar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(desfazer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         AddCorp.setBackground(new java.awt.Color(255, 255, 255));
@@ -1804,7 +1791,6 @@ public class Corporacao extends javax.swing.JFrame {
         set_info.put("codigo", obj.getString("codigo"));
         set_info.put("discord", obj.getString("discord"));
         set_info.put("age", obj.getInt("age"));
-        set_info.put("lspd", obj.getInt("lspd"));
         set_info.put("permissao", obj.getInt("permissao"));*/
         
         set_info.put("ptt_passaporte", PassaporteP+"");
@@ -1895,7 +1881,6 @@ public class Corporacao extends javax.swing.JFrame {
             PassCida=Integer.parseInt(txtPassaporte.getText());
             for(int i = 0; i < usuariosDBarray.length(); i++){
                 JSONObject o = usuariosDBarray.getJSONObject(i);
-                //if(o.getInt("lspd") >= 1){
                 int pass = o.getInt("id_usuario");
                 if(PassCida==pass){
                     nomw=o.getString("nome");
@@ -1923,7 +1908,6 @@ public class Corporacao extends javax.swing.JFrame {
                     nomw=resulteSet.getString("nome");
                     sobw=resulteSet.getString("sobrenome");
                     
-                    if(resulteSet.getInt("lspd") == 1)lspde=true;
                     
                 }
             } catch (SQLException ex) {
@@ -2073,7 +2057,6 @@ public class Corporacao extends javax.swing.JFrame {
     private javax.swing.JButton btexonerado1;
     private javax.swing.JButton btexonerado2;
     private javax.swing.JTextField ccodigo;
-    private javax.swing.JTextField cdiscord;
     private javax.swing.JTextField cid;
     private javax.swing.JTextField cnome;
     private javax.swing.JTextField cnome1;
@@ -2093,7 +2076,6 @@ public class Corporacao extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;

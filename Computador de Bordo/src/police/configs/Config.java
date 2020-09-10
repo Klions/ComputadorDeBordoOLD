@@ -6,6 +6,8 @@
 package police.configs;
 
 import java.util.prefs.Preferences;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import police.InicializadorMain;
 
 /**
@@ -13,62 +15,57 @@ import police.InicializadorMain;
  * @author John
  */
 public class Config {
-    public int build = 20200817;
-    public String versao = "1.0 [BETA]";
-    public String linkB = "https://rainbowcity.com.br/LSPD.exe";
-    Preferences prefs = Preferences.userNodeForPackage(Example.class);
+    public static int build_atual = 20200817;
+    public static String versao = "1.0 [BETA]";
+    public static String linkB = "https://rainbowcity.com.br/LSPD.exe";
     
     //CONFIGURAÇÃOS PERSONALIZADAS PARA CADA TIPO DE POLICIA
     public String NomePolicia           = "Polícia Militar Rainbow City";
     public String Abv_NomePolicia       = "PMERC";
     public String img_DiscordPolicia    = "https://i.imgur.com/WveHfXw.png";
-    public String img_CBIcone           = "imagens/RC.png";
+    public String img_CBIcone           = "imagens/CB.png";
     
-    private static final String buildB = "20200817";
-    private static final String versaoB = "1.0 [BETA]";
-    private static final String needB = "0";
-    private static final String link = "";
-    private static final String mensagem = "";
+    public static JSONObject cb_config = new JSONObject();
     
-    public void setBuild(String Valor) {
-        InicializadorMain.BuildCB = Valor; //prefs.put(buildB, Valor);
-    }
-    public String getBuild() {
-        return InicializadorMain.BuildCB;
+    public static int getBuild() {
+        if(cb_config.has("build")){
+            return cb_config.getInt("build");
+        }
+        return 0;
     }
     
-    public void setVersao(String Valor) {
-        prefs.put(versaoB, Valor);
-    }
-    public String getVersao() {
-        return prefs.get(versaoB, "default");
-    }
-    
-    public void setNeed(String Valor) {
-        prefs.put(needB, Valor);
-    }
-    public boolean getNeed() {
-        int nidi = Integer.parseInt(prefs.get(needB, "default"));
-        return nidi >= 1;
+    public static String getVersao() {
+        if(cb_config.has("versao")){
+            return cb_config.getString("versao");
+        }
+        return "";
     }
     
-    public void setLink(String Valor) {
-        prefs.put(link, Valor);
-    }
-    public String getLink() {
-        return prefs.get(link, "default");
-    }
-    
-    public void setMensagem(String Valor) {
-        prefs.put(mensagem, Valor);
-    }
-    public String getMensagem() {
-        return prefs.get(mensagem, "default");
+    public static boolean getNeed() {
+        if(cb_config.has("need")){
+            int nidi = cb_config.getInt("need");
+            return nidi >= 1;
+        }
+        return false;
     }
     
-    public boolean VerificarAtt(){
-        int AttBuild1 = build;
-        int AttBuild2 = Integer.parseInt(InicializadorMain.BuildCB);//Integer.parseInt(prefs.get(buildB, "default"));
+    public static String getLink() {
+        if(cb_config.has("link")){
+            return cb_config.getString("link");
+        }
+        return "";
+    }
+    
+    public static String getMensagem() {
+        if(cb_config.has("mensagem")){
+            return cb_config.getString("mensagem");
+        }
+        return "";
+    }
+    
+    public static boolean VerificarAtt(){
+        int AttBuild1 = build_atual;
+        int AttBuild2 = getBuild();//Integer.parseInt(prefs.get(buildB, "default"));
         return AttBuild1 < AttBuild2;
     }
 }

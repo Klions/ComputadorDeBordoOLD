@@ -8,8 +8,10 @@ package police;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
+import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 
 /**
@@ -24,6 +26,11 @@ public class ExportarImportar extends javax.swing.JFrame {
     public ExportarImportar() {
         initComponents();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        }
     }
     public int ExportValor = 0;
     public String TextoExportar = "";
@@ -41,7 +48,9 @@ public class ExportarImportar extends javax.swing.JFrame {
         AreaTexto = new javax.swing.JTextArea();
         Copiar = new javax.swing.JButton();
 
+        setTitle("Exportar / Importar");
         setResizable(false);
+        setType(java.awt.Window.Type.POPUP);
 
         Titulo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         Titulo.setForeground(new java.awt.Color(255, 255, 255));
@@ -90,6 +99,7 @@ public class ExportarImportar extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CopiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarActionPerformed
+        //AreaTexto.setText(HttpDownloadUtility.GetCon(AreaTexto.getText()));
         if(ExportValor == 1){
             if(!Gerenciamento.ImportarDados(AreaTexto.getText())){
                 showMessageDialog(null,"Ocorreu um erro ao importar a tabela que inseriu. Tente novamente.","ERRO NA "+Titulo.getText(),JOptionPane.PLAIN_MESSAGE);
@@ -99,7 +109,7 @@ public class ExportarImportar extends javax.swing.JFrame {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
         }
-        this.setVisible(false);
+        //this.setVisible(false);
     }//GEN-LAST:event_CopiarActionPerformed
 
     /**

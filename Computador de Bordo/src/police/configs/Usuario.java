@@ -5,8 +5,14 @@
  */
 package police.configs;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -14,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import police.Corporacao;
 import police.InicializadorMain;
+import static police.configs.SNWindows.DestPasta;
 
 /**
  *
@@ -31,8 +38,12 @@ public class Usuario {
     
     private static final String dadosalvar = "";
     
+    public static JSONObject UsuarioMain = new JSONObject();
+    
     private String usuariosDB = "";
     private String hierarquiaDB = "";
+    
+    public static JSONArray vrp_user_ids = new JSONArray();
 
     Preferences prefs = Preferences.userNodeForPackage(Example.class);
     
@@ -142,18 +153,22 @@ public class Usuario {
         return Integer.parseInt(prefs.get(passaporte, "padrao"));
     }
     
-    public void setDados(JSONObject DaDos) {
-        prefs.put(dadoss, DaDos.toString());
+    public static void setDados(JSONObject DaDos) {
+        UsuarioMain = DaDos;
+        //prefs.put(dadoss, DaDos.toString());
     }
-
-    public String getDados() {
-        String prefss = prefs.get(dadoss, "padrao");
-        if(prefss !=null){
-            return prefs.get(dadoss, "padrao");
+    public static void setDadosParcial(String key, String Valor) {
+        if("nome".equals(key))UsuarioMain.put("sobrenome", "");
+        UsuarioMain.put(key, Valor);
+        //System.out.println("UsuarioMain: "+UsuarioMain.toString());
+        //prefs.put(dadoss, DaDos.toString());
+    }
+    
+    public static JSONObject getDados() {
+        if(UsuarioMain.has("id_usuario") && UsuarioMain.has("nome")){
+            return UsuarioMain;
         }
-        return null;  
-        
-        
+        return null;
     }
     
     public void setDadosalvar(JSONObject DaDos) {
@@ -309,6 +324,40 @@ public class Usuario {
         }
         //System.out.print(usuariosDBarray.toString());
         return usuariosDBarray;
+    }
+    
+    public static boolean AtualizarDiscords(){
+        ConexaoDB conexao = new ConexaoDB();
+        ResultSet resulteSet = conexao.GetPersonalizadoCidade("select * from vrp_user_ids ORDER BY user_id");
+        if(resulteSet == null) return false;
+        try {
+            while (resulteSet.next()) {
+                JSONObject getTemporario = new JSONObject();
+                    String path = resulteSet.getString("identifier");
+                    // Split path into segments
+                    String PegarDiscord="discord:";
+                    if(path.startsWith(PegarDiscord)){
+                        String segments[] = path.split(PegarDiscord);
+                        String document = segments[segments.length - 1];
+                        getTemporario.put("user_id", resulteSet.getString("user_id"));
+                        getTemporario.put("identifier", document);
+                        vrp_user_ids.put(getTemporario);
+                    }
+            }
+        } catch (SQLException ex) {
+            return false;
+        }
+        return true;
+    }
+    
+    public static String DiscordPorID(int user_id){
+        for(int i = 0; i < vrp_user_ids.length(); i++){
+            JSONObject obj = vrp_user_ids.getJSONObject(i);
+            if(user_id==obj.getInt("user_id")){
+                return obj.getString("identifier");
+            }
+        }
+        return "";
     }
     
     public JSONArray AttBlackList(){
@@ -555,5 +604,40 @@ public class Usuario {
             Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return crimesserverDBarray;
+    }
+    
+    public static String DestFileAc = DestPasta+"/cb-ac.txt";
+    public static void getContaPC(){
+        try {
+            File file = new File(DestFileAc);
+            if(file.exists()){    //if this file exists
+
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                setDadosParcial("id_usuario", scan.nextLine());
+                setDadosParcial("nome", scan.nextLine());
+                setDadosParcial("registro", scan.nextLine());
+                scan.close();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
+    public static void setContaPC(String Serial){
+        try {
+            File file = new File(DestFileAc);
+            if(!file.exists()) file.createNewFile();
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+            JSONObject PegarUser = getDados();
+            bw.write(PegarUser.getInt("id_usuario")); //write the name
+            bw.newLine();
+            bw.write(PegarUser.getString("nome")); //write the name
+            bw.newLine(); //leave a new Line
+            bw.write(PegarUser.getString("registration")); //getPassword()
+            bw.close(); //close the BufferdWriter
+        } catch (IOException e) {}
     }
 }
