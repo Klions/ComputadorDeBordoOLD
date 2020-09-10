@@ -5,12 +5,15 @@
  */
 package police.configs;
 
+import java.awt.Desktop;
 import java.awt.RenderingHints.Key;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -18,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -127,5 +131,24 @@ public class HttpDownloadUtility {
         Key pass=null;
         key = pass+"";
         return pass;
+    }
+    
+    public static void openURL(String url) {
+        Object[] options = { "Confirmar", "Cancelar" };
+        int result = JOptionPane.showOptionDialog(null, "Deseja abrir o link '"+url+"' em seu navegador?", "Abrir link externo", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        if (result == JOptionPane.OK_OPTION) {
+            URI uri = null;
+            try {
+                uri = new URI(url);
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(HttpDownloadUtility.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(uri);
+                } catch (IOException e) { /* TODO: error handling */ }
+            } else { /* TODO: error handling */ }
+            
+        }
     }
 }

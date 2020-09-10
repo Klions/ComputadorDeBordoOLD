@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import police.Corporacao;
 import police.InicializadorMain;
+import police.ViewUsuario;
 import static police.configs.SNWindows.DestPasta;
 
 /**
@@ -159,7 +160,14 @@ public class Usuario {
     }
     public static void setDadosParcial(String key, String Valor) {
         if("nome".equals(key))UsuarioMain.put("sobrenome", "");
-        UsuarioMain.put(key, Valor);
+        if("nome".equals(Valor)) Valor="0";
+        if(ViewUsuario.isNumeric(Valor)){
+            UsuarioMain.put(key, Integer.parseInt(Valor));
+        }else{
+            System.out.println("key str: "+Valor);
+            UsuarioMain.put(key, Valor);
+        }
+        
         //System.out.println("UsuarioMain: "+UsuarioMain.toString());
         //prefs.put(dadoss, DaDos.toString());
     }
@@ -626,13 +634,14 @@ public class Usuario {
             e.printStackTrace();
         }
     }
-    public static void setContaPC(String Serial){
+    public static void setContaPC(){
         try {
             File file = new File(DestFileAc);
             if(!file.exists()) file.createNewFile();
             BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
             JSONObject PegarUser = getDados();
-            bw.write(PegarUser.getInt("id_usuario")); //write the name
+            String ID = PegarUser.getInt("id_usuario")+"";
+            bw.write(ID); //write the name
             bw.newLine();
             bw.write(PegarUser.getString("nome")); //write the name
             bw.newLine(); //leave a new Line
