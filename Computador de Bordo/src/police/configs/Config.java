@@ -15,7 +15,7 @@ import police.InicializadorMain;
  * @author John
  */
 public class Config {
-    public static int build_atual = 20200910;
+    public static int build_atual = 20200911;
     public static String versao = "1.0.0";
     public static String linkB = "https://computadordebordo.tk/CBordo.exe";
     

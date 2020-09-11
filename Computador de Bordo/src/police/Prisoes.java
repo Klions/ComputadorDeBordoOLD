@@ -457,7 +457,7 @@ public class Prisoes extends javax.swing.JFrame {
                 }else{
                     CrimesExtenso += " + "+obj.getString("texto");
                 }
-                CrimesDis+="\n• "+obj.getString("texto");
+                CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: R$"+String.format("%,d", obj.getInt("multa"))+"]";
                 ContageCrimes++;
             }
         }
@@ -470,14 +470,16 @@ public class Prisoes extends javax.swing.JFrame {
                 int ValorInput = Integer.parseInt(TextoInput);
                 //System.out.println("TextoInput: "+Integer.parseInt(TextoInput));
                 if(ValorInput > 0){
-                    MultaTotal+=(obj.getInt("multa")*ValorInput);
-                    MesesTotal+=(obj.getInt("meses")*ValorInput);
+                    int ValorMulta = (obj.getInt("multa")*ValorInput);
+                    int ValorMeses = (obj.getInt("meses")*ValorInput);
+                    MultaTotal+=ValorMulta;
+                    MesesTotal+=ValorMeses;
                     if(ContageCrimes == 0){
                         CrimesExtenso = obj.getString("texto")+" (x"+ValorInput+")";
                     }else{
                         CrimesExtenso += " + "+obj.getString("texto")+" (x"+ValorInput+")";
                     }
-                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+")";
+                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: R$"+String.format("%,d", ValorMulta)+"]";
                     ContageCrimes++;
                 }
             }
@@ -514,6 +516,9 @@ public class Prisoes extends javax.swing.JFrame {
                     "\n\n"+
                     "# CRIMES COMETIDOS:"+
                     CrimesDis+
+                    "\n\n"+
+                    "* MULTA TOTAL: R$"+String.format("%,d", MultaTotal)+
+                    "\n* PENA TOTAL: "+MesesTotal+" meses"+
                     "\n\n"+
                     "* DATA: "+dataFormatada;
                 CrimesDiscordFormat = FormatarParaDiscord(FormatDiscord);
