@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.swing.JOptionPane;
+import police.Login;
 
 /**
  *
@@ -150,5 +151,39 @@ public class HttpDownloadUtility {
             } else { /* TODO: error handling */ }
             
         }
+    }
+    
+    public static String DownloadArquivo(String Url){
+        String fileURL = Url;
+        String NovoNome = "CBordo";
+        String path=null;
+        try {
+            path = new File(".").getCanonicalPath();
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.print(path);
+        String saveDir = path;
+        boolean down=false;
+        try {
+            down = downloadFile(fileURL, saveDir, NovoNome);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if(down){
+            try {
+                Process process = new ProcessBuilder(path+"/"+NovoNome+".exe").start();
+                Thread.sleep(1000);
+                System.exit(1);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                return "OCORREU ALGUM ERRO AO TENTAR ABRIR O APP";
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            return "OCORREU UMA FALHA NO DOWNLOAD";
+        }
+        return "INICIANDO APP ATUALIZADO";
     }
 }

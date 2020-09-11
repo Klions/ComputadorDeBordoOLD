@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 import police.configs.ConexaoDB;
 import police.configs.Config;
+import police.configs.GetImages;
 import police.configs.Usuario;
 
 /**
@@ -109,7 +111,12 @@ public class Corporacao extends javax.swing.JFrame {
         jPanel5.setBackground(new java.awt.Color(13, 32, 64));
         
         this.setLocationRelativeTo(null);
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        }
         
         int totalpatentes = 14;
         Bpatentes.removeAllItems();

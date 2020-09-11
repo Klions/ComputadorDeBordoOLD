@@ -45,8 +45,7 @@ public class Login extends javax.swing.JFrame {
     /**
      * Creates new form Login
      */
-    private static final int PORT = 9998;
-    private static ServerSocket socket; 
+    
    
     JSONArray usuariosDBarray = new JSONArray();
     JSONArray hierarquiaDBarray = new JSONArray();
@@ -59,7 +58,6 @@ public class Login extends javax.swing.JFrame {
     
     int tentativas=1;
     public Login() {
-        checkIfRunning();
         initComponents();
         this.setLocationRelativeTo(null);
         Nome.requestFocus();
@@ -67,22 +65,19 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         PainelLogin.setBackground(new java.awt.Color(13, 32, 64));
         jPanel1.setBackground(new java.awt.Color(13, 32, 64));
-        att.setBackground(new java.awt.Color(222, 82, 82));
+        //att.setBackground(new java.awt.Color(222, 82, 82));
         AttUsers();
         //AttDBUsuarios();
         //AttDBHierarquia();
         
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2png")));
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
             icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
         }
         
         if(netIsAvailable()){
-            att.setVisible(Config.VerificarAtt());
-            AtualizarAtt();
-            
             DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/750936560597336095/sP7k8x_Z9IEZpsdOGISavpBBOgOevHbuPcJ25V4BvxE74l_mRCnu6WNWqEXiwpEAOO31");
             webhook.addEmbed(new DiscordWebhook.EmbedObject()
                 .setTitle("Novo login no Computador de Bordo")
@@ -97,11 +92,7 @@ public class Login extends javax.swing.JFrame {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }*/
         }else{
-            txtAtt.setText("Sem conexão com a internet!");
-            versao.setText("Versão: "+Config.versao);
-            build.setText("Build: "+Config.build_atual);
-            download.setEnabled(false);
-            mensagem.setText("Desculpe, mas sua conexão está ruim ou está nula.");
+            txtErro.setText("Desculpe, mas sua conexão está ruim ou nula.");
             Entrar.setEnabled(false);
         }
         pack();
@@ -121,25 +112,7 @@ public class Login extends javax.swing.JFrame {
     public void AttDBHierarquia(){
         hierarquiaDBarray = usuarios.AttDBHierarquia();
     }
-    private static void checkIfRunning() {
-        try {
-          //Bind to localhost adapter with a zero connection queue 
-          socket = new ServerSocket(PORT,0,InetAddress.getByAddress(new byte[] {127,0,0,1}));
-        }
-        catch (BindException e) {
-          showMessageDialog(null,
-            "Feche o programa antes de abrir outra janela!",
-            "Programa já está sendo executado",
-            JOptionPane.ERROR_MESSAGE);
-          System.err.println("Already running.");
-          System.exit(1);
-        }
-        catch (IOException e) {
-          System.err.println("Unexpected error.");
-          e.printStackTrace();
-          System.exit(2);
-        }
-    }
+    
     
     private static boolean netIsAvailable() {
         try {
@@ -153,20 +126,6 @@ public class Login extends javax.swing.JFrame {
         } catch (IOException e) {
             return false;
         }
-    }
-    
-    public void AtualizarAtt(){
-        versao.setText("VERSÃO: "+Config.getVersao());
-        build.setText("BUILD: "+Config.getBuild());
-        mensagem.setText(Config.getMensagem());
-        versaoatual.setText("Versão Atual: "+Config.versao+" / Build: "+Config.build_atual);
-        
-        if(Config.VerificarAtt()){
-            Entrar.setEnabled(!Config.getNeed());
-        }else{
-            Entrar.setEnabled(true);
-        }
-        if(Config.getNeed()) txtAtt.setText("ATUALIZAÇÃO NECESSÁRIA");
     }
     public void TextoErro(String Texto){
         txtErro.setText(Texto);
@@ -433,12 +392,6 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel5 = new javax.swing.JLabel();
-        att = new javax.swing.JPanel();
-        txtAtt = new javax.swing.JLabel();
-        download = new javax.swing.JButton();
-        build = new javax.swing.JLabel();
-        versao = new javax.swing.JLabel();
-        mensagem = new javax.swing.JLabel();
         versaoatual = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         icone = new javax.swing.JLabel();
@@ -460,69 +413,6 @@ public class Login extends javax.swing.JFrame {
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel5.setText("Desenvolvido por kli0ns#7497 vulgo Ferraz");
         jLabel5.setEnabled(false);
-
-        txtAtt.setFont(new java.awt.Font("Arial Narrow", 1, 24)); // NOI18N
-        txtAtt.setForeground(new java.awt.Color(255, 255, 255));
-        txtAtt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        txtAtt.setText("ATUALIZAÇÃO DISPONÍVEL");
-
-        download.setBackground(new java.awt.Color(255, 255, 255));
-        download.setFont(new java.awt.Font("Arial Narrow", 1, 12)); // NOI18N
-        download.setText("DOWNLOAD NOVA VERSÃO");
-        download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                downloadActionPerformed(evt);
-            }
-        });
-
-        build.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        build.setForeground(new java.awt.Color(245, 245, 245));
-        build.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        build.setText("VERSÃO: 20191026");
-
-        versao.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        versao.setForeground(new java.awt.Color(245, 245, 245));
-        versao.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        versao.setText("VERSÃO: 20191026");
-
-        mensagem.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        mensagem.setForeground(new java.awt.Color(245, 245, 245));
-        mensagem.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        mensagem.setText("MENSAGEM");
-
-        javax.swing.GroupLayout attLayout = new javax.swing.GroupLayout(att);
-        att.setLayout(attLayout);
-        attLayout.setHorizontalGroup(
-            attLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, attLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(attLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(mensagem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, attLayout.createSequentialGroup()
-                        .addGroup(attLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(versao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(build, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(download, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .addComponent(txtAtt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        attLayout.setVerticalGroup(
-            attLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(attLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtAtt)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(attLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(attLayout.createSequentialGroup()
-                        .addComponent(versao)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(build))
-                    .addComponent(download, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mensagem)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         versaoatual.setForeground(new java.awt.Color(255, 255, 255));
         versaoatual.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -660,14 +550,11 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(versaoatual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(att, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
@@ -683,40 +570,6 @@ public class Login extends javax.swing.JFrame {
         LogarConta();
     }//GEN-LAST:event_EntrarActionPerformed
 
-    private void downloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadActionPerformed
-        String fileURL = Config.linkB;//"https://newlandsrp.tk/LSPD.exe";
-        String NovoNome = "LSPD";
-        String path=null;
-        try {
-            path = new File(".").getCanonicalPath();
-        } catch (IOException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.print(path);
-        String saveDir = path;
-        boolean down=false;
-        try {
-            down = HttpDownloadUtility.downloadFile(fileURL, saveDir, NovoNome);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        if(down){
-            try {
-                Process process = new ProcessBuilder(path+"/"+NovoNome+".exe").start();
-                Thread.sleep(1000);
-                this.dispose();
-                
-            } catch (IOException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-                mensagem.setText("Algum erro aconteceu ao tentar abrir o programa!");
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else{
-            mensagem.setText("Algum erro aconteceu ao tentar fazer download!");
-        }
-    }//GEN-LAST:event_downloadActionPerformed
-
     private void NomeKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_NomeKeyReleased
         SomenteNumeros(evt);
     }//GEN-LAST:event_NomeKeyReleased
@@ -727,15 +580,7 @@ public class Login extends javax.swing.JFrame {
 
     private void CodigoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CodigoKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if(Config.VerificarAtt()){
-                if(Config.getNeed()){
-                    txtAtt.setText("ATUALIZAÇÃO NECESSÁRIA!!!!");
-                }else{
-                    LogarConta();
-                }
-            }else{
-                LogarConta();
-            }
+            LogarConta();
         }
     }//GEN-LAST:event_CodigoKeyPressed
 
@@ -785,19 +630,13 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JButton Entrar;
     private javax.swing.JTextField Nome;
     private javax.swing.JPanel PainelLogin;
-    private javax.swing.JPanel att;
-    private javax.swing.JLabel build;
-    private javax.swing.JButton download;
     private javax.swing.JLabel icone;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox lembrar;
-    private javax.swing.JLabel mensagem;
-    private javax.swing.JLabel txtAtt;
     private javax.swing.JLabel txtErro;
-    private javax.swing.JLabel versao;
     private javax.swing.JLabel versaoatual;
     // End of variables declaration//GEN-END:variables
 }

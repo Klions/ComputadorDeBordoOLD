@@ -15,9 +15,9 @@ import police.InicializadorMain;
  * @author John
  */
 public class Config {
-    public static int build_atual = 20200817;
+    public static int build_atual = 20200910;
     public static String versao = "1.0.0";
-    public static String linkB = "https://rainbowcity.com.br/LSPD.exe";
+    public static String linkB = "https://computadordebordo.tk/CBordo.exe";
     
     //CONFIGURAÇÃOS PERSONALIZADAS PARA CADA TIPO DE POLICIA
     public String NomePolicia           = "Polícia Militar Rainbow City";

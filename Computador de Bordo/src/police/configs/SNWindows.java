@@ -11,12 +11,17 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.BindException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.Gerenciamento;
@@ -202,5 +207,26 @@ public class SNWindows {
     public static boolean SetSerialALL(String Serial){
         ConexaoDB conexao = new ConexaoDB();
         return conexao.UpdatePersonalizado("update cb_serial set pc_ativou='"+SerialNumber+"', data_ativou='"+System.currentTimeMillis()+"' where serial='"+Serial+"' AND data_ativou = '0'");
+    }
+    
+    public static ServerSocket socket; 
+    public static void checkIfRunning(int Porta) {
+        try {
+          //Bind to localhost adapter with a zero connection queue 
+          socket = new ServerSocket(Porta,0,InetAddress.getByAddress(new byte[] {127,0,0,1}));
+        }
+        catch (BindException e) {
+          showMessageDialog(null,
+            "Feche o programa antes de abrir outra janela!",
+            "Programa já está sendo executado",
+            JOptionPane.ERROR_MESSAGE);
+          System.err.println("Already running.");
+          System.exit(1);
+        }
+        catch (IOException e) {
+          System.err.println("Unexpected error.");
+          e.printStackTrace();
+          System.exit(2);
+        }
     }
 }
