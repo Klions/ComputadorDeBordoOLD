@@ -84,7 +84,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         //Timere.cancel();
         
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }
@@ -281,6 +281,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                         //tce.stopCellEditing();
                 }
             });
+            
             TipoEscolha[i2] = new JButton();
             TipoEscolha[i2].setBackground(new java.awt.Color(255, 255, 255));
             TipoEscolha[i2].setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
@@ -525,6 +526,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                 }
             }
             //Tabelas[i2].requestFocus();
+            //Tabelas[i2].changeSelection(0, 0, false, false);
+            //Tabelas[i2].editCellAt(0,0);
             
             javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(PainelBase[i2]);
             PainelBase[i2].setLayout(jPanel1Layout);
@@ -717,6 +720,15 @@ public class Gerenciamento extends javax.swing.JFrame {
         return "";
     }
     
+    public void AtalhoVer(){
+        showMessageDialog(null,
+            "Inserir Crime: Shift+Insert"+
+            "\nRemover Crime: Shift+Delete"+
+            "\nMover Crime Cima: Shift+Page_UP"+
+            "\nMover Crime Baixo: Shift+Page_DOWN", 
+            "Atalhos do Gerenciador de Crimes",JOptionPane.PLAIN_MESSAGE);
+    }
+    
     public static boolean ImportarDados(String Valores){
         if(Valores.contains("\n")){
             String[] Valor = Valores.split("\n");
@@ -769,14 +781,16 @@ public class Gerenciamento extends javax.swing.JFrame {
         TxtCategoria = new javax.swing.JTextField();
         InfoDB = new javax.swing.JLabel();
         InfoDB1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         importar = new javax.swing.JMenuItem();
         exportar = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -996,6 +1010,15 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jLabel2.setForeground(new java.awt.Color(255, 255, 204));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("VER ATALHOS (SELECIONE ALGUMA LINHA PARA UTILIZA-LOS)");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+
         jMenu3.setText("FECHAR");
 
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
@@ -1007,20 +1030,6 @@ public class Gerenciamento extends javax.swing.JFrame {
         jMenu3.add(jMenuItem2);
 
         jMenuBar2.add(jMenu3);
-
-        jMenu4.setText("EXIBIR");
-        jMenu4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jMenu4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        jMenuItem3.setText("SOBRE");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        jMenu4.add(jMenuItem3);
-
-        jMenuBar2.add(jMenu4);
 
         jMenu5.setText("EXPORTAR/IMPORTAR");
 
@@ -1042,6 +1051,28 @@ public class Gerenciamento extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu5);
 
+        jMenu4.setText("EXIBIR");
+        jMenu4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jMenu4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jMenuItem3.setText("SOBRE");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem3);
+
+        jMenuItem4.setText("ATALHOS");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem4);
+
+        jMenuBar2.add(jMenu4);
+
         setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1051,6 +1082,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1059,9 +1091,11 @@ public class Gerenciamento extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addGap(10, 10, 10)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1076,8 +1110,6 @@ public class Gerenciamento extends javax.swing.JFrame {
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
         int index = jTable1.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        
-        
         pressedKeys.add(evt.getKeyCode());
         if (!pressedKeys.isEmpty()) {
             if (pressedKeys.contains(KeyEvent.VK_SHIFT)) {
@@ -1217,8 +1249,15 @@ public class Gerenciamento extends javax.swing.JFrame {
         Export.TextoExportar = Catego+"\n"+Crimer;
         Export.ExportValor = 2;
         Export.setVisible(true);
-        
     }//GEN-LAST:event_exportarActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        AtalhoVer();
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        AtalhoVer();
+    }//GEN-LAST:event_jLabel2MouseClicked
 
     /**
      * @param args the command line arguments
@@ -1273,6 +1312,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -1283,6 +1323,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private static javax.swing.JTabbedPane jTabbedPane1;

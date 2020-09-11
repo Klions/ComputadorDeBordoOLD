@@ -35,7 +35,7 @@ public class ViewUsuario extends javax.swing.JFrame {
         jPanel5.setBackground(new java.awt.Color(10, 28, 60));*/
         SubTitulo.setText(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase());
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
             EditarBt4.setEnabled(false);
         }else{
             jLabel12.setText("•••••••••");

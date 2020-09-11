@@ -925,8 +925,8 @@ public class ConexaoDB {
         
     }
     
-    public void ConfigCarregar() throws SQLException {
-        ResultSet resulteSet = GetPersonalizado("select * from cb_config ORDER BY id DESC");
+    public void ConfigCarregar() {
+        ResultSet resulteSet = GetPersonalizado("select * from cb_config ORDER BY id DESC LIMIT 1");
         try {
             while (resulteSet.next()) {
                 JSONObject getTemporario2 = new JSONObject();

@@ -27,7 +27,7 @@ public class ExportarImportar extends javax.swing.JFrame {
         initComponents();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }

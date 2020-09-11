@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import net.dv8tion.jda.api.JDA;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import police.configs.ConexaoDB;
 import police.configs.GetImages;
 import police.configs.SNWindows;
 import police.configs.Usuario;
@@ -65,6 +66,8 @@ public class InicializadorMain {
                     hierarquiaDBarray = usuarios.AttDBHierarquia();
                     //System.out.println("Banco de dados ATUALIZADO.");
                 }
+                ConexaoDB conexao = new ConexaoDB();
+                conexao.ConfigCarregar();
                 SNWindows.getSerialALL();
             }
         },0,2*60000);

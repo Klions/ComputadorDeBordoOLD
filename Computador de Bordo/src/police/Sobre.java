@@ -25,7 +25,7 @@ public class Sobre extends javax.swing.JFrame {
     public Sobre() {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
         //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource('imagens/CB.png')));
         //this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         

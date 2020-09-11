@@ -7,11 +7,18 @@ package police;
 
 import police.configs.Usuario;
 import java.awt.Toolkit;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import org.json.JSONObject;
+import static police.Prisoes.FecharJanela;
 import police.configs.Config;
 import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
 
 /**
@@ -25,9 +32,15 @@ public class Painel extends javax.swing.JFrame {
      */
     Usuario usuario = new Usuario();
     Config config = new Config();
+    
+    int contageAtt = 10;
     public Painel() {
         initComponents();
-        this.setLocationRelativeTo(null);
+        contageAtt = 10;
+        Att.setVisible(false);
+        corporacao.setVisible(false);
+        gerenciar.setVisible(false);
+        
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         
         //pessoas.setBackground(new java.awt.Color(13, 32, 64));
@@ -36,21 +49,41 @@ public class Painel extends javax.swing.JFrame {
         
         //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
             icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
         }
+        VerAtt();
+        this.setLocationRelativeTo(null);
+        
+        JFrame EsteFrame = this;
+        Timer timer = new Timer(); 
+        TimerTask tt = new TimerTask() { 
+  
+            public void run(){
+                Date date = new Date();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                String dataFormatada = simpleDateFormat.format(date);
+                sobre1.setText(dataFormatada);
+                if(!EsteFrame.isVisible()){
+                    timer.cancel();
+                }
+                if(contageAtt>0){
+                    contageAtt--;
+                }else{
+                    contageAtt=10;
+                    VerAtt();
+                }
+            }
+        }; 
+        timer.schedule(tt, 500, 1000);
+        
         
         Carregar();
     }
     public void Carregar(){
-        
         //System.err.println("getDados: "+ usuario.getDados()+"/ fechou");
-        
-        corporacao.setVisible(false);
-        gerenciar.setVisible(false);
-        
         JSONObject obj = usuario.getDados();
         
         Titulo1.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
@@ -73,6 +106,24 @@ public class Painel extends javax.swing.JFrame {
         ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
         sobre.setText("COMPUTADOR DE BORDO v"+Config.versao);
         pack();
+    }
+    boolean AntesAtt = false;
+    public void VerAtt(){
+        if(Config.VerificarAtt()){
+            Att.setVisible(true);
+            boolean Neces = Config.getNeed();
+            if(Neces){
+                AttSubTitulo.setText("ATUALIZAÇÃO NECESSÁRIA");
+            }else{
+                AttSubTitulo.setText("VERSÃO DA ATUALIZAÇÃO: "+Config.getVersao());
+            }
+            if(!AntesAtt) pack();
+            AntesAtt = true;
+        }else{
+            Att.setVisible(false);
+            if(AntesAtt) pack();
+            AntesAtt = false;
+        }
     }
     
     private void DesativarBT(JButton Botao){
@@ -103,6 +154,12 @@ public class Painel extends javax.swing.JFrame {
         ContaBt = new javax.swing.JButton();
         gerenciar = new javax.swing.JPanel();
         gerenciar3 = new javax.swing.JButton();
+        Att = new javax.swing.JPanel();
+        AttTitulo = new javax.swing.JLabel();
+        AttSite = new javax.swing.JButton();
+        AttAgora = new javax.swing.JButton();
+        AttSubTitulo = new javax.swing.JLabel();
+        sobre1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -266,6 +323,71 @@ public class Painel extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        Att.setBackground(new java.awt.Color(222, 82, 82));
+
+        AttTitulo.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        AttTitulo.setForeground(new java.awt.Color(255, 255, 255));
+        AttTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        AttTitulo.setText("ATUALIZAÇÃO DISPONÍVEL");
+
+        AttSite.setBackground(new java.awt.Color(255, 255, 204));
+        AttSite.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        AttSite.setText("BAIXAR PELO SITE");
+        AttSite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AttSiteActionPerformed(evt);
+            }
+        });
+
+        AttAgora.setBackground(new java.awt.Color(0, 204, 255));
+        AttAgora.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        AttAgora.setText("ATUALIZAR AGORA");
+        AttAgora.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AttAgoraActionPerformed(evt);
+            }
+        });
+
+        AttSubTitulo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        AttSubTitulo.setForeground(new java.awt.Color(255, 255, 255));
+        AttSubTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        AttSubTitulo.setText(" ");
+
+        javax.swing.GroupLayout AttLayout = new javax.swing.GroupLayout(Att);
+        Att.setLayout(AttLayout);
+        AttLayout.setHorizontalGroup(
+            AttLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AttLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(AttLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(AttTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(AttSubTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(AttAgora, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(AttSite, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        AttLayout.setVerticalGroup(
+            AttLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AttLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(AttLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(AttLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(AttSite, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(AttAgora, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(AttLayout.createSequentialGroup()
+                        .addComponent(AttTitulo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(AttSubTitulo)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        sobre1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        sobre1.setForeground(new java.awt.Color(255, 255, 255));
+        sobre1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        sobre1.setText(" ");
+
         jMenu3.setText("EXIBIR");
         jMenu3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jMenu3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -301,13 +423,18 @@ public class Painel extends javax.swing.JFrame {
                                 .addComponent(ContaBt))))
                     .addComponent(corporacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(gerenciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(sobre, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(sobre1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(sobre, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addComponent(Att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(Att, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(ContaBt)
@@ -323,7 +450,9 @@ public class Painel extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(gerenciar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sobre)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sobre)
+                    .addComponent(sobre1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -366,6 +495,14 @@ public class Painel extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_ContaBtActionPerformed
 
+    private void AttAgoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttAgoraActionPerformed
+        AttSubTitulo.setText(HttpDownloadUtility.DownloadArquivo(Config.getLink()));
+    }//GEN-LAST:event_AttAgoraActionPerformed
+
+    private void AttSiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttSiteActionPerformed
+        HttpDownloadUtility.openURL(Config.getLink());
+    }//GEN-LAST:event_AttSiteActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -402,6 +539,11 @@ public class Painel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel Att;
+    private javax.swing.JButton AttAgora;
+    private javax.swing.JButton AttSite;
+    private javax.swing.JLabel AttSubTitulo;
+    private javax.swing.JLabel AttTitulo;
     private javax.swing.JButton ContaBt;
     private javax.swing.JLabel Titulo1;
     private javax.swing.JLabel Titulo2;
@@ -418,5 +560,6 @@ public class Painel extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel pessoas;
     private javax.swing.JLabel sobre;
+    private javax.swing.JLabel sobre1;
     // End of variables declaration//GEN-END:variables
 }

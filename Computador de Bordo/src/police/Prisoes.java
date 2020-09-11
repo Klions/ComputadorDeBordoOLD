@@ -88,7 +88,7 @@ public class Prisoes extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
             PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CADASTRAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
             PesquisarBt.setText("CADASTRAR");
             PegarValoresOffline();
@@ -457,7 +457,7 @@ public class Prisoes extends javax.swing.JFrame {
                 }else{
                     CrimesExtenso += " + "+obj.getString("texto");
                 }
-                CrimesDis+="\n• "+obj.getString("texto");
+                CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: R$"+String.format("%,d", obj.getInt("multa"))+"]";
                 ContageCrimes++;
             }
         }
@@ -470,14 +470,16 @@ public class Prisoes extends javax.swing.JFrame {
                 int ValorInput = Integer.parseInt(TextoInput);
                 //System.out.println("TextoInput: "+Integer.parseInt(TextoInput));
                 if(ValorInput > 0){
-                    MultaTotal+=(obj.getInt("multa")*ValorInput);
-                    MesesTotal+=(obj.getInt("meses")*ValorInput);
+                    int ValorMulta = (obj.getInt("multa")*ValorInput);
+                    int ValorMeses = (obj.getInt("meses")*ValorInput);
+                    MultaTotal+=ValorMulta;
+                    MesesTotal+=ValorMeses;
                     if(ContageCrimes == 0){
                         CrimesExtenso = obj.getString("texto")+" (x"+ValorInput+")";
                     }else{
                         CrimesExtenso += " + "+obj.getString("texto")+" (x"+ValorInput+")";
                     }
-                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+")";
+                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: R$"+String.format("%,d", ValorMulta)+"]";
                     ContageCrimes++;
                 }
             }
@@ -514,6 +516,9 @@ public class Prisoes extends javax.swing.JFrame {
                     "\n\n"+
                     "# CRIMES COMETIDOS:"+
                     CrimesDis+
+                    "\n\n"+
+                    "* MULTA TOTAL: R$"+String.format("%,d", MultaTotal)+
+                    "\n* PENA TOTAL: "+MesesTotal+" meses"+
                     "\n\n"+
                     "* DATA: "+dataFormatada;
                 CrimesDiscordFormat = FormatarParaDiscord(FormatDiscord);

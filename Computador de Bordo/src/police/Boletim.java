@@ -55,7 +55,7 @@ public class Boletim extends javax.swing.JFrame {
         //this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         
         if(InicializadorMain.ModoOffline){
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB.png")));
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }
