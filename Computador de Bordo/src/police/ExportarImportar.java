@@ -109,7 +109,7 @@ public class ExportarImportar extends javax.swing.JFrame {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
         }
-        //this.setVisible(false);
+        this.setVisible(false);
     }//GEN-LAST:event_CopiarActionPerformed
 
     /**

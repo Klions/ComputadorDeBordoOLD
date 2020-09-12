@@ -186,4 +186,24 @@ public class HttpDownloadUtility {
         }
         return "INICIANDO APP ATUALIZADO";
     }
+    
+    public static boolean WebhookLog(String Url, String Titulo, String Description){ // 
+        DiscordWebhook webhook = new DiscordWebhook(Url);
+        webhook.addEmbed(new DiscordWebhook.EmbedObject()
+            //.setAuthor("Informações sobre o Modo Offline", "https://imgur.com/vBK8vRk.png")
+            .setFooter("Computador de Bordo", "https://imgur.com/vBK8vRk.png")
+                    
+            .setTitle(Titulo)
+            .setDescription(Description)
+            .addField("IP", SNWindows.IP, false)
+            .addField("PC", SNWindows.SerialNumber, false));
+        //webhook.addEmbed(new DiscordWebhook.EmbedObject().setDescription("Novo login efetuado!\nIP: 127.0.0.1"));
+        try {
+            webhook.execute(); //Handle exception
+        } catch (IOException ex) {
+            Logger.getLogger(HttpDownloadUtility.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
 }

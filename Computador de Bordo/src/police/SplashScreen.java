@@ -106,6 +106,9 @@ public class SplashScreen extends javax.swing.JFrame {
             } catch (SQLException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            SNWindows.PegarIP();
+            
             ProgressoAtual=ValorProgresso;
             ValorProgresso=65;
             texto.setText("VERIFICANDO INTEGRIDADE DOS REGISTROS");
@@ -614,6 +617,10 @@ public class SplashScreen extends javax.swing.JFrame {
                 JSONObject obj = ServidoresRegistrados.getJSONObject(i);
                 String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
                 if(FormatNome.equals(IndexStr)){
+                    /*HttpDownloadUtility.WebhookLog(
+                        "https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX", 
+                        "Novo Login (Cidade "+obj.getString("nome_cidade")+")", 
+                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+".");*/
                     GetImages.PegarImagensCB(obj.getString("url_logo"));
                     SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
                     nomedacidade = obj.getString("nome_cidade");
@@ -664,6 +671,11 @@ public class SplashScreen extends javax.swing.JFrame {
         Fechar=true;
         ProgressoAtual=100;
         ContandoFalhas=0;
+        
+        /*HttpDownloadUtility.WebhookLog(
+            "https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX", 
+            "Novo Login (Modo Offline)", 
+            "Algum usuário entrou no Computador de Bordo pelo Modo Offline");*/
         
         new Painel().setVisible(true);
         this.dispose();
