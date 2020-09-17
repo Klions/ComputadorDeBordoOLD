@@ -40,6 +40,15 @@ public class SNWindows {
     public static JSONArray cb_serial_cidade = new JSONArray();
     public static String IP;
     
+    public static boolean isNumeric(String str) { 
+        try {  
+            Double.parseDouble(str);  
+            return true;
+        } catch(NumberFormatException e){  
+            return false;  
+        }  
+    }
+    
     public static void PegarIP(){
         String systemipaddress = ""; 
         try { 

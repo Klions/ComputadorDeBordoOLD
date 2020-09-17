@@ -121,13 +121,17 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel2" max="32767" attributes="0"/>
                   <Component id="jTabbedPane1" max="32767" attributes="0"/>
                   <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
                   <Component id="PainelDetalhes" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="AddCategoria1" min="-2" pref="150" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -140,7 +144,9 @@
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="AddCategoria1" min="-2" pref="30" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="PainelDetalhes" min="-2" max="-2" attributes="0"/>
@@ -193,8 +199,6 @@
                           <Component id="jScrollPane2" pref="749" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="jButton5" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="75" max="-2" attributes="0"/>
-                              <Component id="RenameTab" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="RenameTabBt" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
@@ -217,7 +221,6 @@
                           <Component id="jButton4" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                           <Component id="jButton5" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                           <Component id="RenameTabBt" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                          <Component id="RenameTab" alignment="3" max="32767" attributes="0"/>
                           <Component id="jComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
@@ -239,25 +242,10 @@
                       <Font name="Tahoma" size="12" style="0"/>
                     </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                      <Table columnCount="4" rowCount="4">
-                        <Column editable="true" title="NOME DO CRIME" type="java.lang.String">
-                          <Data value="CRIME 1"/>
-                          <Data value="CRIME 2"/>
-                          <Data value="CRIME 3"/>
-                          <Data value="CRIME 4"/>
-                        </Column>
-                        <Column editable="true" title="MULTA" type="java.lang.Integer">
-                          <Data value="1500"/>
-                          <Data value="2500"/>
-                          <Data value="5000"/>
-                          <Data value="10000"/>
-                        </Column>
-                        <Column editable="true" title="PENA EM MESES" type="java.lang.Integer">
-                          <Data value="11111"/>
-                          <Data value="2222222"/>
-                          <Data value="333333333"/>
-                          <Data value="444444444"/>
-                        </Column>
+                      <Table columnCount="4" rowCount="0">
+                        <Column editable="true" title="NOME DO CRIME" type="java.lang.String"/>
+                        <Column editable="true" title="MULTA" type="java.lang.Integer"/>
+                        <Column editable="true" title="PENA EM MESES" type="java.lang.Integer"/>
                         <Column editable="false" title="PREENCHIMENTO" type="java.lang.String"/>
                       </Table>
                     </Property>
@@ -303,8 +291,6 @@
                 <Property name="horizontalTextPosition" type="int" value="0"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="RenameTab">
-            </Component>
             <Component class="javax.swing.JButton" name="RenameTabBt">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -341,7 +327,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="ADICIONAR CATEGORIA">
+            <TitledBorder>
               <Color PropertyName="color" blue="ff" green="ff" red="ff" type="rgb"/>
             </TitledBorder>
           </Border>
@@ -355,11 +341,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="LabelCategoria" min="-2" pref="104" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="TxtCategoria" min="-2" pref="150" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="AddCategoria" min="-2" max="-2" attributes="0"/>
+                          <Component id="AddCategoria" min="-2" pref="190" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                           <Component id="ResetarTudo" min="-2" pref="140" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -378,21 +360,13 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="LabelCategoria" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
-                              <Component id="TxtCategoria" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="SalvarDados" alignment="1" max="32767" attributes="0"/>
-                          <Component id="ResetarTudo" alignment="1" max="32767" attributes="0"/>
-                          <Component id="AddCategoria" alignment="1" pref="30" max="32767" attributes="0"/>
-                      </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="SalvarDados" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="ResetarTudo" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="AddCategoria" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="InfoDB" alignment="3" max="32767" attributes="0"/>
                       <Component id="InfoDB1" alignment="3" max="32767" attributes="0"/>
@@ -431,17 +405,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarTudoActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="LabelCategoria">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Arial Unicode MS" size="15" style="0"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" red="ff" type="rgb"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="CATEGORIA:"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JButton" name="AddCategoria">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -450,16 +413,11 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Arial Unicode MS" size="12" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="ADICIONAR"/>
+            <Property name="text" type="java.lang.String" value="ADICIONAR CATEGORIA"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="AddCategoriaActionPerformed"/>
           </Events>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
-          </AuxValues>
-        </Component>
-        <Component class="javax.swing.JTextField" name="TxtCategoria">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
           </AuxValues>
@@ -500,6 +458,23 @@
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel2MouseClicked"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="AddCategoria1">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Arial Unicode MS" size="12" style="0"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="CONFIGURA&#xc7;&#xd5;ES"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="AddCategoria1ActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

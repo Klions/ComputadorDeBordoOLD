@@ -497,6 +497,10 @@ public class Painel extends javax.swing.JFrame {
 
     private void AttAgoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttAgoraActionPerformed
         AttSubTitulo.setText(HttpDownloadUtility.DownloadArquivo(Config.getLink()));
+        HttpDownloadUtility.WebhookLog(
+            "755986573031637073", 
+            "Usuário atualizando Computador de Bordo", 
+            "Algum usuário está atualizando o Computador de Bordo para a versão: "+Config.getVersao());
     }//GEN-LAST:event_AttAgoraActionPerformed
 
     private void AttSiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttSiteActionPerformed

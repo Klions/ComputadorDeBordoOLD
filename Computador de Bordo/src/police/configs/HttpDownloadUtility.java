@@ -5,6 +5,7 @@
  */
 package police.configs;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.RenderingHints.Key;
 import java.io.File;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.swing.JOptionPane;
+import net.dv8tion.jda.api.EmbedBuilder;
 import police.Login;
 
 /**
@@ -187,23 +189,32 @@ public class HttpDownloadUtility {
         return "INICIANDO APP ATUALIZADO";
     }
     
-    public static boolean WebhookLog(String Url, String Titulo, String Description){ // 
-        DiscordWebhook webhook = new DiscordWebhook(Url);
-        webhook.addEmbed(new DiscordWebhook.EmbedObject()
-            //.setAuthor("Informações sobre o Modo Offline", "https://imgur.com/vBK8vRk.png")
-            .setFooter("Computador de Bordo", "https://imgur.com/vBK8vRk.png")
-                    
-            .setTitle(Titulo)
-            .setDescription(Description)
-            .addField("IP", SNWindows.IP, false)
-            .addField("PC", SNWindows.SerialNumber, false));
-        //webhook.addEmbed(new DiscordWebhook.EmbedObject().setDescription("Novo login efetuado!\nIP: 127.0.0.1"));
-        try {
-            webhook.execute(); //Handle exception
-        } catch (IOException ex) {
-            Logger.getLogger(HttpDownloadUtility.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+    public static boolean WebhookLog(String canal_id, String Titulo, String Description){ // 
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(Titulo, null);
+        //eb.setAuthor(Titulo, "https://imgur.com/vBK8vRk.png");
+        if(Description.toLowerCase().contains("online")){
+            eb.setColor(new Color(254, 254, 254));
+        }else if(Description.toLowerCase().contains("offline")){
+            eb.setColor(new Color(41, 143, 202));
+        }else{
+            eb.setColor(new Color(5, 65, 99));
         }
+        
+        eb.setDescription(Description);
+
+        eb.addField("IP", SNWindows.IP, true);
+        eb.addField("PC", SNWindows.SerialNumber, true);
+        eb.addField("VERSÃO CB", Config.versao, true);
+        
+        /*eb.addField("Policial "+proreb, nome_usuario+" ("+id_usuario+")", true);
+        eb.addField("Oficial solicitante", nome_promoveu+" ("+id_promoveu+")", true);
+        eb.addField("Motivo", motivo, false);
+        eb.addField("Antiga Patente", oldpatente+" "+PttInsi2, true);
+        eb.addField("Nova Patente", novapatente+" "+PttInsi, true);
+        eb.setThumbnail(config.img_DiscordPolicia);*/
+        
+        DiscordWebhook2.EnviarMsg(canal_id, eb);
         return true;
     }
 }
