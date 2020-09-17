@@ -50,6 +50,9 @@ public class Prisoes extends javax.swing.JFrame {
     JSONArray CrimesRegistro = new JSONArray();
     JSONArray CategoriasCrimes = new JSONArray();
     
+    JSONArray BeneficiosCrimes = new JSONArray();
+    JSONObject OpcoesDeCrimes = new JSONObject();
+    
     JSONArray RegistroBotoes = new JSONArray();
     JSONArray RegistroInputs = new JSONArray();
     
@@ -65,6 +68,9 @@ public class Prisoes extends javax.swing.JFrame {
     
     static String CrimesStore2="";
     static String CategoriasStore2="";
+    
+    static String AumentoEReducao="";
+    static String OpcoesCrimes="";
     
     JSONObject UsuarioPegar = new JSONObject();
     
@@ -92,6 +98,7 @@ public class Prisoes extends javax.swing.JFrame {
             PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CADASTRAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
             PesquisarBt.setText("CADASTRAR");
             PegarValoresOffline();
+            PegarValoresOfflineOpcoes();
             
             JSONObject PegarUser = Usuario.getDados();
             if(PegarUser.getInt("id_usuario") == 0){
@@ -160,6 +167,32 @@ public class Prisoes extends javax.swing.JFrame {
         }
     }
     
+    public void PegarValoresOfflineOpcoes(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFile3);
+            if(file.exists()){    //if this file exists
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                Base64.Decoder dec = Base64.getDecoder();
+                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    AumentoEReducao = DecoderStre;
+                }
+                
+                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    OpcoesCrimes = DecoderStre;
+                }
+                scan.close();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
+    
     public void SetarBotoes(){
         if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
@@ -185,6 +218,32 @@ public class Prisoes extends javax.swing.JFrame {
                 getTemporario2.put("categoria", 1);
                 
                 CrimesRegistro.put(getTemporario2);
+            }
+            
+            BeneficiosCrimes = new JSONArray();
+            if(!"".equals(AumentoEReducao) && AumentoEReducao.length() > 10){
+                BeneficiosCrimes = new JSONArray(AumentoEReducao);
+            }else{
+                JSONObject getTemporario2 = new JSONObject();
+                getTemporario2.put("texto", "Reu Primario");
+                getTemporario2.put("meses", 25);
+                getTemporario2.put("calculo", "PORCENTAGEM");
+                getTemporario2.put("tipo", "REDUCAO");
+                BeneficiosCrimes.put(getTemporario2);
+                
+                getTemporario2 = new JSONObject();
+                getTemporario2.put("texto", "Reu Reincidente");
+                getTemporario2.put("meses", 30);
+                getTemporario2.put("calculo", "PORCENTAGEM");
+                getTemporario2.put("tipo", "AUMENTO");
+                BeneficiosCrimes.put(getTemporario2);
+            }
+            
+            OpcoesDeCrimes = new JSONObject();
+            if(!"".equals(OpcoesCrimes) && OpcoesCrimes.length() > 10){
+                OpcoesDeCrimes = new JSONObject(OpcoesCrimes);
+            }else{
+                OpcoesDeCrimes.put("pena_max", 0);
             }
         }else{
             Usuario usuarios = new Usuario();
@@ -424,7 +483,113 @@ public class Prisoes extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Crimes 1", jScrollPane1);
         */
+        AdicionarBotoesBeneficios();
     }
+    
+    public void AdicionarBotoesBeneficios(){
+        //for(int i2 = 0; i2 < BeneficiosCrimes.length(); i2++){
+            //JSONObject o2 = BeneficiosCrimes.getJSONObject(i2);
+            int i2 = 40;
+            PainelBase[i2] = new JPanel();
+            
+            javax.swing.GroupLayout jPanel1Layout2 = new javax.swing.GroupLayout(PainelBase[i2]);
+            PainelBase[i2].setLayout(jPanel1Layout2);
+            jPanel1Layout2.setHorizontalGroup(
+                jPanel1Layout2.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 856, Short.MAX_VALUE)
+            );
+            jPanel1Layout2.setVerticalGroup(
+                jPanel1Layout2.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 386, Short.MAX_VALUE)
+            );
+            ScrollPainel[i2] = new JScrollPane(PainelBase[i2], JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+            ScrollPainel[i2].setViewportView(PainelBase[i2]);
+            jTabbedPane1.addTab("Aumento/Redução de Pena", ScrollPainel[i2]);
+            
+            ScrollPainel[i2].getVerticalScrollBar().setUnitIncrement(30);
+            int PadraoX = 15;
+            int LimiteQuadro = 4;
+            int ContagemLimite = 0;
+
+            int TamanhoPainel = (jPanel4.getWidth()/LimiteQuadro)-5;
+            int Linha = 0;
+            
+            int NLinha = (CrimesRegistro.length()/3);
+            
+            Container container = PainelBase[i2];
+            
+            javax.swing.GroupLayout jPanel1Layout3 = new javax.swing.GroupLayout(PainelBase[i2]);
+            container.setLayout(jPanel1Layout3);
+            jPanel1Layout3.setHorizontalGroup(
+                jPanel1Layout3.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 200, Short.MAX_VALUE)
+            );
+            
+            
+            for(int i = 0; i < BeneficiosCrimes.length(); i++){
+                final int As = i;
+                final int As2 = i2;
+                
+                JSONObject o = BeneficiosCrimes.getJSONObject(i);
+               
+                Painel[i2][i] = new JPanel();
+                Painel[i2][i].setBounds(PadraoX+(TamanhoPainel*ContagemLimite), 20+(50*Linha), 220, 45);
+
+                //Painel[i].setBackground(new java.awt.Color(0, 0, 153));
+                Painel[i2][i].setBorder(javax.swing.BorderFactory.createEtchedBorder());
+                container.add( Painel[i2][i] );
+
+                Container container2 = Painel[i2][i];
+                container2.setLayout(null);
+
+                //Botoes[i] = new javax.swing.JToggleButton();
+
+                //================ BOTOES ================
+                JSONObject PegarDadosBt = o;
+                PegarDadosBt.put("i1", i2);
+                PegarDadosBt.put("i2", i);
+                RegistroBotoes.put(PegarDadosBt);
+
+                Botoes[i2][i] = new JToggleButton(o.getString("texto"));
+                Botoes[i2][i].setIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/falso.png"))); // NOI18N
+                Botoes[i2][i].setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                Botoes[i2][i].setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+                Botoes[i2][i].setRolloverEnabled(false);
+                Botoes[i2][i].setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/police/imagens/verdadeiro.png"))); // NOI18N
+                Botoes[i2][i].setBackground(new java.awt.Color(255, 255, 255));
+
+                Botoes[i2][i].addItemListener(new ItemListener() {
+                    public void itemStateChanged(ItemEvent ev) {
+                       AttCrimes();
+                    }
+                });
+
+                Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
+
+                Botoes[i2][i].setBounds(3, 3, 214, 39);
+                container2.add( Botoes[i2][i] );
+                //=========================================
+                
+
+
+
+                ContagemLimite++;
+                if(ContagemLimite>=LimiteQuadro){
+                    ContagemLimite=0;
+                    Linha++;
+                }
+            }
+            if(ContagemLimite == 0)Linha--;
+            jPanel1Layout3.setVerticalGroup(
+                jPanel1Layout3.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 40+(50*Linha)+45, Short.MAX_VALUE) //386
+            );
+            this.pack();
+        //}
+    }
+    
     public void AtualizarJanelas(){
         int AtualTab = jTabbedPane1.getSelectedIndex();
         while (jTabbedPane1.getTabCount() > 0)
@@ -442,25 +607,11 @@ public class Prisoes extends javax.swing.JFrame {
         
         String CrimesExtenso = "N/A";
         int ContageCrimes = 0;
+        
+        String ReducaoDis = "";
         CrimesDiscordFormat = "";
         String CrimesDis = "";
-        for(int i = 0; i < RegistroBotoes.length(); i++){
-            JSONObject obj = RegistroBotoes.getJSONObject(i);
-            int ir1 = obj.getInt("i1");
-            int ir2 = obj.getInt("i2");
-            if(Botoes[ir1][ir2].isSelected()){
-                //System.out.println("Nome do crime: "+obj.getString("texto"));
-                MultaTotal+=obj.getInt("multa");
-                MesesTotal+=obj.getInt("meses");
-                if(ContageCrimes == 0){
-                    CrimesExtenso = obj.getString("texto");
-                }else{
-                    CrimesExtenso += " + "+obj.getString("texto");
-                }
-                CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: R$"+String.format("%,d", obj.getInt("multa"))+"]";
-                ContageCrimes++;
-            }
-        }
+        
         for(int i = 0; i < RegistroInputs.length(); i++){
             JSONObject obj = RegistroInputs.getJSONObject(i);
             int ir1 = obj.getInt("i1");
@@ -472,8 +623,10 @@ public class Prisoes extends javax.swing.JFrame {
                 if(ValorInput > 0){
                     int ValorMulta = (obj.getInt("multa")*ValorInput);
                     int ValorMeses = (obj.getInt("meses")*ValorInput);
+                    //System.out.println("TextoInput: "+Integer.parseInt(TextoInput)+" / ValorInput: "+ValorInput+" / obj.getInt(\"meses\"): "+obj.getInt("meses")+" / MesesTotal: "+MesesTotal);
                     MultaTotal+=ValorMulta;
                     MesesTotal+=ValorMeses;
+                    
                     if(ContageCrimes == 0){
                         CrimesExtenso = obj.getString("texto")+" (x"+ValorInput+")";
                     }else{
@@ -482,6 +635,49 @@ public class Prisoes extends javax.swing.JFrame {
                     CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: R$"+String.format("%,d", ValorMulta)+"]";
                     ContageCrimes++;
                 }
+            }
+        }
+        
+        for(int i = 0; i < RegistroBotoes.length(); i++){
+            JSONObject obj = RegistroBotoes.getJSONObject(i);
+            int ir1 = obj.getInt("i1");
+            int ir2 = obj.getInt("i2");
+            if(Botoes[ir1][ir2].isSelected()){
+                //System.out.println("Nome do crime: "+obj.getString("texto"));
+                if(ir1 != 40){
+                    MultaTotal+=obj.getInt("multa");
+                    MesesTotal+=obj.getInt("meses");
+                    if(ContageCrimes == 0){
+                        CrimesExtenso = obj.getString("texto");
+                    }else{
+                        CrimesExtenso += " + "+obj.getString("texto");
+                    }
+                    CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: R$"+String.format("%,d", obj.getInt("multa"))+"]";
+                    ContageCrimes++;
+                }else{
+                    int ValorConta = 0;
+                    if("FIXO".equals(obj.getString("calculo"))){
+                        ValorConta = obj.getInt("meses");
+                        System.out.println("obj.getInt(\"meses\"): "+obj.getInt("meses")+" / MesesTotal: "+MesesTotal+" / ValorConta: "+ValorConta);
+                        if("REDUCAO".equals(obj.getString("tipo"))){
+                            ReducaoDis+="\n• "+obj.getString("texto")+" (-"+obj.getInt("meses")+")[REDUÇÃO DE "+ValorConta+" MESES]";
+                            MesesTotal-=ValorConta;
+                        }else{
+                            ReducaoDis+="\n• "+obj.getString("texto")+" (+"+obj.getInt("meses")+")[AUMENTO DE "+ValorConta+" MESES]";
+                            MesesTotal+=ValorConta;
+                        }
+                    }else{
+                        ValorConta = (obj.getInt("meses")*MesesTotal)/100;
+                        if("REDUCAO".equals(obj.getString("tipo"))){
+                            ReducaoDis+="\n• "+obj.getString("texto")+" (-"+obj.getInt("meses")+"%)[REDUÇÃO DE "+ValorConta+" MESES]";
+                            MesesTotal-=ValorConta;
+                        }else{
+                            ReducaoDis+="\n• "+obj.getString("texto")+" (+"+obj.getInt("meses")+"%)[AUMENTO DE "+ValorConta+" MESES]";
+                            MesesTotal+=ValorConta;
+                        }
+                    }
+                }
+                
             }
         }
         boolean Ativado = false;
@@ -511,14 +707,25 @@ public class Prisoes extends javax.swing.JFrame {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 String dataFormatada = simpleDateFormat.format(date);
                 
+                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                String StrPenaTotal = MesesTotal+" meses";
+                if(OpcoesDeCrimes.getInt("pena_max") > 0 && MesesTotal >= OpcoesDeCrimes.getInt("pena_max")){
+                    MesesTotal = OpcoesDeCrimes.getInt("pena_max");
+                    StrPenaTotal = MesesTotal+" meses [PENA MÁXIMA]";
+                }
+                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                
                 String FormatDiscord = "[INDIVÍDUO]("+nome+" ["+UsuarioPegar.getInt("id_usuario")+"])"+RGi+
                     "\n[POLICIAL]("+nome_policial+" ["+PolicialUser.getInt("id_usuario")+"])"+
                     "\n\n"+
                     "# CRIMES COMETIDOS:"+
                     CrimesDis+
-                    "\n\n"+
-                    "* MULTA TOTAL: R$"+String.format("%,d", MultaTotal)+
-                    "\n* PENA TOTAL: "+MesesTotal+" meses"+
+                    "\n\n";
+                
+                if(!"".equals(ReducaoDis)) FormatDiscord+="# AUMENTO/REDUÇÃO DE PENA:"+ReducaoDis+"\n\n";
+                
+                FormatDiscord+= "* MULTA TOTAL: R$"+String.format("%,d", MultaTotal)+
+                    "\n* PENA TOTAL: "+StrPenaTotal+
                     "\n\n"+
                     "* DATA: "+dataFormatada;
                 CrimesDiscordFormat = FormatarParaDiscord(FormatDiscord);
@@ -533,12 +740,11 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt1.setEnabled(AtivadoOn);
         SalvarBt.setEnabled(AtivadoOn);
         
-        if(MultaTotal>0) StrMeses = "R$"+String.format("%,d", MultaTotal);
-        if(MesesTotal>0) StrMultas = MesesTotal+" meses";
-        info_Pena1S.setText(StrMeses);
-        info_Pena2S.setText(StrMultas);
+        if(MultaTotal>0) StrMultas = "R$"+String.format("%,d", MultaTotal);
+        if(MesesTotal>0) StrMeses = MesesTotal+" meses";
+        info_Pena1S.setText(StrMultas);
+        info_Pena2S.setText(StrMeses);
         CopiarDiscordBt.setText("COPIAR P/ DISCORD");
-        
     }
     
     public static String FormatarParaDiscord(String Texto){

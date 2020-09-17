@@ -78,19 +78,7 @@ public class Login extends javax.swing.JFrame {
         }
         
         if(netIsAvailable()){
-            DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/750936560597336095/sP7k8x_Z9IEZpsdOGISavpBBOgOevHbuPcJ25V4BvxE74l_mRCnu6WNWqEXiwpEAOO31");
-            webhook.addEmbed(new DiscordWebhook.EmbedObject()
-                .setTitle("Novo login no Computador de Bordo")
-                .setDescription("This is a description")
-                .addField("1st Field", "Inline", true)
-                .addField("2nd Field", "Inline", true));
-            //webhook.addEmbed(new DiscordWebhook.EmbedObject().setDescription("Novo login efetuado!\nIP: 127.0.0.1"));
             
-            /*try {
-                webhook.execute(); //Handle exception
-            } catch (IOException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
         }else{
             txtErro.setText("Desculpe, mas sua conexão está ruim ou nula.");
             Entrar.setEnabled(false);

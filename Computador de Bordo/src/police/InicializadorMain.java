@@ -51,6 +51,9 @@ public class InicializadorMain {
     
     public static String DestFile = SNWindows.DestPasta+"/cb-l.txt";
     public static String DestFile2 = SNWindows.DestPasta+"/cb-c.txt";
+    public static String DestFile3 = SNWindows.DestPasta+"/cb-ar.txt";
+    
+    //static ExportarImportar Export = new ExportarImportar();
     
     public static void main(String[] args) throws InterruptedException {
         SplashScreen splash = new SplashScreen();

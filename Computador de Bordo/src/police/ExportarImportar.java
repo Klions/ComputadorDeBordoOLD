@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import police.configs.GetImages;
-import police.configs.HttpDownloadUtility;
 
 /**
  *
@@ -34,6 +33,7 @@ public class ExportarImportar extends javax.swing.JFrame {
     }
     public int ExportValor = 0;
     public String TextoExportar = "";
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -109,7 +109,7 @@ public class ExportarImportar extends javax.swing.JFrame {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
         }
-        //this.setVisible(false);
+        this.setVisible(false);
     }//GEN-LAST:event_CopiarActionPerformed
 
     /**

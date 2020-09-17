@@ -70,6 +70,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     ExportarImportar Export = new ExportarImportar();
     
     
+    
     public static int tCrimes = 0;
     public static int tCategorias = 0;
     
@@ -78,9 +79,11 @@ public class Gerenciamento extends javax.swing.JFrame {
     static int Nivel_Ass = 0;
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
+    static JFrame EsteFrame = new JFrame();
     public Gerenciamento() {
         initComponents();
-        JFrame EsteFrame = this;
+        SalvarTime=10;
+        EsteFrame = this;
         //Timere.cancel();
         
         if(InicializadorMain.ModoOffline){
@@ -163,7 +166,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             novo_CategoriasCrimes = CategoriasCrimes;
             novo_CrimesRegistro = CrimesRegistro;
         }
-        SalvarTime=20;
+        SalvarTime=10;
         AtualizarJanelas();
         PegarValoresTabela();
     }
@@ -195,7 +198,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         if(InicializadorMain.ModoOffline){
             if(novo_CategoriasCrimes.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || novo_CrimesRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
                 Bloqueado = true;
-                TxtCategoria.setEnabled(false);
+                //TxtCategoria.setEnabled(false);
                 AddCategoria.setEnabled(false);
                 showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente.", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
             }
@@ -493,6 +496,37 @@ public class Gerenciamento extends javax.swing.JFrame {
             RenameTabBtc[i2].addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     String NCategoria = RenameTabc[As].getText();
+                    if(jTabbedPane1.getTabCount() < SNWindows.CategAssinatura[Nivel_Ass][0]){
+                        String NomeCategoria = (String)JOptionPane.showInputDialog(EsteFrame, "Escolha o nome para a categoria. Entre 3 e 30 caracteres.",
+                            "Renomear Categoria", JOptionPane.QUESTION_MESSAGE,null,null,NCategoria);
+                        //String NomeCategoria = JOptionPane.showInputDialog(EsteFrame, "Escolha o nome para a categoria. Entre 3 e 30 caracteres.", "Nome da Categoria", JOptionPane.PLAIN_MESSAGE);
+                        if(NomeCategoria != null && !"".equals(NomeCategoria) && NomeCategoria.length() >= 3 && NomeCategoria.length() <= 30){
+                            String CatNome = "Desconhecido";
+                            jTabbedPane1.setTitleAt(As, NomeCategoria);
+                            JSONArray ArrayDescartavel = new JSONArray();
+                            for(int i3 = 0; i3 < novo_CategoriasCrimes.length(); i3++){
+                                JSONObject Obj = novo_CategoriasCrimes.getJSONObject(i3);
+
+                                JSONObject getTemporario2 = new JSONObject();
+                                if(i3 == As){
+                                    CatNome = Obj.getString("nome_categoria");
+                                    getTemporario2.put("id", Obj.getInt("id"));
+                                    getTemporario2.put("nome_categoria", NomeCategoria);
+                                }else{
+                                    getTemporario2 = Obj;
+                                }
+                                ArrayDescartavel.put(getTemporario2);
+                            }
+                            novo_CategoriasCrimes = ArrayDescartavel;
+                            InfoDB1.setText("Categoria "+CatNome+" renomeada para "+NomeCategoria);
+                        }else{
+                            showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao renomear categoria",JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }else{
+                        showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias.", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
+                    }
+                    
+                    /*
                     if(NCategoria.length() > 3 && NCategoria.length() < 20){
                         String CatNome = "Desconhecido";
                         jTabbedPane1.setTitleAt(As, NCategoria);
@@ -512,7 +546,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                         }
                         novo_CategoriasCrimes = ArrayDescartavel;
                         InfoDB1.setText("Categoria "+CatNome+" renomeada para "+NCategoria);
-                    }
+                    }*/
                 }
             });
         
@@ -541,9 +575,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                         
                         
                             .addComponent(BotoesRem[i2])
-                            .addGap(75, 75, 75)
-                            .addComponent(RenameTabc[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                
                             .addComponent(RenameTabBtc[i2])
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(TipoEscolha[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -562,10 +595,11 @@ public class Gerenciamento extends javax.swing.JFrame {
                         .addComponent(BotoesRem[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             
                         .addComponent(RenameTabBtc[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(RenameTabc[i2])
                         .addComponent(TipoEscolha[i2], javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
+            
+        
             if(Bloqueado){
                 Tabelas[i2].setEnabled(false);
                 RenameTabBtc[i2].setEnabled(false);
@@ -770,18 +804,16 @@ public class Gerenciamento extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
-        RenameTab = new javax.swing.JTextField();
         RenameTabBt = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
         PainelDetalhes = new javax.swing.JPanel();
         SalvarDados = new javax.swing.JButton();
         ResetarTudo = new javax.swing.JButton();
-        LabelCategoria = new javax.swing.JLabel();
         AddCategoria = new javax.swing.JButton();
-        TxtCategoria = new javax.swing.JTextField();
         InfoDB = new javax.swing.JLabel();
         InfoDB1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        AddCategoria1 = new javax.swing.JButton();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -820,10 +852,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         jTable1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"CRIME 1",  new Integer(1500),  new Integer(11111), null},
-                {"CRIME 2",  new Integer(2500),  new Integer(2222222), null},
-                {"CRIME 3",  new Integer(5000),  new Integer(333333333), null},
-                {"CRIME 4",  new Integer(10000),  new Integer(444444444), null}
+
             },
             new String [] {
                 "NOME DO CRIME", "MULTA", "PENA EM MESES", "PREENCHIMENTO"
@@ -900,8 +929,6 @@ public class Gerenciamento extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 749, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jButton5)
-                        .addGap(75, 75, 75)
-                        .addComponent(RenameTab, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(RenameTabBt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -920,14 +947,13 @@ public class Gerenciamento extends javax.swing.JFrame {
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(RenameTabBt, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RenameTab)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab2", jPanel1);
 
-        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "ADICIONAR CATEGORIA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        PainelDetalhes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
 
         SalvarDados.setBackground(new java.awt.Color(255, 255, 255));
         SalvarDados.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -947,13 +973,9 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
-        LabelCategoria.setFont(new java.awt.Font("Arial Unicode MS", 0, 15)); // NOI18N
-        LabelCategoria.setForeground(new java.awt.Color(255, 255, 255));
-        LabelCategoria.setText("CATEGORIA:");
-
         AddCategoria.setBackground(new java.awt.Color(255, 255, 255));
         AddCategoria.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        AddCategoria.setText("ADICIONAR");
+        AddCategoria.setText("ADICIONAR CATEGORIA");
         AddCategoria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 AddCategoriaActionPerformed(evt);
@@ -975,11 +997,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PainelDetalhesLayout.createSequentialGroup()
-                        .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(AddCategoria)
+                        .addComponent(AddCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ResetarTudo, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -993,17 +1011,12 @@ public class Gerenciamento extends javax.swing.JFrame {
         PainelDetalhesLayout.setVerticalGroup(
             PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PainelDetalhesLayout.createSequentialGroup()
-                .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PainelDetalhesLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(LabelCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TxtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(SalvarDados, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(ResetarTudo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(AddCategoria, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addContainerGap()
+                .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SalvarDados, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ResetarTudo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(AddCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
                 .addGroup(PainelDetalhesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(InfoDB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(InfoDB1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1016,6 +1029,15 @@ public class Gerenciamento extends javax.swing.JFrame {
         jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel2MouseClicked(evt);
+            }
+        });
+
+        AddCategoria1.setBackground(new java.awt.Color(255, 255, 255));
+        AddCategoria1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        AddCategoria1.setText("CONFIGURAÇÕES");
+        AddCategoria1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddCategoria1ActionPerformed(evt);
             }
         });
 
@@ -1085,7 +1107,10 @@ public class Gerenciamento extends javax.swing.JFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(AddCategoria1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1095,7 +1120,9 @@ public class Gerenciamento extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addGap(10, 10, 10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(AddCategoria1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1132,9 +1159,11 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1KeyReleased
 
     private void AddCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCategoriaActionPerformed
-        String NomeCategoria = TxtCategoria.getText();
+        //String NomeCategoria = TxtCategoria.getText();
+        
         if(jTabbedPane1.getTabCount() < SNWindows.CategAssinatura[Nivel_Ass][0]){
-            if(NomeCategoria.length() >= 3 && NomeCategoria.length() <= 30){
+            String NomeCategoria = JOptionPane.showInputDialog(this, "Escolha o nome para a categoria. Entre 3 e 30 caracteres.", "Nome da Categoria", JOptionPane.PLAIN_MESSAGE);
+            if(NomeCategoria != null && !"".equals(NomeCategoria) && NomeCategoria.length() >= 3 && NomeCategoria.length() <= 30){
                 PegarValoresTabela();
                 JSONObject getTemporario10 = new JSONObject();
                 TotalIdsTab++;
@@ -1142,10 +1171,10 @@ public class Gerenciamento extends javax.swing.JFrame {
                 getTemporario10.put("nome_categoria", NomeCategoria);
 
                 novo_CategoriasCrimes.put(getTemporario10);
-                TxtCategoria.setText(null);
+                //TxtCategoria.setText(null);
                 AtualizarJanelas();
             }else{
-                showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao renomear categoria",JOptionPane.PLAIN_MESSAGE);
+                showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao adicionar categoria",JOptionPane.PLAIN_MESSAGE);
             }
         }else{
             showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias.", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
@@ -1259,6 +1288,13 @@ public class Gerenciamento extends javax.swing.JFrame {
         AtalhoVer();
     }//GEN-LAST:event_jLabel2MouseClicked
 
+    private void AddCategoria1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCategoria1ActionPerformed
+        //Opcoes.setVisible(true);
+        new GerenciamentoOpcoes().setVisible(true);
+        this.dispose();
+        //Opcoes.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE); //DO_NOTHING_ON_CLOSE / EXIT_ON_CLOSE
+    }//GEN-LAST:event_AddCategoria1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1297,15 +1333,13 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JButton AddCategoria;
+    private static javax.swing.JButton AddCategoria1;
     private static javax.swing.JLabel InfoDB;
     private static javax.swing.JLabel InfoDB1;
-    private javax.swing.JLabel LabelCategoria;
     private javax.swing.JPanel PainelDetalhes;
-    private javax.swing.JTextField RenameTab;
     private javax.swing.JButton RenameTabBt;
     private javax.swing.JButton ResetarTudo;
     private javax.swing.JButton SalvarDados;
-    private static javax.swing.JTextField TxtCategoria;
     private javax.swing.JMenuItem exportar;
     private javax.swing.JMenuItem importar;
     private javax.swing.JButton jButton4;
