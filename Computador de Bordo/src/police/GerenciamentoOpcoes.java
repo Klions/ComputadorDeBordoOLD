@@ -186,6 +186,21 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     public static void AdicionarBotoes(){
         DefaultTableModel modelTable = (DefaultTableModel)jTable1.getModel();
         modelTable.setRowCount(0);
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
+        if(InicializadorMain.ModoOffline){
+            if(ReducaoRegistro.length() > SNWindows.BeneficiosAssinatura[nivel_assinatura]){
+                jTable1.setEnabled(false);
+                MudarCalculoBt.setEnabled(false);
+                MudarTipoBt.setEnabled(false);
+                showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente."
+                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
+            }else{
+                jTable1.setEnabled(true);
+                MudarCalculoBt.setEnabled(true);
+                MudarTipoBt.setEnabled(true);
+            }
+        }
+        
         for(int i = 0; i < ReducaoRegistro.length(); i++){
             JSONObject o = ReducaoRegistro.getJSONObject(i);
             //if(o.getInt("categoria") == o2.getInt("id")){
@@ -351,6 +366,25 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             "Atalhos do Gerenciador de Crimes",JOptionPane.PLAIN_MESSAGE);
     }
     
+    public void AddLinha(){
+        //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
+
+        //SNWindows.CorAssinatura[nivel_ass][0]
+        
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
+        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
+        if(model.getRowCount() < SNWindows.BeneficiosAssinatura[nivel_assinatura]){
+            InfoDB1.setText("Nova linha foi adicionada");
+            model.addRow(new Object[]{"", 0, "PORCENTAGEM", "REDUCAO"});
+            jTable1.setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
+            PegarTotalTabela();
+        }else{
+            pressedKeys = new HashSet<>();
+            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_assinatura]+"' permite adicionar até "+SNWindows.BeneficiosAssinatura[nivel_assinatura]+" aumento/redução de pena."
+            + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro ao inserir",JOptionPane.PLAIN_MESSAGE);
+        }
+    }
+    
     public static boolean ImportarDadosOpcoes(String Valores){
         if(Valores.contains("\n")){
             String[] Valor = Valores.split("\n");
@@ -422,6 +456,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         importar = new javax.swing.JMenuItem();
@@ -828,6 +863,14 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
 
         jMenu3.setText("FECHAR");
 
+        jMenuItem5.setText("VOLTAR PARA GERENCIAMENTO");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem5);
+
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -957,18 +1000,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                     }
                 }
                 if (pressedKeys.contains(KeyEvent.VK_INSERT)) {
-                    //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
-
-                    //SNWindows.CorAssinatura[nivel_ass][0]
-                    if(model.getRowCount() <= 7){
-                        InfoDB1.setText("Nova linha foi adicionada");
-                        model.addRow(new Object[]{"", 0, "PORCENTAGEM", "REDUCAO"});
-                        jTable1.setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
-                        PegarTotalTabela();
-                    }else{
-                        pressedKeys = new HashSet<>();
-                        showMessageDialog(null,"Lamento, mas só é permitido até 7 aumento/redução de pena.", "Erro ao inserir",JOptionPane.PLAIN_MESSAGE);
-                    }
+                    AddLinha();
                 }
             }
         }
@@ -980,15 +1012,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1KeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        if(model.getRowCount() <= 7){
-            InfoDB1.setText("Nova linha foi adicionada");
-            model.addRow(new Object[]{"", 0, "PORCENTAGEM", "REDUCAO"});
-            jTable1.setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
-            PegarTotalTabela();
-        }else{
-            showMessageDialog(null,"Lamento, mas só é permitido até 7 aumento/redução de pena.", "Erro ao inserir",JOptionPane.PLAIN_MESSAGE);
-        }
+        AddLinha();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void ResetarTudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarTudoActionPerformed
@@ -1159,6 +1183,11 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         EditarDados("registration");
     }//GEN-LAST:event_EditarBt3ActionPerformed
 
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        new Gerenciamento().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1234,6 +1263,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

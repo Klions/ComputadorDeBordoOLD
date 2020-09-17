@@ -9,7 +9,10 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +46,8 @@ public class Boletim extends javax.swing.JFrame {
     String Registro;
     String Passaporte;
     String Ocorrido;
+    
+    String DiscordFormat;
     public Boletim() {
         
         initComponents();
@@ -66,25 +71,30 @@ public class Boletim extends javax.swing.JFrame {
 
         
         
-        jPanel1.setBackground(new java.awt.Color(13, 32, 64));
-        jPanel3.setBackground(new java.awt.Color(13, 32, 64));
-        jPanel4.setBackground(new java.awt.Color(13, 32, 64));
+        //jPanel1.setBackground(new java.awt.Color(13, 32, 64));
+        //jPanel3.setBackground(new java.awt.Color(13, 32, 64));
+        //jPanel4.setBackground(new java.awt.Color(13, 32, 64));
             
     }
     
     public boolean AtualizarCrimes(){
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        String dataFormatada = simpleDateFormat.format(date);
+        
         copiar.setText("COPIAR");
         if(Nome == null || ocorrido.getText() == null || ocorrido.getText() == ""){
-            discord.setText("Campos vazios, digite alguma coisa para gerar.");
+            //discord.setText("Campos vazios, digite alguma coisa para gerar.");
+            DiscordFormat = "";
         }else{
-            discord.setText(
-                    "```\n"
-                    + "Nome: "+Nome+"\n"
-                    + "ID: "+Passaporte+"\n"
-                    + "Registro: "+Registro+"\n"
-                    + "Telefone: "+Telefone+"\n"
-                    + "Ocorrido: "+ocorrido.getText()+"\n"
-                    + "```");
+            DiscordFormat =
+                    "```md\n# BOLETIM DE OCORRÊNCIA - "+dataFormatada
+                    + "\n• Nome: "+Nome
+                    + "\n• ID: "+Passaporte;
+            if(!"N/A".equals(Registro))DiscordFormat += "\n• Registro: "+Registro;
+            if(!"N/A".equals(Telefone))DiscordFormat += "\n• Telefone: "+Telefone;
+            DiscordFormat+= "\n\n* Ocorrido: \n"+ocorrido.getText()
+                    + "\n```";
         }
         return true;
     }
@@ -93,6 +103,13 @@ public class Boletim extends javax.swing.JFrame {
         ocorrido.setText("");
         id.setText("");
         copiar.setText("COPIAR");
+        
+        jLabel9.setText("S/ INFO");
+        jLabel6.setText("S/ INFO");
+        jLabel8.setText("S/ INFO");
+        copiar.setEnabled(false);
+        ocorrido.setText("");
+        id.grabFocus();
         return true;
     }
     
@@ -102,33 +119,66 @@ public class Boletim extends javax.swing.JFrame {
         String tpassa = id.getText();
         if(tpassa.length() <= 0)return;
         boolean contare=false;
-        for(int i = 0; i < usuariosDBarray.length(); i++){
-            JSONObject o = usuariosDBarray.getJSONObject(i);
-            int paser = Integer.parseInt(tpassa);
-            if(paser == o.getInt("id_usuario")){
-                contare=true;
-                String passaporte = o.getString("id_usuario");
-                String identidade = o.getString("registration");
-                String telefone = o.getString("phone");
-                String nomer="Sem";
-                String sobrenomer="Registro";
-                if(o.getString("nome").length() > 0)nomer=o.getString("nome");
-                if(o.getString("sobrenome").length() > 0)sobrenomer=o.getString("sobrenome");
-                String nome = nomer+" "+sobrenomer;
-                
+        if(InicializadorMain.ModoOffline){
+            contare=true;
+            Nome="N/A";
+            String nomecompleto = JOptionPane.showInputDialog(this, "Qual é o NOME COMPLETO de quem está fazendo o boletim?", "Boletim de Ocorrência", JOptionPane.PLAIN_MESSAGE);
+            if(nomecompleto == null)nomecompleto="";
+            if(nomecompleto.length() > 0 && nomecompleto.length() < 20){
+                Nome=nomecompleto;
+            }else{
+                showMessageDialog(null,"O Nome Completo é necessário para prosseguir.", "Sem registrante, sem boletim",JOptionPane.PLAIN_MESSAGE);
+                return;
+            }
+            
+            Telefone="N/A";
+            String telefone = JOptionPane.showInputDialog(this, "Qual é o TELEFONE?", "Boletim de Ocorrência", JOptionPane.PLAIN_MESSAGE);
+            if(telefone == null)telefone="";
+            if(telefone.length() > 0 && telefone.length() < 20){
                 Telefone=telefone;
-                Nome=nome;
+            }
+            
+            Registro="N/A";
+            String identidade = JOptionPane.showInputDialog(this, "Qual é o Registro Geral? (Opcional)", "Boletim de Ocorrência", JOptionPane.PLAIN_MESSAGE);
+            if(identidade == null)identidade="";
+            if(identidade.length() > 0 && identidade.length() < 20){
                 Registro=identidade;
-                Passaporte=passaporte;
-                Ocorrido=ocorrido.getText();
-                
-                jLabel9.setText(nome);
-                jLabel6.setText(identidade);
-                jLabel8.setText(telefone);
-                copiar.setEnabled(true);
+            }
+            Passaporte=tpassa;
+            ocorrido.grabFocus();
+        }else{
+            for(int i = 0; i < usuariosDBarray.length(); i++){
+                JSONObject o = usuariosDBarray.getJSONObject(i);
+                int paser = Integer.parseInt(tpassa);
+                if(paser == o.getInt("id_usuario")){
+                    contare=true;
+                    String passaporte = o.getString("id_usuario");
+                    String identidade = o.getString("registration");
+                    String telefone = o.getString("phone");
+                    String nomer="Sem";
+                    String sobrenomer="Registro";
+                    if(o.getString("nome").length() > 0)nomer=o.getString("nome");
+                    if(o.getString("sobrenome").length() > 0)sobrenomer=o.getString("sobrenome");
+                    String nome = nomer+" "+sobrenomer;
+
+                    Telefone=telefone;
+                    Nome=nome;
+                    Registro=identidade;
+                    Passaporte=passaporte;
+                    Ocorrido=ocorrido.getText();
+
+                    
+                }
             }
         }
-        if(!contare){
+        
+        
+        if(contare){
+            jLabel9.setText(Nome);
+            jLabel6.setText(Registro);
+            jLabel8.setText(Telefone);
+            copiar.setEnabled(true);
+        }else{
             jLabel9.setText("S/ INFO");
             jLabel6.setText("S/ INFO");
             jLabel8.setText("S/ INFO");
@@ -136,7 +186,7 @@ public class Boletim extends javax.swing.JFrame {
             ocorrido.setText("");
         }
         AtualizarCrimes();
-        id.requestFocus();
+        //id.requestFocus();
     }
     
     /**
@@ -162,8 +212,6 @@ public class Boletim extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         resetar = new javax.swing.JButton();
         copiar = new javax.swing.JButton();
-        jPanel4 = new javax.swing.JPanel();
-        discord = new java.awt.TextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         ocorrido = new javax.swing.JTextArea();
         jLabel5 = new javax.swing.JLabel();
@@ -184,6 +232,7 @@ public class Boletim extends javax.swing.JFrame {
         jLabel1.setText("BOLETIM DE OCORRÊNCIA");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "VÍTIMA / REGISTRANTE DO BOLETIM", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel1.setOpaque(false);
 
         id.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
         id.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -285,6 +334,9 @@ public class Boletim extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jPanel3.setOpaque(false);
+
+        resetar.setBackground(new java.awt.Color(255, 255, 255));
         resetar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         resetar.setText("RESETAR TUDO");
         resetar.addActionListener(new java.awt.event.ActionListener() {
@@ -293,6 +345,7 @@ public class Boletim extends javax.swing.JFrame {
             }
         });
 
+        copiar.setBackground(new java.awt.Color(255, 255, 255));
         copiar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         copiar.setText("COPIAR");
         copiar.setEnabled(false);
@@ -321,28 +374,6 @@ public class Boletim extends javax.swing.JFrame {
                 .addComponent(copiar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resetar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "DISCORD", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
-
-        discord.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        discord.setEditable(false);
-        discord.setText("AGUARDANDO INFORMAÇÕES");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(discord, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(discord, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -399,16 +430,14 @@ public class Boletim extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(3, 3, 3)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(0, 3, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -417,14 +446,11 @@ public class Boletim extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1))
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -444,11 +470,11 @@ public class Boletim extends javax.swing.JFrame {
     private void copiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copiarActionPerformed
         String ide = id.getText();
         if(ide.length() < 1){
-            showMessageDialog(null, "Está faltando Nome ou ID do indivíduo!!");
+            showMessageDialog(null,"Está faltando as informações do registrante do boletim. Adicione acima.", "Falta as informações do registrante",JOptionPane.PLAIN_MESSAGE);
             id.requestFocus();
         }else{
         
-            String myString = discord.getText();
+            String myString = DiscordFormat;
             StringSelection stringSelection = new StringSelection(myString);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
@@ -529,7 +555,6 @@ public class Boletim extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton copiar;
-    private java.awt.TextArea discord;
     private javax.swing.JTextField id;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -547,7 +572,6 @@ public class Boletim extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextArea ocorrido;

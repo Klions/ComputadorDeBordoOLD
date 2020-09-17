@@ -96,7 +96,7 @@ public class Painel extends javax.swing.JFrame {
             //ContaBt.setText("Sem Registro");
             DesativarBT(gerenciar1);
             DesativarBT(gerenciar2);
-            DesativarBT(boletim);
+            //DesativarBT(boletim);
             
             gerenciar.setVisible(true);
         }else{
