@@ -7,6 +7,8 @@ package police;
 
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -36,6 +38,7 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
+import police.configs.ExportarOuImportar;
 import police.configs.GetImages;
 import police.configs.SNWindows;
 import police.configs.Usuario;
@@ -200,7 +203,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                 Bloqueado = true;
                 //TxtCategoria.setEnabled(false);
                 AddCategoria.setEnabled(false);
-                showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente.", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
+                showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente."
+                        + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
             }
         }
         
@@ -389,7 +393,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                                     PegarTotalTabela();
                                 }else{
                                     pressedKeys = new HashSet<>();
-                                    showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_ass]+"' permite adicionar até "+SNWindows.CategAssinatura[nivel_ass][1]+" crimes.", "Erro ao inserir novo crime",JOptionPane.PLAIN_MESSAGE);
+                                    showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_ass]+"' permite adicionar até "+SNWindows.CategAssinatura[nivel_ass][1]+" crimes."
+                                            + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro ao inserir novo crime",JOptionPane.PLAIN_MESSAGE);
                                 }
                             }
                         }
@@ -523,7 +528,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                             showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao renomear categoria",JOptionPane.PLAIN_MESSAGE);
                         }
                     }else{
-                        showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias.", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
+                        showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias."
+                                + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
                     }
                     
                     /*
@@ -1177,7 +1183,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                 showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao adicionar categoria",JOptionPane.PLAIN_MESSAGE);
             }
         }else{
-            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias.", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
+            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[Nivel_Ass]+"' permite adicionar até "+SNWindows.CategAssinatura[Nivel_Ass][0]+" categorias."
+                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro ao inserir nova categoria",JOptionPane.PLAIN_MESSAGE);
         }
     }//GEN-LAST:event_AddCategoriaActionPerformed
 
@@ -1251,18 +1258,22 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void importarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importarActionPerformed
-        Export.setLocationRelativeTo(null);
+        /*Export.setLocationRelativeTo(null);
         Export.Titulo.setText("IMPORTAR");
         Export.AreaTexto.setEditable(true);
         Export.AreaTexto.setText("");
         Export.Copiar.setText("IMPORTAR CRIMES");
         Export.ExportValor = 1;
         Export.AreaTexto.grabFocus();
-        Export.setVisible(true);
+        Export.setVisible(true);*/
+        String ExportStr = ExportarOuImportar.textAreaDialog(null, "Importar Tabela", "", true, "Importar");
+        if(ExportStr != null && ExportStr.length() > 0){
+            ImportarDados(ExportStr);
+        }
     }//GEN-LAST:event_importarActionPerformed
 
     private void exportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportarActionPerformed
-        Export.setLocationRelativeTo(null);
+        /*Export.setLocationRelativeTo(null);
         Export.Titulo.setText("EXPORTAR");
         Export.AreaTexto.setEditable(false);
         
@@ -1277,7 +1288,17 @@ public class Gerenciamento extends javax.swing.JFrame {
         
         Export.TextoExportar = Catego+"\n"+Crimer;
         Export.ExportValor = 2;
-        Export.setVisible(true);
+        Export.setVisible(true);*/
+        Base64.Encoder enc = Base64.getEncoder();
+        String ReducaoAumento = enc.encodeToString(novo_CategoriasCrimes.toString().getBytes());
+        String OpcoesDeCrimes = enc.encodeToString(novo_CrimesRegistro.toString().getBytes());
+        
+        String ExportStr = ExportarOuImportar.textAreaDialog(null, "Exportar Tabela", ReducaoAumento+"\n"+OpcoesDeCrimes, false, "Exportar");
+        if(ExportStr != null && ExportStr.length() > 0){
+            StringSelection stringSelection = new StringSelection(ExportStr);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
+        }
     }//GEN-LAST:event_exportarActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed

@@ -91,7 +91,7 @@ public class Prisoes extends javax.swing.JFrame {
         PesquisarPainel.setBackground(new java.awt.Color(13, 32, 64));
         jPanel2.setBackground(new java.awt.Color(13, 32, 64));
         jPanel3.setBackground(new java.awt.Color(13, 32, 64));
-        this.setLocationRelativeTo(null);
+        
         
         if(InicializadorMain.ModoOffline){
             this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
@@ -115,6 +115,7 @@ public class Prisoes extends javax.swing.JFrame {
         this.repaint();
         this.pack();
         SetarBotoes();
+        this.setLocationRelativeTo(null);
         
         usuariosDBarray = InicializadorMain.usuariosDBarray;
         discordDBarray = InicializadorMain.discordDBarray;

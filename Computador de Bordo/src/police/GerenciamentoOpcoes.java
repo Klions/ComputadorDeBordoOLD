@@ -107,6 +107,9 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         this.setLocationRelativeTo(null);
         PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
+        
+        jPanel1.setBackground(new java.awt.Color(13, 32, 64));
+        jPanel2.setBackground(new java.awt.Color(13, 32, 64));
         //Export.setLocationRelativeTo(null);
         PegarDBOpcoes();
         RecarregarValoresTabela();
@@ -277,7 +280,11 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         if("pena_max".equals(Valor)){
             Numbr = " Coloque somente números.";
             if(ConfigGerais.has(Valor)){
-                PegarValor = ConfigGerais.getInt(Valor)+"";
+                if(ConfigGerais.getInt(Valor) > 0){ 
+                    PegarValor = ConfigGerais.getInt(Valor)+"";
+                }else{
+                    PegarValor = "0";
+                }
             }else{
                 PegarValor = "0";
             }
@@ -294,7 +301,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         String ValorDados = (String)JOptionPane.showInputDialog(this, "Digite o novo valor."+Numbr,
             "Alterando valor", JOptionPane.QUESTION_MESSAGE,null,null,PegarValor);
         
-        if(ValorDados != null && (ValorDados.length() > 0 && ValorDados.length() < 20 && "".equals(Numbr)) || (!"".equals(Numbr) && SNWindows.isNumeric(ValorDados) && ValorDados.length() < 6)){
+        if(ValorDados != null && (ValorDados.length() > 0 && ValorDados.length() < 20 && "".equals(Numbr)) || (!"".equals(Numbr) && SNWindows.isNumeric(ValorDados) && Integer.parseInt(ValorDados) >= 0 && ValorDados.length() < 6)){
             //ConfigGerais.setDadosParcial(Valor, ValorDados);
             ConfigGerais.put(Valor, ValorDados);
         }
@@ -448,6 +455,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         EditarBt4 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         PainelDetalhes = new javax.swing.JPanel();
         SalvarDados = new javax.swing.JButton();
         ResetarTudo = new javax.swing.JButton();
@@ -483,7 +491,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("GERENCIADOR DE AUMENTO/REDUÇÃO DE PENA");
 
-        jPanel1.setOpaque(false);
+        TabPainel.setBackground(new java.awt.Color(255, 255, 255));
 
         jTable1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -590,8 +598,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
 
         TabPainel.addTab("Aumento/Redução de Pena", jPanel1);
 
-        jPanel2.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel2.setOpaque(false);
+        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
 
         jPanel3.setOpaque(false);
 
@@ -607,10 +614,12 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         });
 
         NomeTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        NomeTxt.setForeground(new java.awt.Color(255, 255, 255));
         NomeTxt.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         NomeTxt.setText("PENA MÁXIMA:");
 
         ValorTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        ValorTxt.setForeground(new java.awt.Color(255, 255, 255));
         ValorTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ValorTxt.setText("indefinido");
 
@@ -645,11 +654,13 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         });
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel5.setText("EM BREVE:");
         jLabel5.setEnabled(false);
 
         ValorTxt2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        ValorTxt2.setForeground(new java.awt.Color(255, 255, 255));
         ValorTxt2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ValorTxt2.setText("indefinido");
         ValorTxt2.setEnabled(false);
@@ -685,11 +696,13 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         });
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel9.setText("EM BREVE:");
         jLabel9.setEnabled(false);
 
         ValorTxt3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        ValorTxt3.setForeground(new java.awt.Color(255, 255, 255));
         ValorTxt3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ValorTxt3.setText("indefinido");
         ValorTxt3.setEnabled(false);
@@ -720,11 +733,13 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         EditarBt4.setEnabled(false);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel11.setText("EM BREVE:");
         jLabel11.setEnabled(false);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("indefinido");
         jLabel12.setEnabled(false);
@@ -747,6 +762,10 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("0 = Ilimitado");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -757,7 +776,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -771,7 +791,9 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -1250,6 +1272,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;

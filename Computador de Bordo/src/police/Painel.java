@@ -55,7 +55,7 @@ public class Painel extends javax.swing.JFrame {
             icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
         }
         VerAtt();
-        this.setLocationRelativeTo(null);
+        
         
         JFrame EsteFrame = this;
         Timer timer = new Timer(); 
@@ -78,9 +78,8 @@ public class Painel extends javax.swing.JFrame {
             }
         }; 
         timer.schedule(tt, 500, 1000);
-        
-        
         Carregar();
+        this.setLocationRelativeTo(null);
     }
     public void Carregar(){
         //System.err.println("getDados: "+ usuario.getDados()+"/ fechou");
