@@ -153,6 +153,7 @@ public class Painel extends javax.swing.JFrame {
         ContaBt = new javax.swing.JButton();
         gerenciar = new javax.swing.JPanel();
         gerenciar3 = new javax.swing.JButton();
+        gerenciar4 = new javax.swing.JButton();
         Att = new javax.swing.JPanel();
         AttTitulo = new javax.swing.JLabel();
         AttSite = new javax.swing.JButton();
@@ -305,6 +306,16 @@ public class Painel extends javax.swing.JFrame {
             }
         });
 
+        gerenciar4.setBackground(new java.awt.Color(0, 153, 102));
+        gerenciar4.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar4.setText("GERENCIAR USUÁRIOS");
+        gerenciar4.setToolTipText("Adicionar ou Remover Crimes");
+        gerenciar4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gerenciar4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout gerenciarLayout = new javax.swing.GroupLayout(gerenciar);
         gerenciar.setLayout(gerenciarLayout);
         gerenciarLayout.setHorizontalGroup(
@@ -312,13 +323,17 @@ public class Painel extends javax.swing.JFrame {
             .addGroup(gerenciarLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(gerenciar4, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         gerenciarLayout.setVerticalGroup(
             gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(gerenciarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(gerenciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(gerenciar3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(gerenciar4, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -506,6 +521,11 @@ public class Painel extends javax.swing.JFrame {
         HttpDownloadUtility.openURL(Config.getLink());
     }//GEN-LAST:event_AttSiteActionPerformed
 
+    private void gerenciar4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerenciar4ActionPerformed
+        new GerenciamentoUsuarios().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_gerenciar4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -557,6 +577,7 @@ public class Painel extends javax.swing.JFrame {
     private javax.swing.JButton gerenciar1;
     private javax.swing.JButton gerenciar2;
     private javax.swing.JButton gerenciar3;
+    private javax.swing.JButton gerenciar4;
     private javax.swing.JLabel icone;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;

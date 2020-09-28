@@ -84,18 +84,26 @@ public class SNWindows {
         {229,228,226}
     };
     public static int[][] CategAssinatura = {
-        {4,20},
+        {2,20},
         {6,40},
         {7,60},
         {10,120},
         {30,200}
     };
-    public static int[] BeneficiosAssinatura = {
+    public static int[] BeneficiosAssinatura = { // LIMITE DE BENEFICIOS
         3,
         5,
         7,
         10,
         15
+    };
+    
+    public static int[] UsuariosAssinatura = {
+        3,
+        15,
+        40,
+        100,
+        500
     };
     public static final void getSerialNumber(){
         String command = "wmic csproduct get UUID";

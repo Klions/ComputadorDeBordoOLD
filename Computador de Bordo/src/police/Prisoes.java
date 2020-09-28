@@ -6,7 +6,6 @@
 package police;
 
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -36,6 +35,8 @@ import javax.swing.JToggleButton;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
+import police.configs.SNWindows;
 import police.configs.Usuario;
 
 /**
@@ -52,6 +53,9 @@ public class Prisoes extends javax.swing.JFrame {
     
     JSONArray BeneficiosCrimes = new JSONArray();
     JSONObject OpcoesDeCrimes = new JSONObject();
+    
+    JSONArray UsuariosOfflineTbl = new JSONArray();
+    JSONObject OpcoesUsuariosTbl = new JSONObject();
     
     JSONArray RegistroBotoes = new JSONArray();
     JSONArray RegistroInputs = new JSONArray();
@@ -72,9 +76,14 @@ public class Prisoes extends javax.swing.JFrame {
     static String AumentoEReducao="";
     static String OpcoesCrimes="";
     
+    static String UsuariosOffline="";
+    static String OpcoesUsuarios="";
+    
     JSONObject UsuarioPegar = new JSONObject();
     
     static boolean FecharJanela = false;
+    
+    static boolean NaoAbrirDnvAss = false;
     
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
@@ -99,6 +108,7 @@ public class Prisoes extends javax.swing.JFrame {
             PesquisarBt.setText("CADASTRAR");
             PegarValoresOffline();
             PegarValoresOfflineOpcoes();
+            PegarValoresOfflineUsuarios();
             
             JSONObject PegarUser = Usuario.getDados();
             if(PegarUser.getInt("id_usuario") == 0){
@@ -194,6 +204,32 @@ public class Prisoes extends javax.swing.JFrame {
         }
     }
     
+    public void PegarValoresOfflineUsuarios(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFileUsers);
+            if(file.exists()){    //if this file exists
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                Base64.Decoder dec = Base64.getDecoder();
+                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    UsuariosOffline = DecoderStre;
+                }
+                
+                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                if(!"".equals(DecoderStre)){
+                    OpcoesUsuarios = DecoderStre;
+                }
+                scan.close();
+            }
+
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
+    
     public void SetarBotoes(){
         if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
@@ -245,6 +281,20 @@ public class Prisoes extends javax.swing.JFrame {
                 OpcoesDeCrimes = new JSONObject(OpcoesCrimes);
             }else{
                 OpcoesDeCrimes.put("pena_max", 0);
+            }
+            
+            
+            
+            UsuariosOfflineTbl = new JSONArray();
+            if(!"".equals(UsuariosOffline) && UsuariosOffline.length() > 10){
+                UsuariosOfflineTbl = new JSONArray(UsuariosOffline);
+            }
+            
+            OpcoesUsuariosTbl = new JSONObject();
+            if(!"".equals(OpcoesUsuarios) && OpcoesUsuarios.length() > 10){
+                OpcoesUsuariosTbl = new JSONObject(OpcoesUsuarios);
+            }else{
+                OpcoesUsuariosTbl.put("save_automatico", 0);
             }
         }else{
             Usuario usuarios = new Usuario();
@@ -368,6 +418,9 @@ public class Prisoes extends javax.swing.JFrame {
                         Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
                         
                         Botoes[i2][i].setBounds(3, 3, 214, 39);
+                        
+                        if(o.has("obs") && !"".equals(o.getString("obs"))) Botoes[i2][i].setToolTipText(o.getString("obs"));
+                        
                         container2.add( Botoes[i2][i] );
                     //=========================================
                     }else{
@@ -428,6 +481,9 @@ public class Prisoes extends javax.swing.JFrame {
                                 }
                             }
                         });
+                        
+                        if(o.has("obs") && !"".equals(o.getString("obs"))) InputText[i2][i].setToolTipText(o.getString("obs"));
+                        
                         container2.add( InputText[i2][i] );
                     }
                     
@@ -689,6 +745,9 @@ public class Prisoes extends javax.swing.JFrame {
                 Ativado = true;
                 if(!InicializadorMain.ModoOffline){
                     AtivadoOn=true;
+                }else{
+                    SalvarBt1.setToolTipText("DESATIVADO NO MODO OFFLINE");
+                    SalvarBt.setToolTipText("DESATIVADO NO MODO OFFLINE");
                 }
                 
                 
@@ -708,13 +767,13 @@ public class Prisoes extends javax.swing.JFrame {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 String dataFormatada = simpleDateFormat.format(date);
                 
-                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                //System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
                 String StrPenaTotal = MesesTotal+" meses";
                 if(OpcoesDeCrimes.getInt("pena_max") > 0 && MesesTotal >= OpcoesDeCrimes.getInt("pena_max")){
                     MesesTotal = OpcoesDeCrimes.getInt("pena_max");
                     StrPenaTotal = MesesTotal+" meses [PENA MÁXIMA]";
                 }
-                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                //System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
                 
                 String FormatDiscord = "[INDIVÍDUO]("+nome+" ["+UsuarioPegar.getInt("id_usuario")+"])"+RGi+
                     "\n[POLICIAL]("+nome_policial+" ["+PolicialUser.getInt("id_usuario")+"])"+
@@ -876,9 +935,23 @@ public class Prisoes extends javax.swing.JFrame {
         showMessageDialog(null,Titulo, Mensagem,JOptionPane.PLAIN_MESSAGE);
     }
     
+    public JSONObject GetUserOffline(int user_id){
+        for(int i2 = 0; i2 < UsuariosOfflineTbl.length(); i2++){
+            JSONObject obj = UsuariosOfflineTbl.getJSONObject(i2);
+            //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
+            if(obj.getInt("user_id") == user_id){
+                return obj;
+            }
+        }
+        return null;
+    }
+    
     public void PegarUsuario(){
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
         ResetarCrimes();
         JSONObject Usuario = new JSONObject();
+        int vzespreso = 0;
+        int vzesmulta = 0;
         
         if(InicializadorMain.ModoOffline){
             String Cad1 = txtID.getText();
@@ -886,16 +959,73 @@ public class Prisoes extends javax.swing.JFrame {
             String Cad3 = txtPlaca.getText();
             String Cad4 = txtTelefone.getText();
             if(Cad1.length() <= 0){Alerta("Necessário digitar o passaporte!", "Ocorreu algum erro");txtID.grabFocus(); return ;}
-            if(Cad2.length() <= 5){Alerta("Necessário digitar o nome! Está muito curto.", "Ocorreu algum erro");txtNome.grabFocus(); return ;}
-            if(Cad3.length() <= 0)Cad3 = "N/A";
-            if(Cad4.length() <= 0)Cad4 = "N/A";
-            Usuario.put("id_usuario", Cad1);
-            Usuario.put("nome_completo", Cad2);
-            Usuario.put("nome", Cad2);
-            Usuario.put("sobrenome", Cad2);
-            Usuario.put("registration", Cad3);
-            Usuario.put("phone", Cad4);
-            Usuario.put("age", "0");
+            
+            
+            int PassaporteDigitado = Integer.parseInt(Cad1);
+            JSONObject getUser = GetUserOffline(PassaporteDigitado);
+            if(nivel_assinatura <= 0 && UsuariosOfflineTbl.length() > SNWindows.UsuariosAssinatura[nivel_assinatura]){
+                getUser = null;
+            }
+            if(getUser != null){
+                Usuario.put("id_usuario", getUser.getInt("user_id"));
+                Usuario.put("nome_completo", getUser.getString("nome"));
+                Usuario.put("nome", getUser.getString("nome"));
+                Usuario.put("sobrenome", getUser.getString("nome"));
+                Usuario.put("registration", getUser.getString("registration"));
+                Usuario.put("phone", getUser.getString("phone"));
+                
+                if(getUser.getInt("age") > 0){
+                    Usuario.put("age", getUser.getInt("age")+"");
+                }else{
+                    Usuario.put("age", "0");
+                }
+                //vzespreso = getUser.getInt("vezes_preso");
+            }else{
+                if(Cad2.length() <= 5){Alerta("Necessário digitar o nome! Está muito curto.", "Ocorreu algum erro");txtNome.grabFocus(); return ;}
+                if(Cad3.length() <= 0)Cad3 = "N/A";
+                if(Cad4.length() <= 0)Cad4 = "N/A";
+                Usuario.put("id_usuario", Cad1);
+                Usuario.put("nome_completo", Cad2);
+                Usuario.put("nome", Cad2);
+                Usuario.put("sobrenome", Cad2);
+                Usuario.put("registration", Cad3);
+                Usuario.put("phone", Cad4);
+                Usuario.put("age", "0");
+                
+                
+                if(UsuariosOfflineTbl.length() < SNWindows.UsuariosAssinatura[nivel_assinatura]){
+                    JSONObject Novo_user = new JSONObject();
+                    Novo_user.put("user_id", PassaporteDigitado);
+                    Novo_user.put("nome", Cad2);
+                    Novo_user.put("registration", Cad3);
+                    Novo_user.put("phone", Cad4);
+                    Novo_user.put("age", 0);
+
+                    UsuariosOfflineTbl.put(Novo_user);
+                    if(OpcoesUsuariosTbl.has("save_automatico") && OpcoesUsuariosTbl.getInt("save_automatico") == 1){
+                        GerenciamentoUsuarios.SAVEUsersAdd(UsuariosOfflineTbl, OpcoesUsuariosTbl);
+                    }else{
+                        Object[] options = { "Registrar", "Não registrar" };
+                        int result = JOptionPane.showOptionDialog(null, "Me parece que este usuário não está registrado no seu banco de dados, deseja registrar agora?\nAo registrar não precisará cadastrar novamente.", "Cadastro de Usuário", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                        if (result == JOptionPane.OK_OPTION) {
+                            GerenciamentoUsuarios.SAVEUsersAdd(UsuariosOfflineTbl, OpcoesUsuariosTbl);
+                        }
+                    }
+                }else{
+                    if(!NaoAbrirDnvAss){
+                        Object[] options = { "Quero uma Assinatura", "Não mostrar novamente" };
+                        int result = JOptionPane.showOptionDialog(null, "Você chegou no seu limite de registro de usuários que é de "+SNWindows.UsuariosAssinatura[nivel_assinatura]+"."
+                                + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro no Cadastro de Usuário", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                        if (result == JOptionPane.OK_OPTION) {
+                            HttpDownloadUtility.openURL("https://discord.gg/nFNqvDs");
+                        }else{
+                            NaoAbrirDnvAss = true;
+                        }
+                    }
+                }
+                
+            }
+            
         }else{
             String TxtPegarBusca = txtID.getText();
             if(TxtPegarBusca.length() > 0){
@@ -989,8 +1119,7 @@ public class Prisoes extends javax.swing.JFrame {
         JSONObject usua = new JSONObject(usuario.getDados());
         prenderDBarray.put("id_prendeu", usua.getString("id_usuario"));*/
 
-        int vzespreso = 0;
-        int vzesmulta = 0;
+        
         for(int i2 = 0; i2 < prisoesDBarray.length(); i2++){
             JSONObject ohier = prisoesDBarray.getJSONObject(i2);
             //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
@@ -1496,6 +1625,11 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt.setBackground(new java.awt.Color(255, 255, 255));
         SalvarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt.setText("REGISTRAR PRISÃO");
+        SalvarBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SalvarBtActionPerformed(evt);
+            }
+        });
 
         ResetarBt.setBackground(new java.awt.Color(255, 255, 255));
         ResetarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -1509,6 +1643,11 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt1.setBackground(new java.awt.Color(255, 255, 255));
         SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt1.setText("REGISTRAR PROCURADO");
+        SalvarBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SalvarBt1ActionPerformed(evt);
+            }
+        });
 
         CopiarDiscordBt.setBackground(new java.awt.Color(255, 255, 255));
         CopiarDiscordBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -1664,7 +1803,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jMenu3.setText("FECHAR");
+        jMenu3.setText("VOLTAR");
 
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -1814,6 +1953,14 @@ public class Prisoes extends javax.swing.JFrame {
     private void txtTelefoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefoneKeyTyped
         DigitandoCampo(4);
     }//GEN-LAST:event_txtTelefoneKeyTyped
+
+    private void SalvarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SalvarBtActionPerformed
+
+    private void SalvarBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SalvarBt1ActionPerformed
 
     public boolean SomenteNumeros(KeyEvent evt){
         char c = evt.getKeyChar();

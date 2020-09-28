@@ -5,6 +5,7 @@
  */
 package police;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -17,12 +18,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -83,6 +90,8 @@ public class Gerenciamento extends javax.swing.JFrame {
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     static JFrame EsteFrame = new JFrame();
+    
+    static boolean SalvarSairBool = false;
     public Gerenciamento() {
         initComponents();
         SalvarTime=10;
@@ -238,14 +247,14 @@ public class Gerenciamento extends javax.swing.JFrame {
             Tabelas[i2].setModel(new javax.swing.table.DefaultTableModel(
                 null,
                 new String [] {
-                    "NOME DO CRIME", "VALOR DA MULTA", "PENA EM MESES", "TIPO"
+                    "NOME DO CRIME", "MULTA", "MESES", "TIPO", "OBSERVAÇÃO"
                 }
             ) {
                 Class[] types = new Class [] {
-                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
                 };
                 boolean[] canEdit = new boolean [] {
-                    true, true, true, false
+                    true, true, true, false, true
                 };
 
                 public Class getColumnClass(int columnIndex) {
@@ -261,7 +270,9 @@ public class Gerenciamento extends javax.swing.JFrame {
             for(int i = 0; i < novo_CrimesRegistro.length(); i++){
                 JSONObject o = novo_CrimesRegistro.getJSONObject(i);
                 if(o.getInt("categoria") == o2.getInt("id")){
-                    modelTable.addRow(new Object[]{o.getString("texto"), o.getInt("multa"), o.getInt("meses"), o.getString("tipo")});
+                    String Obs = "";
+                    if(o.has("obs")) Obs = o.getString("obs");
+                    modelTable.addRow(new Object[]{o.getString("texto"), o.getInt("multa"), o.getInt("meses"), o.getString("tipo"), Obs});
                 }
             }
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -270,6 +281,11 @@ public class Gerenciamento extends javax.swing.JFrame {
             Tabelas[i2].getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
             Tabelas[i2].getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
             Tabelas[i2].getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+            Tabelas[i2].getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+            
+            Tabelas[i2].getColumnModel().getColumn(1).setPreferredWidth(3);
+            Tabelas[i2].getColumnModel().getColumn(2).setPreferredWidth(3);
+            Tabelas[i2].getColumnModel().getColumn(3).setPreferredWidth(3);
             
             ((DefaultTableCellRenderer)Tabelas[i2].getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
             
@@ -381,6 +397,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                                     }
                                     PegarTotalTabela();
                                 }
+                                SalvarSairBool=true;
                             }
                             if (pressedKeys.contains(KeyEvent.VK_INSERT)) {
                                 //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
@@ -391,6 +408,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                                     model.addRow(new Object[]{"", 0, 0,"UNICO"});
                                     Tabelas[As].setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
                                     PegarTotalTabela();
+                                    SalvarSairBool=true;
                                 }else{
                                     pressedKeys = new HashSet<>();
                                     showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_ass]+"' permite adicionar até "+SNWindows.CategAssinatura[nivel_ass][1]+" crimes."
@@ -524,6 +542,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                             }
                             novo_CategoriasCrimes = ArrayDescartavel;
                             InfoDB1.setText("Categoria "+CatNome+" renomeada para "+NomeCategoria);
+                            SalvarSairBool=true;
                         }else{
                             showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao renomear categoria",JOptionPane.PLAIN_MESSAGE);
                         }
@@ -654,6 +673,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                             String TipoValor = Tabelas[ir].getValueAt(r, c)+"";
                             if("".equals(TipoValor)) TipoValor = "UNICO";
                             getTemporario2.put("tipo", TipoValor);
+                        case 4:
+                            getTemporario2.put("obs", Tabelas[ir].getValueAt(r, c));
                     }
                 }
                 getTemporario2.put("categoria", obj.getInt("id"));
@@ -756,7 +777,11 @@ public class Gerenciamento extends javax.swing.JFrame {
         try {
             bites = dec.decode(StrDec);
         } catch (IllegalArgumentException e) { e.printStackTrace(); }     
-        if(bites != null) return new String(bites);
+        if(bites != null) try {
+            return new String(bites,"UTF8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Gerenciamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return "";
     }
     
@@ -789,6 +814,16 @@ public class Gerenciamento extends javax.swing.JFrame {
             return true;
         }
         return false;
+    }
+    
+    boolean SalvarSair(){
+        Object[] options = { "Sim", "Não" };
+        int ret = JOptionPane.showOptionDialog(null, "Deseja sair sem salvar as alterações?", "Há alterações não salvas", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        //JOptionPane.showConfirmDialog((Component) obj, new JScrollPane(textArea), title, JOptionPane.OK_OPTION);
+        if (ret == 0) {
+            return false;
+        }
+        return true;
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -1047,7 +1082,7 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
         });
 
-        jMenu3.setText("FECHAR");
+        jMenu3.setText("VOLTAR");
 
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -1138,6 +1173,22 @@ public class Gerenciamento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    void SalvarFunction(){
+        if(SalvarSairBool){
+            if (SalvarSair()){
+                PegarValoresTabela();
+                if(InicializadorMain.ModoOffline){
+                    SAVE();
+                    UPDATE();
+                    PegarDB();
+                }else{
+                    ConexaoDB conexao = new ConexaoDB();
+                    conexao.SetarCrimesECategoria(novo_CategoriasCrimes.toString(), novo_CrimesRegistro.toString(), contageGetCrimes);
+                    PegarDB();
+                }
+            }
+        }
+    }
     
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
@@ -1179,6 +1230,7 @@ public class Gerenciamento extends javax.swing.JFrame {
                 novo_CategoriasCrimes.put(getTemporario10);
                 //TxtCategoria.setText(null);
                 AtualizarJanelas();
+                SalvarSairBool=true;
             }else{
                 showMessageDialog(null,"O nome da categoria deve estar entre 3 e 30 caracteres.", "Erro ao adicionar categoria",JOptionPane.PLAIN_MESSAGE);
             }
@@ -1221,6 +1273,7 @@ public class Gerenciamento extends javax.swing.JFrame {
 
     private void SalvarDadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarDadosActionPerformed
         PegarValoresTabela();
+        SalvarSairBool=false;
         if(InicializadorMain.ModoOffline){
             SAVE();
             UPDATE();
@@ -1242,6 +1295,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        SalvarFunction();
         //Timere.cancel();
         new Painel().setVisible(true);
         this.dispose();
@@ -1310,7 +1364,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void AddCategoria1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCategoria1ActionPerformed
-        //Opcoes.setVisible(true);
+        SalvarFunction();
         new GerenciamentoOpcoes().setVisible(true);
         this.dispose();
         //Opcoes.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE); //DO_NOTHING_ON_CLOSE / EXIT_ON_CLOSE

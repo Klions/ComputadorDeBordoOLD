@@ -213,8 +213,7 @@ public class HttpDownloadUtility {
         eb.addField("Antiga Patente", oldpatente+" "+PttInsi2, true);
         eb.addField("Nova Patente", novapatente+" "+PttInsi, true);
         eb.setThumbnail(config.img_DiscordPolicia);*/
-        
-        DiscordWebhook2.EnviarMsg(canal_id, eb);
+        if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)) DiscordWebhook2.EnviarMsg(canal_id, eb);
         return true;
     }
 }

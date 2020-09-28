@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
@@ -26,8 +28,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
@@ -39,7 +45,7 @@ import police.configs.SNWindows;
  *
  * @author John
  */
-public class GerenciamentoOpcoes extends javax.swing.JFrame {
+public class GerenciamentoUsuarios extends javax.swing.JFrame {
 
     /**
      * Creates new form Prisoes
@@ -71,7 +77,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
     static JFrame EsteFrame2 = new JFrame();
-    public GerenciamentoOpcoes() {
+    public GerenciamentoUsuarios() {
         initComponents();
         
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -80,6 +86,11 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jTable1.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
         jTable1.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
         jTable1.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+        jTable1.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+        
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(7);
+        
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(7);
 
         ((DefaultTableCellRenderer)jTable1.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
 
@@ -99,7 +110,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }
         
-        if(InicializadorMain.ModoOffline) UPDATEOpcoes();
+        if(InicializadorMain.ModoOffline) UPDATEUsers();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         this.setLocationRelativeTo(null);
         PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
@@ -141,27 +152,21 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             ReducaoRegistro = new JSONArray();
             if(!"".equals(CrimesStore) && CrimesStore.length() > 10){
                 ReducaoRegistro = new JSONArray(CrimesStore);
-            }else{
+            }/*else{
                 JSONObject getTemporario2 = new JSONObject();
-                getTemporario2.put("texto", "Reu Primario");
-                getTemporario2.put("meses", 25);
-                getTemporario2.put("calculo", "PORCENTAGEM");
-                getTemporario2.put("tipo", "REDUCAO");
+                getTemporario2.put("user_id", "1");
+                getTemporario2.put("nome", "Fulano");
+                getTemporario2.put("registration", "N/A");
+                getTemporario2.put("phone", "N/A");
+                getTemporario2.put("preso", 0);
                 ReducaoRegistro.put(getTemporario2);
-                
-                getTemporario2 = new JSONObject();
-                getTemporario2.put("texto", "Reu Reincidente");
-                getTemporario2.put("meses", 30);
-                getTemporario2.put("calculo", "PORCENTAGEM");
-                getTemporario2.put("tipo", "AUMENTO");
-                ReducaoRegistro.put(getTemporario2);
-            }
+            }*/
             
             ConfigGerais = new JSONObject();
             if(!"".equals(OpcoesStore) && OpcoesStore.length() > 10){
                 ConfigGerais = new JSONObject(OpcoesStore);
             }else{
-                ConfigGerais.put("pena_max", 0);
+                ConfigGerais.put("save_automatico", 0);
             }
         }else{
             /*
@@ -182,94 +187,106 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     
     //JComboBox[] TipoEscolha = new JComboBox[10];
     
-    public static void AdicionarBotoes(){
+    static void AdicionarBotoes(){
         DefaultTableModel modelTable = (DefaultTableModel)jTable1.getModel();
         modelTable.setRowCount(0);
+        
         int nivel_assinatura = SNWindows.getNivelSerialPC();
+        boolean NaoAdd = false;
         if(InicializadorMain.ModoOffline){
-            if(ReducaoRegistro.length() > SNWindows.BeneficiosAssinatura[nivel_assinatura]){
-                jTable1.setEnabled(false);
-                MudarCalculoBt.setEnabled(false);
-                MudarTipoBt.setEnabled(false);
-                showMessageDialog(null,"A tabela importada é de uma assinatura. Você não conseguirá edita-la, mas funcionará normalmente."
-                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Tabela importada de uma assinatura",JOptionPane.PLAIN_MESSAGE);
+            if(nivel_assinatura > 0){
+                if(modelTable.getRowCount() > SNWindows.UsuariosAssinatura[nivel_assinatura]){
+                    jTable1.setEnabled(false);
+                    showMessageDialog(null,"A tabela em uso possui "+modelTable.getRowCount()+" usuários e sua assinatura '"+SNWindows.TipoAssinatura[nivel_assinatura]+"' permite registrar até "+SNWindows.UsuariosAssinatura[nivel_assinatura]+" usuários."
+                        + "\nFuncionará tudo normalmente, mas você não conseguirá editá-la", "Assinatura não compatível com tabela",JOptionPane.PLAIN_MESSAGE);
+                }else{
+                    jTable1.setEnabled(true);
+                }
             }else{
-                jTable1.setEnabled(true);
-                MudarCalculoBt.setEnabled(true);
-                MudarTipoBt.setEnabled(true);
+                jTable1.setEnabled(false);
+                showMessageDialog(null,"Lamento, mas a tabela é de uma assinatura. Para importar ou exportar tabelas é necessário possuir uma assinatura."
+                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Assinatura",JOptionPane.PLAIN_MESSAGE);
+                NaoAdd = true;
+            }
+        }
+        if(!NaoAdd){
+            for(int i = 0; i < ReducaoRegistro.length(); i++){
+                JSONObject o = ReducaoRegistro.getJSONObject(i);
+                //if(o.getInt("categoria") == o2.getInt("id")){
+                    modelTable.addRow(new Object[]{o.getInt("user_id"), o.getString("nome"), o.getString("registration"), o.getString("phone"), o.getInt("age") });
+                //}
             }
         }
         
-        for(int i = 0; i < ReducaoRegistro.length(); i++){
-            JSONObject o = ReducaoRegistro.getJSONObject(i);
-            //if(o.getInt("categoria") == o2.getInt("id")){
-                modelTable.addRow(new Object[]{o.getString("texto"), o.getInt("meses"), o.getString("calculo"), o.getString("tipo")});
-            //}
-        }
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(jTable1.getModel());
+        jTable1.setRowSorter(sorter);
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+
+        int columnIndexToSort = 0;
+        sortKeys.add(new RowSorter.SortKey(columnIndexToSort, SortOrder.ASCENDING));
+
+        sorter.setSortKeys(sortKeys);
+        sorter.sort();
+        sorter.setSortable(1, true);
+        sorter.setSortable(2, false);
+        sorter.setSortable(3, false);
+        sorter.setSortable(4, false);
+        /*
         if(modelTable.getRowCount() <= 0){
             modelTable.addRow(new Object[]{"Reu Primario", 25, "PORCENTAGEM", "REDUCAO"});
             jTable1.setRowSelectionInterval(0, 0);
-        }
+        }*/
     }
     
-    public static void PegarValoresTabela(){
+    static void PegarValoresTabela(){
         ReducaoRegistro = new JSONArray();
         int semnome = 0;
         int row = jTable1.getRowCount();
         int column = jTable1.getColumnCount();
+        
+        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
         for (int r = 0; r  < row; r++) {
             JSONObject getTemporario2 = new JSONObject();
+            boolean naosalvar = false;
             for (int c = 0; c  < column; c++) {
                 //System.out.println("Tabelas[ir].getValueAt(r, c): "+Tabelas[ir].getValueAt(r, c));
                 switch(c){
                     case 0:
-                        String Nome_Crime = jTable1.getValueAt(r, c)+"";
-                        if("".equals(Nome_Crime)){ Nome_Crime = "Sem Nome";semnome++;}
-                        getTemporario2.put("texto", Nome_Crime);
+                        int id_user = Integer.parseInt(jTable1.getValueAt(r, c).toString());
+                        if(id_user > 0){
+                            getTemporario2.put("user_id", id_user);
+                        }else{
+                            naosalvar = true;
+                        }
                     case 1:
-                        getTemporario2.put("meses", jTable1.getValueAt(r, c));
+                        String Nome_Player = jTable1.getValueAt(r, c)+"";
+                        if("".equals(Nome_Player)){ Nome_Player = "Sem Nome";semnome++;}
+                        if(!naosalvar) getTemporario2.put("nome", Nome_Player);
                     case 2:
-                        String TipoValor = jTable1.getValueAt(r, c)+"";
-                        if("".equals(TipoValor)) TipoValor = "PORCENTAGEM";
-                        getTemporario2.put("calculo", TipoValor);
+                        String Registro = jTable1.getValueAt(r, c)+"";
+                        if("".equals(Registro)) Registro = "N/A";
+                        if(!naosalvar) getTemporario2.put("registration", Registro);
                     case 3:
-                        String TipoValor2 = jTable1.getValueAt(r, c)+"";
-                        if("".equals(TipoValor2)) TipoValor2 = "REDUCAO";
-                        getTemporario2.put("tipo", TipoValor2);
+                        String Phone = jTable1.getValueAt(r, c)+"";
+                        if("".equals(Phone)) Phone = "N/A";
+                        if(!naosalvar) getTemporario2.put("phone", Phone);
+                    case 4:
+                        if(!naosalvar) getTemporario2.put("age", jTable1.getValueAt(r, c));
+                    //case 5:
+                      //  if(!naosalvar) getTemporario2.put("vezes_preso", jTable1.getValueAt(r, c));
                 }
             }
-            ReducaoRegistro.put(getTemporario2);
+            if(!naosalvar) ReducaoRegistro.put(getTemporario2);
         }
         //RecarregarValoresTabela();
         PegarTotalTabela();
         if(semnome > 0)InfoDB.setText(semnome+" foram renomeados para 'Sem Nome'");
     }
     
-    public static void PegarTotalTabela(){
+    static void PegarTotalTabela(){
         InfoDB.setText("Total de "+jTable1.getRowCount()+" aumento/redução de pena registradas.");
     }
-
-    public void AddKey(java.awt.event.KeyEvent evt, JTable tabela) {
-        int index = tabela.getSelectedRow();
-        DefaultTableModel model = (DefaultTableModel)tabela.getModel();
-        
-        
-        pressedKeys.add(evt.getKeyCode());
-        if (!pressedKeys.isEmpty()) {
-            if (pressedKeys.contains(KeyEvent.VK_SHIFT)) {
-                if (pressedKeys.contains(KeyEvent.VK_UP)) {
-                    //System.out.println("SHIFT + UP");
-                    if(index > 0) model.moveRow(index, index, index - 1);
-                    //jTable1.setRowSelectionInterval(index - 1, index - 1);
-                }
-                if (pressedKeys.contains(KeyEvent.VK_DOWN)) {
-                    //System.out.println("SHIFT + DOWN");
-                    if(index < model.getRowCount() - 1) model.moveRow(index, index, index + 1);
-                }
-            }
-        }
-    }
-    public void EditarDados(String Valor){
+    void EditarDados(String Valor){
         String Numbr = "";
         String PegarValor;
         
@@ -304,21 +321,38 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         RecarregarValoresTabela();
     }
     
-    private static void RecarregarValoresTabela(){
-        if(!ConfigGerais.has("pena_max")) ConfigGerais.put("pena_max", 0);
-        ValorTxt.setText(ConfigGerais.getInt("pena_max")+"");
+    void EditarDadosBool(String Valor){
+        int PegarValor;
+        int ValorDados = 0;
+        if(ConfigGerais.has(Valor)){
+            PegarValor = ConfigGerais.getInt(Valor);
+            if(PegarValor == 0){
+                ValorDados = 1;
+            }
+        }
+        
+        ConfigGerais.put(Valor, ValorDados);
+        RecarregarValoresTabela();
+    }
+    static String[] TipoTrueFalse = {
+        "NÃO",
+        "SIM"
+    };
+    static void RecarregarValoresTabela(){
+        if(!ConfigGerais.has("save_automatico")) ConfigGerais.put("save_automatico", 0);
+        ValorTxt.setText(TipoTrueFalse[ConfigGerais.getInt("save_automatico")]);
         //ValorTxt2.setText(PegarUser.getString("nome")+" "+PegarUser.getString("sobrenome"));
         //ValorTxt3.setText(PegarUser.getString("registration").toUpperCase());
     }
     
-    public void SAVEOpcoes(){      //Save the UserName and Password (for one user)
+    public static void SAVEUsers(){      //Save the UserName and Password (for one user)
         try {
-            File file = new File(InicializadorMain.DestFile3);
+            File file = new File(InicializadorMain.DestFileUsers);
             if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
             Base64.Encoder enc = Base64.getEncoder();
-            System.out.println("enc.encodeToString(ReducaoRegistro.toString().getBytes()): "+enc.encodeToString(ReducaoRegistro.toString().getBytes()));
+            //System.out.println("enc.encodeToString(ReducaoRegistro.toString().getBytes()): "+enc.encodeToString(ReducaoRegistro.toString().getBytes()));
             bw.write(enc.encodeToString(ReducaoRegistro.toString().getBytes())); //write the name
             
             bw.newLine(); //leave a new Line
@@ -329,9 +363,9 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         } catch (IOException e) { e.printStackTrace(); }        
     }//End Of Save
     
-    public static void UPDATEOpcoes(){ //UPDATE ON OPENING THE APPLICATION
+    public static void UPDATEUsers(){ //UPDATE ON OPENING THE APPLICATION
         try {
-            File file = new File(InicializadorMain.DestFile3);
+            File file = new File(InicializadorMain.DestFileUsers);
             if(file.exists()){    //if this file exists
                 Scanner scan = new Scanner(file);   //Use Scanner to read the File
                 /*while (scan.hasNext()) {
@@ -360,13 +394,29 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         }
     }
     
+    public static void SAVEUsersAdd(JSONArray novousuario, JSONObject OpcoesNovoUser){      //Save the UserName and Password (for one user)
+        try {
+            File file = new File(InicializadorMain.DestFileUsers);
+            if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+            Base64.Encoder enc = Base64.getEncoder();
+            //System.out.println("enc.encodeToString(ReducaoRegistro.toString().getBytes()): "+enc.encodeToString(ReducaoRegistro.toString().getBytes()));
+            bw.write(enc.encodeToString(novousuario.toString().getBytes())); //write the name
+            
+            bw.newLine(); //leave a new Line
+            
+            bw.write(enc.encodeToString(OpcoesNovoUser.toString().getBytes())); //getPassword()
+            bw.close(); //close the BufferdWriter
+
+        } catch (IOException e) { e.printStackTrace(); }        
+    }//End Of Save
+    
     void AtalhoVer(){
         showMessageDialog(null,
-            "Inserir Linha: Shift+Insert"+
-            "\nRemover Linha: Shift+Delete"+
-            "\nMover Linha Cima: Shift+Page_UP"+
-            "\nMover Linha Baixo: Shift+Page_DOWN", 
-            "Atalhos do Gerenciador de Aumento/Redução",JOptionPane.PLAIN_MESSAGE);
+            "Inserir Usuário: Shift+Insert"+
+            "\nRemover Usuário: Shift+Delete", 
+            "Atalhos do Gerenciador de Usuários",JOptionPane.PLAIN_MESSAGE);
     }
     
     public void AddLinha(){
@@ -376,14 +426,15 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         
         int nivel_assinatura = SNWindows.getNivelSerialPC();
         DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        if(model.getRowCount() < SNWindows.BeneficiosAssinatura[nivel_assinatura]){
+        if(model.getRowCount() < SNWindows.UsuariosAssinatura[nivel_assinatura]){
             InfoDB1.setText("Nova linha foi adicionada");
-            model.addRow(new Object[]{"", 0, "PORCENTAGEM", "REDUCAO"});
+            //model.addRow(new Object[]{"", 0, "PORCENTAGEM", "REDUCAO"});
+            model.addRow(new Object[]{0, "", "", "", 0, 0 });
             jTable1.setRowSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
             PegarTotalTabela();
         }else{
             pressedKeys = new HashSet<>();
-            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_assinatura]+"' permite adicionar até "+SNWindows.BeneficiosAssinatura[nivel_assinatura]+" aumento/redução de pena."
+            showMessageDialog(null,"Lamento, mas sua assinatura '"+SNWindows.TipoAssinatura[nivel_assinatura]+"' permite registrar até "+SNWindows.UsuariosAssinatura[nivel_assinatura]+" usuários."
             + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro ao inserir",JOptionPane.PLAIN_MESSAGE);
         }
     }
@@ -431,8 +482,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton4 = new javax.swing.JButton();
-        MudarTipoBt = new javax.swing.JButton();
-        MudarCalculoBt = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -460,7 +509,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         importar = new javax.swing.JMenuItem();
@@ -478,14 +526,14 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("GERENCIAR AUMENTO/REDUÇÃO");
+        setTitle("GERENCIAR USUÁRIOS");
         setBackground(new java.awt.Color(13, 32, 64));
         setResizable(false);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("GERENCIADOR DE AUMENTO/REDUÇÃO DE PENA");
+        jLabel1.setText("GERENCIADOR DE USUÁRIOS");
 
         TabPainel.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -495,22 +543,15 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
 
             },
             new String [] {
-                "NOME", "MESES", "CALCULO", "TIPO"
+                "ID", "NOME", "RG", "TELEFONE", "IDADE"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                true, true, false, false
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
             }
         });
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -534,31 +575,11 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
 
         jButton4.setBackground(new java.awt.Color(255, 255, 255));
         jButton4.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jButton4.setText("ADICIONAR CRIME");
+        jButton4.setText("ADICIONAR USUÁRIO");
         jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
-            }
-        });
-
-        MudarTipoBt.setBackground(new java.awt.Color(255, 255, 255));
-        MudarTipoBt.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        MudarTipoBt.setText("MUDAR TIPO");
-        MudarTipoBt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        MudarTipoBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MudarTipoBtActionPerformed(evt);
-            }
-        });
-
-        MudarCalculoBt.setBackground(new java.awt.Color(255, 255, 255));
-        MudarCalculoBt.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        MudarCalculoBt.setText("MUDAR CALCULO");
-        MudarCalculoBt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        MudarCalculoBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MudarCalculoBtActionPerformed(evt);
             }
         });
 
@@ -569,14 +590,10 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(MudarCalculoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(MudarTipoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton4)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -585,10 +602,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(MudarTipoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(MudarCalculoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -612,8 +626,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         NomeTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         NomeTxt.setForeground(new java.awt.Color(255, 255, 255));
         NomeTxt.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        NomeTxt.setText("PENA MÁXIMA:");
-        NomeTxt.setToolTipText("Limite máximo de pena, não ultrapassará este valor.");
+        NomeTxt.setText("SALVAR AUTO:");
+        NomeTxt.setToolTipText("Salvar automaticamente ao registrar");
 
         ValorTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         ValorTxt.setForeground(new java.awt.Color(255, 255, 255));
@@ -629,7 +643,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ValorTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(EditarBt1, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
+                .addComponent(EditarBt1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -882,14 +896,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
 
         jMenu3.setText("VOLTAR");
 
-        jMenuItem5.setText("VOLTAR PARA GERENCIAMENTO");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem5);
-
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -986,23 +992,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                 if(row >= 0){
                     String NomeRow = jTable1.getValueAt(row, 0)+"";
                     if("".equals(NomeRow)) NomeRow = "Linha "+(row+1);
-                    if (pressedKeys.contains(KeyEvent.VK_UP)) {
-                        //System.out.println("SHIFT + UP");
-                        if(index > 0){
-                            InfoDB1.setText(NomeRow+" movido para cima");
-                            model.moveRow(index, index, index - 1);
-                            PegarValoresTabela();
-                        }
-                        //jTable1.setRowSelectionInterval(index - 1, index - 1);
-                    }
-                    if (pressedKeys.contains(KeyEvent.VK_DOWN)) {
-                        //System.out.println("SHIFT + DOWN");
-                        if(index < model.getRowCount() - 1){
-                            InfoDB1.setText(NomeRow+" movido para baixo");
-                            model.moveRow(index, index, index + 1);
-                            PegarValoresTabela();
-                        }
-                    }
                     if (pressedKeys.contains(KeyEvent.VK_DELETE)) {
                         InfoDB1.setText(NomeRow+" foi removido");
                         model.removeRow( row );
@@ -1037,8 +1026,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private void ResetarTudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarTudoActionPerformed
 
         if(InicializadorMain.ModoOffline){
-            UPDATEOpcoes();
-            if(ConfigGerais.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || ReducaoRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
+            UPDATEUsers();
+            //if(ConfigGerais.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || ReducaoRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
                 Object[] options = { "Resetar TUDO", "Resetar Alterações" }; 
                 int Escolha=JOptionPane.showOptionDialog(this,
                         "Você deseja resetar tudo ou resetar as alterações?\nAo resetar tudo será zerada toda a tabela.", 
@@ -1052,7 +1041,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                     OpcoesStore="";
                     CrimesStore="";
                 }
-            }
+            //}
         }
         PegarDBOpcoes();
     }//GEN-LAST:event_ResetarTudoActionPerformed
@@ -1061,8 +1050,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         PegarValoresTabela();
         if(InicializadorMain.ModoOffline){
             System.out.println("ReducaoRegistro.toString(): "+ReducaoRegistro.toString());
-            SAVEOpcoes();
-            UPDATEOpcoes();
+            SAVEUsers();
+            UPDATEUsers();
             PegarDBOpcoes();
         }else{
             ConexaoDB conexao = new ConexaoDB();
@@ -1101,23 +1090,34 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         Export.ExportValor = 1;
         Export.AreaTexto.grabFocus();
         Export.setVisible(true);*/
-        
-        String ExportStr = ExportarOuImportar.textAreaDialog(null, "Importar Tabela", "", true, "Importar");
-        if(ExportStr != null && ExportStr.length() > 0){
-            ImportarDadosOpcoes(ExportStr);
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
+        if(nivel_assinatura > 0){
+            String ExportStr = ExportarOuImportar.textAreaDialog(null, "Importar Tabela", "", true, "Importar");
+            if(ExportStr != null && ExportStr.length() > 0){
+                ImportarDadosOpcoes(ExportStr);
+            }
+        }else{
+            showMessageDialog(null,"Lamento, mas para Importar Usuários é necessário possuir uma assinatura."
+                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Assine já!",JOptionPane.PLAIN_MESSAGE);
         }
     }//GEN-LAST:event_importarActionPerformed
 
     private void exportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportarActionPerformed
-        Base64.Encoder enc = Base64.getEncoder();
-        String ReducaoAumento = enc.encodeToString(ReducaoRegistro.toString().getBytes());
-        String OpcoesDeCrimes = enc.encodeToString(ConfigGerais.toString().getBytes());
-        
-        String ExportStr = ExportarOuImportar.textAreaDialog(null, "Exportar Tabela", ReducaoAumento+"\n"+OpcoesDeCrimes, false, "Exportar");
-        if(ExportStr != null && ExportStr.length() > 0){
-            StringSelection stringSelection = new StringSelection(ExportStr);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
+        if(nivel_assinatura > 0){
+            Base64.Encoder enc = Base64.getEncoder();
+            String ReducaoAumento = enc.encodeToString(ReducaoRegistro.toString().getBytes());
+            String OpcoesDeCrimes = enc.encodeToString(ConfigGerais.toString().getBytes());
+
+            String ExportStr = ExportarOuImportar.textAreaDialog(null, "Exportar Tabela", ReducaoAumento+"\n"+OpcoesDeCrimes, false, "Exportar");
+            if(ExportStr != null && ExportStr.length() > 0){
+                StringSelection stringSelection = new StringSelection(ExportStr);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            }
+        }else{
+            showMessageDialog(null,"Lamento, mas para Exportar Usuários é necessário possuir uma assinatura."
+                    + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Assine já!",JOptionPane.PLAIN_MESSAGE);
         }
         //JOptionPane.showMessageDialog(null, msg, title, JOptionPane.OK_CANCEL_OPTION);
         
@@ -1152,46 +1152,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         AtalhoVer();
     }//GEN-LAST:event_jLabel2MouseClicked
 
-    private void MudarTipoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MudarTipoBtActionPerformed
-        int index = jTable1.getSelectedRow();
-        if(index >= 0){
-            String ValorAtualTabela = jTable1.getValueAt(index, 3)+"";
-            if(null != ValorAtualTabela)switch (ValorAtualTabela) {
-                case "REDUCAO":
-                    ValorAtualTabela = "AUMENTO";
-                    break;
-                case "AUMENTO":
-                    ValorAtualTabela = "REDUCAO";
-                    break;
-                default:
-                    ValorAtualTabela = "REDUCAO";
-                    break;
-            }
-            jTable1.setValueAt(ValorAtualTabela, index, 3);
-        }
-    }//GEN-LAST:event_MudarTipoBtActionPerformed
-
-    private void MudarCalculoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MudarCalculoBtActionPerformed
-        int index = jTable1.getSelectedRow();
-        if(index >= 0){
-            String ValorAtualTabela = jTable1.getValueAt(index, 2)+"";
-            if(null != ValorAtualTabela)switch (ValorAtualTabela) {
-                case "PORCENTAGEM":
-                    ValorAtualTabela = "FIXO";
-                    break;
-                case "FIXO":
-                    ValorAtualTabela = "PORCENTAGEM";
-                    break;
-                default:
-                    ValorAtualTabela = "PORCENTAGEM";
-                    break;
-            }
-            jTable1.setValueAt(ValorAtualTabela, index, 2);
-        }
-    }//GEN-LAST:event_MudarCalculoBtActionPerformed
-
     private void EditarBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarBt1ActionPerformed
-        EditarDados("pena_max");
+        EditarDadosBool("save_automatico");
     }//GEN-LAST:event_EditarBt1ActionPerformed
 
     private void EditarBt2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarBt2ActionPerformed
@@ -1201,11 +1163,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private void EditarBt3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarBt3ActionPerformed
         EditarDados("registration");
     }//GEN-LAST:event_EditarBt3ActionPerformed
-
-    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        new Gerenciamento().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1224,14 +1181,18 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GerenciamentoOpcoes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GerenciamentoUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GerenciamentoOpcoes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GerenciamentoUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GerenciamentoOpcoes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GerenciamentoUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GerenciamentoOpcoes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GerenciamentoUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -1240,7 +1201,7 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GerenciamentoOpcoes().setVisible(true);
+                new GerenciamentoUsuarios().setVisible(true);
             }
         });
     }
@@ -1252,8 +1213,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private javax.swing.JButton EditarBt4;
     private static javax.swing.JLabel InfoDB;
     private static javax.swing.JLabel InfoDB1;
-    private static javax.swing.JButton MudarCalculoBt;
-    private static javax.swing.JButton MudarTipoBt;
     private javax.swing.JLabel NomeTxt;
     private javax.swing.JPanel PainelDetalhes;
     private javax.swing.JButton ResetarTudo;
@@ -1283,7 +1242,6 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

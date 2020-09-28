@@ -37,7 +37,7 @@ public class Desmanche extends javax.swing.JFrame {
         initComponents();
         //copiado.setVisible(false);
         this.setLocationRelativeTo(null);
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/mclost_1.png")));
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/mclost_1.png")));
         
         AtualizarCrimes();
         inputnumero15.requestFocus();
@@ -147,7 +147,7 @@ public class Desmanche extends javax.swing.JFrame {
             BtMenos(valorcampo).setEnabled(true);
             BtZerar(valorcampo).setEnabled(true);
         }
-        System.out.printf("valorcampo: "+valorcampo);
+        //System.out.printf("valorcampo: "+valorcampo);
         AtualizarCrimes();
         //copiado.setVisible(false);
         return 1;
@@ -203,15 +203,15 @@ public class Desmanche extends javax.swing.JFrame {
         
         vtotal1.setText("$ "+dinheiro(valorlocal));
         
-        String TextDiscord = "```\n";
-        if(vdividir>1)TextDiscord+="Valor da MC divido por "+vdividir+": $"+dinheiro(contadivid)+"\n";
+        String TextDiscord = "```md\n";
+        if(vdividir>1)TextDiscord+="* Valor da MC divido por "+vdividir+": $"+dinheiro(contadivid)+"\n";
         if(descontconta>0){
-            TextDiscord+="Valor da MC: $"+dinheiro(descontconta);
+            TextDiscord+="* Valor da MC: $"+dinheiro(descontconta);
             if(vdescontar2!=0)TextDiscord+=" ("+vdescontar2+"%)";
             TextDiscord+="\n";
         }
         if(valortotal!=0){
-            TextDiscord+="Valor Total: $"+dinheiro(valortotal)+"\n";
+            TextDiscord+="* Valor Total: $"+dinheiro(valortotal)+"\n";
             copiar.setEnabled(true);
         }else{
             copiar.setEnabled(false);

@@ -395,9 +395,9 @@ public class Boletim extends javax.swing.JFrame {
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("OCORRIDO");
 
-        jMenu2.setText("FECHAR");
+        jMenu2.setText("VOLTAR");
 
-        jMenuItem2.setText("VOLTAR PAINEL");
+        jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
