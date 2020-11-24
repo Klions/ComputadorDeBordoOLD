@@ -27,7 +27,7 @@ public class ExportarOuImportar {
         textArea.setRows(10);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setEnabled(CampoAtivado);
+        textArea.setEditable(CampoAtivado);
         textArea.setSize(textArea.getPreferredSize().width, textArea.getPreferredSize().height);
         
         Object[] options = { ValorPrimario, "Cancelar" };

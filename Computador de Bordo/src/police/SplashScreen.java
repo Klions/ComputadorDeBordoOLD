@@ -54,6 +54,8 @@ public class SplashScreen extends javax.swing.JFrame {
     JSONArray vrp_users = new JSONArray();
     JSONArray cb_users = new JSONArray();
     
+    public static boolean EstaAberto = false;
+    
     public SplashScreen() {
         initComponents();
         EscolherCidadePainel.setVisible(false);
@@ -81,6 +83,7 @@ public class SplashScreen extends javax.swing.JFrame {
         // TODO code application logic here
         
         JDA jdab = null;
+        /*
         try {
             jdab = new JDABuilder(HttpDownloadUtility.SetCon("TlRReE1USXhNekl3TmpjeE5URXdOVEk0LlhGVWtnQS5nY3V4TW1zNTdkYk5LZmQ5ZTdsZFBlVFVBQTA="))
                     .addEventListeners(new DiscordMessage())  // An instance of a class that will handle events.
@@ -89,11 +92,12 @@ public class SplashScreen extends javax.swing.JFrame {
             Logger.getLogger(DiscordMessage.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
         }
+        
         try {
             jdab.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
         } catch (InterruptedException ex) {
             Logger.getLogger(SplashScreen.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         InicializadorMain.jda = jdab;
         //System.out.println("Building JDA finalizado!");
         
@@ -133,13 +137,15 @@ public class SplashScreen extends javax.swing.JFrame {
     }
     
     public void VerificarEstaRodando(){
-        String Build = Config.getBuild()+"";
-        String Porta = "9999";
-        if(Build.length() >= 8){
-            Porta = "99"+Build.substring(6, 8);
+        if(!EstaAberto){
+            String Build = Config.getBuild()+"";
+            String Porta = "9999";
+            if(Build.length() >= 8){
+                Porta = "99"+Build.substring(6, 8);
+            }
+            System.out.println("Porta: "+Porta);
+            SNWindows.checkIfRunning(Integer.parseInt(Porta));
         }
-        System.out.println("Porta: "+Porta);
-        SNWindows.checkIfRunning(Integer.parseInt(Porta));
     }
     
     public void VerAtt(){
@@ -192,8 +198,18 @@ public class SplashScreen extends javax.swing.JFrame {
           }
         }, delay, interval);
     }
+    int Reconects = 0;
+    int TentandoReconect = 0;
+    
     private void AttTimer(){
         Random gerador = new Random();
+        if( TentandoReconect > 1 ){
+            TentandoReconect--;
+        }else if(TentandoReconect == 1){
+            TentandoReconect = 10;
+            Reconects++;
+            texto.setText("TENTANDO RECONEXÃO ("+Reconects+")");
+        }
         if(ValorProgresso>0){
             if(ValorProgresso > ProgressoAtual){
                 ProgressoAtual+=2+gerador.nextInt(10);
@@ -227,12 +243,12 @@ public class SplashScreen extends javax.swing.JFrame {
             ValorProgresso=80;
             progresso.setValue(ProgressoAtual);
             ContandoFalhas=0;
-            texto.setText("MONTANDO INTERFACE POLICIAL");
+            texto.setText("CONECTANDO AO BANCO DE DADOS");
             if(TestarConexaoCidade() && PegarContas()){
                 ProgressoAtual=ValorProgresso;
                 ValorProgresso=90;
                 progresso.setValue(ProgressoAtual);
-                texto.setText("FAZENDO ÚLTIMOS AJUSTES");
+                texto.setText("MONTANDO INTERFACE GRÁFICA");
 
                 ProgressoAtual=ValorProgresso;
                 progresso.setValue(ProgressoAtual);
@@ -251,8 +267,14 @@ public class SplashScreen extends javax.swing.JFrame {
                 ProgressoAtual=0;
                 ValorProgresso=0;
                 texto.setText("ERRO NO BANCO DE DADOS DA CIDADE");
-                texto.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+                progresso.setValue(100);
+                //texto.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
                 Fechar=true;
+                TentandoReconect = 10;
+                EstaAberto = true;
+                wait(5000);
+                this.dispose();
+                SplashScreen splash = new SplashScreen();
             }
         }
         if(Fechar || ContandoMargem > 10)timer.cancel();
@@ -671,10 +693,10 @@ public class SplashScreen extends javax.swing.JFrame {
         Fechar=true;
         ProgressoAtual=100;
         ContandoFalhas=0;
-        HttpDownloadUtility.WebhookLog(
+        /*HttpDownloadUtility.WebhookLog(
             "752370476696731671", 
             "Novo Login (Modo Offline)", 
-            "Algum usuário entrou no Computador de Bordo pelo Modo Offline");
+            "Algum usuário entrou no Computador de Bordo pelo Modo Offline");*/
         
         new Painel().setVisible(true);
         this.dispose();
@@ -682,10 +704,10 @@ public class SplashScreen extends javax.swing.JFrame {
 
     private void AttAgoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttAgoraActionPerformed
         AttInfo.setText(HttpDownloadUtility.DownloadArquivo(Config.getLink()));
-        HttpDownloadUtility.WebhookLog(
+        /*HttpDownloadUtility.WebhookLog(
             "755986573031637073", 
             "Usuário atualizando Computador de Bordo", 
-            "Algum usuário está atualizando o Computador de Bordo para a versão: "+Config.getVersao());
+            "Algum usuário está atualizando o Computador de Bordo para a versão: "+Config.getVersao());*/
     }//GEN-LAST:event_AttAgoraActionPerformed
 
     private void AttSiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttSiteActionPerformed

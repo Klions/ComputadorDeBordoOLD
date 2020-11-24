@@ -606,6 +606,8 @@ public class Usuario {
                 getTemporario.put("id", resulteSet.getInt("id"));
                 getTemporario.put("categorias", resulteSet.getString("categorias"));
                 getTemporario.put("crimes", resulteSet.getString("crimes"));
+                getTemporario.put("aumento_reducao", resulteSet.getString("aumento_reducao"));
+                getTemporario.put("opcoes", resulteSet.getString("opcoes"));
                 crimesserverDBarray.put(getTemporario);
             }
         } catch (SQLException ex) {

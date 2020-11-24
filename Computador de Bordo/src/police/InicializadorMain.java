@@ -52,6 +52,7 @@ public class InicializadorMain {
     public static String DestFile = SNWindows.DestPasta+"/cb-l.txt";
     public static String DestFile2 = SNWindows.DestPasta+"/cb-c.txt";
     public static String DestFile3 = SNWindows.DestPasta+"/cb-ar.txt";
+    public static String DestFileUsers = SNWindows.DestPasta+"/cb-users.txt";
     
     //static ExportarImportar Export = new ExportarImportar();
     
@@ -91,6 +92,12 @@ public class InicializadorMain {
     public void AttDBUsuariosSetDiscord(){
         Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuariosDiscord();
+    }
+    
+    public static void AttDBSHierarquia(){
+        Usuario usuarios = new Usuario();
+        usuariosDBarray = usuarios.AttDBUsuarios();
+        hierarquiaDBarray = usuarios.AttDBHierarquia();
     }
     
     public void AttDBSTodas(){

@@ -5,18 +5,15 @@
  */
 package police.configs;
 
-import java.util.prefs.Preferences;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import police.InicializadorMain;
 
 /**
  *
  * @author John
  */
 public class Config {
-    public static int build_atual = 20200912;
-    public static String versao = "1.0.0";
+    public static int build_atual = 20201027;
+    public static String versao = "1.0.3";
     public static String linkB = "https://computadordebordo.tk/CBordo.exe";
     
     //CONFIGURAÇÃOS PERSONALIZADAS PARA CADA TIPO DE POLICIA

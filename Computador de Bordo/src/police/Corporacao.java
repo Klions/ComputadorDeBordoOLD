@@ -250,11 +250,7 @@ public class Corporacao extends javax.swing.JFrame {
                 //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
                 if(pass==ohier.getInt("id_usuario")){
                     pter = ohier.getInt("cargo");
-                    if(pter!=99){
-                        lspd = true;
-                    }else{
-                        lspd = false;
-                    }
+                    lspd = pter!=99;
                 }
             }
             if(lspd){
@@ -277,7 +273,7 @@ public class Corporacao extends javax.swing.JFrame {
     }
     
     public void Alterou(){
-        boolean BOL = true;
+        boolean BOL = false; //true
         if(pttatual.getText().equals(newptt.getText()))BOL=false;
         jButton5.setEnabled(BOL);
         jButton6.setEnabled(BOL);
@@ -357,7 +353,7 @@ public class Corporacao extends javax.swing.JFrame {
         //MUDAR ESSAS COISAS
         //String Titulo = dados.getString("oqfez");
         Usuario usuario = new Usuario();
-        JSONObject obj = new JSONObject(usuario.getDados());
+        JSONObject obj = Usuario.UsuarioMain;//new JSONObject(usuario.getDados());
         
         String id_usuario = dados.getString("passaporte");
         String id_promoveu = obj.getString("id_usuario");
@@ -372,22 +368,23 @@ public class Corporacao extends javax.swing.JFrame {
         
         String canal="669698732517752852";
         TextChannel usuar = jda.getTextChannelById​(Long.parseLong(canal));
-        
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Adição na hierarquia", null);
-        eb.setColor(new Color(cor));
-        eb.setDescription(Texto);
-        eb.addField("Policial recrutado", nome_usuario+" ("+id_usuario+")", true);
-        eb.addField("Oficial recrutador", nome_promoveu+" ("+id_promoveu+")", true);
-        eb.addField("Patente", patente, true);
-        
-        eb.setFooter("Computador de Bordo [ver. "+config.versao+"]", null);
+        if(usuar != null){
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("Adição na hierarquia", null);
+            eb.setColor(new Color(cor));
+            eb.setDescription(Texto);
+            eb.addField("Policial recrutado", nome_usuario+" ("+id_usuario+")", true);
+            eb.addField("Oficial recrutador", nome_promoveu+" ("+id_promoveu+")", true);
+            eb.addField("Patente", patente, true);
 
-        eb.setThumbnail(config.img_DiscordPolicia);
-        Instant instant = Instant.from(ZonedDateTime.now());
-        eb.setTimestamp(instant);
-        
-        usuar.sendMessage(eb.build()).queue();
+            eb.setFooter("Computador de Bordo [ver. "+config.versao+"]", null);
+
+            eb.setThumbnail(config.img_DiscordPolicia);
+            Instant instant = Instant.from(ZonedDateTime.now());
+            eb.setTimestamp(instant);
+
+            usuar.sendMessage(eb.build()).queue();
+        }
     }
     
     
@@ -495,9 +492,12 @@ public class Corporacao extends javax.swing.JFrame {
                 Discord=discord;
                 PassaporteP=pass;
 
+                /*
                 jButton3.setEnabled(true);
                 jButton4.setEnabled(true);
-
+                btexonerado.setEnabled(true);*/
+                jButton3.setEnabled(false);
+                jButton4.setEnabled(false);
                 btexonerado.setEnabled(true);
 
                 editar.setEnabled(true);
@@ -602,8 +602,9 @@ public class Corporacao extends javax.swing.JFrame {
     }
     
     
-    public void AtualizarPtt(){
+    public void AtualizarPtt(){ //ATIVAR DPS DE ARRUMAR
         
+        /*
         if(PatenteP == usuarios.Qntptt){
             jButton4.setEnabled(false);
         }else{
@@ -619,15 +620,6 @@ public class Corporacao extends javax.swing.JFrame {
             jButton4.setEnabled(true);
             PatenteInsigna=0;
         }
-        /*
-        if(PatenteP < 14){
-            jButton4.setEnabled(true);
-            jButton3.setEnabled(false);
-        }
-        if(PatenteP > 0){
-            jButton4.setEnabled(false);
-            jButton3.setEnabled(true);
-        }*/
         
         if(PatenteP < 0){
             PatenteP = 0;
@@ -671,7 +663,7 @@ public class Corporacao extends javax.swing.JFrame {
         }
         
         jLabel40.setText("NOVA PATENTE"+Dife);
-        Alterou();
+        Alterou();*/
     }
     
     
@@ -725,7 +717,7 @@ public class Corporacao extends javax.swing.JFrame {
     
     public void AdicionarUser(){
         Usuario usuario = new Usuario();
-        JSONObject obj = new JSONObject(usuario.getDados());
+        JSONObject obj = Usuario.UsuarioMain;//new JSONObject(usuario.getDados());
         int passause = Integer.parseInt(PassaAddU);
         
         /*
@@ -789,22 +781,24 @@ public class Corporacao extends javax.swing.JFrame {
             AddLSPD.put("discord", Discordae);
             AddLSPD.put("newuser", temconta);
             AddLSPD.put("oqfez", 1);
-            if(conexao.AddUserLSPD("cb_identities", AddLSPD)){
+            if(conexao.AddUserLSPD(AddLSPD)){
                 System.out.print("deu certo!!");
                 //MensagemDiscord("kli0ns#3092","Seu código foi alterado!!","Seu novo código é: ASDA");
+                
+                JOptionPane.showMessageDialog(null, "O código de "+NomeU+" ("+PassaAddU+") é: "+Codegor, "Código gerado para o Usuário", JOptionPane.PLAIN_MESSAGE);
             }
             if(!"".equals(Discordae)){
                 int dialogButton = JOptionPane.YES_NO_OPTION;
                 int dialogResult = JOptionPane.showConfirmDialog(this, "Deseja enviar o novo código para "+NomeU+" ?", "Envio de código no discord", dialogButton);
                 if(dialogResult == 0) {
-                    MensagemDiscord(AddLSPD);
+                    //MensagemDiscord(AddLSPD);
                     System.out.print("Mensagem enviada para: "+Discordae+" /// ");
                 } else {
                     System.out.println("Opção de não.");
                 } 
             }
             AttDBHierarquia();
-            MensagemHierarquia(AddLSPD);
+            //MensagemHierarquia(AddLSPD);
         }else{
             JOptionPane.showMessageDialog(null, NomeU+" ("+PassaAddU+") já está na Polícia como "+usuarios.Patentes(pter)+".", "Já está na "+config.Abv_NomePolicia, JOptionPane.PLAIN_MESSAGE);
         }
@@ -826,6 +820,7 @@ public class Corporacao extends javax.swing.JFrame {
     public void AttDBHierarquia(){
         hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;//usuarios.AttDBHierarquia();
     }
+    
     
     public void AtivarCampos(){
         //cid.setEnabled(true);
@@ -1717,7 +1712,11 @@ public class Corporacao extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void AddCorpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCorpActionPerformed
+        
         AdicionarUser();
+        InicializadorMain.AttDBSHierarquia();
+        AttDBHierarquia();
+        TabelaAtt();
     }//GEN-LAST:event_AddCorpActionPerformed
 
     private void editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarActionPerformed
@@ -1771,6 +1770,7 @@ public class Corporacao extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btexoneradoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btexoneradoActionPerformed
+        /*
         PatenteP=99;
         PatenteInsigna=0;
         newptt.setText("EXONERADO");
@@ -1779,6 +1779,30 @@ public class Corporacao extends javax.swing.JFrame {
         jButton4.setEnabled(true);
         
         Alterou();
+        */
+        JSONObject obj = Usuario.UsuarioMain;//new JSONObject(usuario.getDados());
+        if(Integer.parseInt(obj.getString("id_usuario")) == PassaporteP){
+            showMessageDialog(null,"Impossível excluir o seu próprio acesso.","Ocorreu um erro",JOptionPane.PLAIN_MESSAGE);
+            System.err.println("ERRO AO EXCLUIR PROPRIO ACESSO");
+        }else{
+            Object[] options = { "Sim, excluir", "Não, cancelar" }; 
+            int Escolha=JOptionPane.showOptionDialog(null,
+                "Tem certeza que deseja excluir o acesso de "+NomeP+"?", // \n
+                "Excluir Acesso de Usuário", 
+                JOptionPane.DEFAULT_OPTION, 
+                JOptionPane.WARNING_MESSAGE, 
+                null, 
+                options, 
+                options[0]);
+            if(Escolha==JOptionPane.YES_OPTION){
+                conexao.DeleteUserLSPD(PassaporteP);
+                showMessageDialog(null,"O acesso de "+NomeP+" foi excluido com sucesso!","Acesso excluido",JOptionPane.PLAIN_MESSAGE);
+                System.err.println("EXCLUIDO COM SUCESSO");
+                InicializadorMain.AttDBSHierarquia();
+                AttDBHierarquia();
+                TabelaAtt();
+            }
+        }
     }//GEN-LAST:event_btexoneradoActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -1792,7 +1816,7 @@ public class Corporacao extends javax.swing.JFrame {
         
         JSONObject set_info = new JSONObject();
         Usuario usuario = new Usuario();
-        JSONObject obj = new JSONObject(usuario.getDados());
+        JSONObject obj = Usuario.UsuarioMain;//new JSONObject(usuario.getDados());
         set_info=obj;
         /*set_info.put("nome", obj.getString("nome"));
         set_info.put("codigo", obj.getString("codigo"));
@@ -1813,10 +1837,11 @@ public class Corporacao extends javax.swing.JFrame {
         //salvar dados do usuário atual
         System.err.println("set_info: "+ set_info.toString()+"/ fechou");
         usuario.setDadosalvar(set_info);
-        
+        /*
         SalvarDadosCorporacao salvard = new SalvarDadosCorporacao();
         salvard.setVisible(true);
         this.dispose();
+        */
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void btCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCodigoActionPerformed

@@ -6,7 +6,6 @@
 package police;
 
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -36,6 +35,8 @@ import javax.swing.JToggleButton;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
+import police.configs.SNWindows;
 import police.configs.Usuario;
 
 /**
@@ -52,6 +53,9 @@ public class Prisoes extends javax.swing.JFrame {
     
     JSONArray BeneficiosCrimes = new JSONArray();
     JSONObject OpcoesDeCrimes = new JSONObject();
+    
+    JSONArray UsuariosOfflineTbl = new JSONArray();
+    JSONObject OpcoesUsuariosTbl = new JSONObject();
     
     JSONArray RegistroBotoes = new JSONArray();
     JSONArray RegistroInputs = new JSONArray();
@@ -72,9 +76,14 @@ public class Prisoes extends javax.swing.JFrame {
     static String AumentoEReducao="";
     static String OpcoesCrimes="";
     
+    static String UsuariosOffline="";
+    static String OpcoesUsuarios="";
+    
     JSONObject UsuarioPegar = new JSONObject();
     
     static boolean FecharJanela = false;
+    
+    static boolean NaoAbrirDnvAss = false;
     
     /*JSONArray CategoriasCrimes = new JSONArray();
     JSONArray CrimesRegistro = new JSONArray();*/
@@ -91,14 +100,16 @@ public class Prisoes extends javax.swing.JFrame {
         PesquisarPainel.setBackground(new java.awt.Color(13, 32, 64));
         jPanel2.setBackground(new java.awt.Color(13, 32, 64));
         jPanel3.setBackground(new java.awt.Color(13, 32, 64));
-        this.setLocationRelativeTo(null);
+        
+        PegarValoresOffline();
+        PegarValoresOfflineOpcoes();
+        PegarValoresOfflineUsuarios();
         
         if(InicializadorMain.ModoOffline){
             this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
             PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CADASTRAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
             PesquisarBt.setText("CADASTRAR");
-            PegarValoresOffline();
-            PegarValoresOfflineOpcoes();
+            
             
             JSONObject PegarUser = Usuario.getDados();
             if(PegarUser.getInt("id_usuario") == 0){
@@ -111,10 +122,12 @@ public class Prisoes extends javax.swing.JFrame {
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }
+        
         this.revalidate();
         this.repaint();
         this.pack();
         SetarBotoes();
+        this.setLocationRelativeTo(null);
         
         usuariosDBarray = InicializadorMain.usuariosDBarray;
         discordDBarray = InicializadorMain.discordDBarray;
@@ -142,59 +155,101 @@ public class Prisoes extends javax.swing.JFrame {
     }
     
     public void PegarValoresOffline(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile2);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CategoriasStore2 = DecoderStre;
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CrimesStore2 = DecoderStre;
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile2);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CategoriasStore2 = DecoderStre;
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CrimesStore2 = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
+        }else{
+            Usuario usuarios = new Usuario();
+            GetCrimes = usuarios.CrimesServerID();
+            for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+                JSONObject o2 = GetCrimes.getJSONObject(i2);
+                CategoriasStore2 = o2.getString("categorias");
+                CrimesStore2 = o2.getString("crimes");
+                AumentoEReducao = o2.getString("aumento_reducao");
+                OpcoesCrimes = o2.getString("opcoes");
+            }
         }
     }
     
     public void PegarValoresOfflineOpcoes(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile3);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    AumentoEReducao = DecoderStre;
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    OpcoesCrimes = DecoderStre;
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile3);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        AumentoEReducao = DecoderStre;
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        OpcoesCrimes = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void PegarValoresOfflineUsuarios(){ //UPDATE ON OPENING THE APPLICATION
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFileUsers);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        UsuariosOffline = DecoderStre;
+                    }
+
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        OpcoesUsuarios = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
         }
     }
     
     public void SetarBotoes(){
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
             if(!"".equals(CategoriasStore2) && CategoriasStore2.length() > 10){
                 CategoriasCrimes = new JSONArray(CategoriasStore2);
@@ -245,7 +300,22 @@ public class Prisoes extends javax.swing.JFrame {
             }else{
                 OpcoesDeCrimes.put("pena_max", 0);
             }
-        }else{
+            
+            
+            if(InicializadorMain.ModoOffline){
+                UsuariosOfflineTbl = new JSONArray();
+                if(!"".equals(UsuariosOffline) && UsuariosOffline.length() > 10){
+                    UsuariosOfflineTbl = new JSONArray(UsuariosOffline);
+                }
+
+                OpcoesUsuariosTbl = new JSONObject();
+                if(!"".equals(OpcoesUsuarios) && OpcoesUsuarios.length() > 10){
+                    OpcoesUsuariosTbl = new JSONObject(OpcoesUsuarios);
+                }else{
+                    OpcoesUsuariosTbl.put("save_automatico", 0);
+                }
+            }
+        /*}else{
             Usuario usuarios = new Usuario();
             GetCrimes = usuarios.CrimesServerID();
             for(int i2 = 0; i2 < GetCrimes.length(); i2++){
@@ -253,7 +323,7 @@ public class Prisoes extends javax.swing.JFrame {
                 CategoriasCrimes = new JSONArray(o2.getString("categorias"));
                 CrimesRegistro = new JSONArray(o2.getString("crimes"));
             }
-        }
+        }*/
         AtualizarJanelas();
         /*
         Usuario usuarios = new Usuario();
@@ -367,6 +437,9 @@ public class Prisoes extends javax.swing.JFrame {
                         Botoes[i2][i].setFont(new java.awt.Font("Tahoma", 0, FontPorTamanho(o.getString("texto").length())));
                         
                         Botoes[i2][i].setBounds(3, 3, 214, 39);
+                        
+                        if(o.has("obs") && !"".equals(o.getString("obs"))) Botoes[i2][i].setToolTipText(o.getString("obs"));
+                        
                         container2.add( Botoes[i2][i] );
                     //=========================================
                     }else{
@@ -427,6 +500,9 @@ public class Prisoes extends javax.swing.JFrame {
                                 }
                             }
                         });
+                        
+                        if(o.has("obs") && !"".equals(o.getString("obs"))) InputText[i2][i].setToolTipText(o.getString("obs"));
+                        
                         container2.add( InputText[i2][i] );
                     }
                     
@@ -688,6 +764,9 @@ public class Prisoes extends javax.swing.JFrame {
                 Ativado = true;
                 if(!InicializadorMain.ModoOffline){
                     AtivadoOn=true;
+                }else{
+                    ProcuradoBt.setToolTipText("DESATIVADO NO MODO OFFLINE");
+                    SalvarBt.setToolTipText("DESATIVADO NO MODO OFFLINE");
                 }
                 
                 
@@ -707,13 +786,13 @@ public class Prisoes extends javax.swing.JFrame {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 String dataFormatada = simpleDateFormat.format(date);
                 
-                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                //System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
                 String StrPenaTotal = MesesTotal+" meses";
                 if(OpcoesDeCrimes.getInt("pena_max") > 0 && MesesTotal >= OpcoesDeCrimes.getInt("pena_max")){
                     MesesTotal = OpcoesDeCrimes.getInt("pena_max");
                     StrPenaTotal = MesesTotal+" meses [PENA MÁXIMA]";
                 }
-                System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
+                //System.out.println("MesesTotal: "+MesesTotal+" / OpcoesDeCrimes.getInt(\"pena_max\"): "+OpcoesDeCrimes.getInt("pena_max"));
                 
                 String FormatDiscord = "[INDIVÍDUO]("+nome+" ["+UsuarioPegar.getInt("id_usuario")+"])"+RGi+
                     "\n[POLICIAL]("+nome_policial+" ["+PolicialUser.getInt("id_usuario")+"])"+
@@ -737,7 +816,7 @@ public class Prisoes extends javax.swing.JFrame {
         }
         CopiarDiscordBt.setEnabled(Ativado);
         
-        SalvarBt1.setEnabled(AtivadoOn);
+        ProcuradoBt.setEnabled(AtivadoOn);
         SalvarBt.setEnabled(AtivadoOn);
         
         if(MultaTotal>0) StrMultas = "R$"+String.format("%,d", MultaTotal);
@@ -875,9 +954,23 @@ public class Prisoes extends javax.swing.JFrame {
         showMessageDialog(null,Titulo, Mensagem,JOptionPane.PLAIN_MESSAGE);
     }
     
+    public JSONObject GetUserOffline(int user_id){
+        for(int i2 = 0; i2 < UsuariosOfflineTbl.length(); i2++){
+            JSONObject obj = UsuariosOfflineTbl.getJSONObject(i2);
+            //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
+            if(obj.getInt("user_id") == user_id){
+                return obj;
+            }
+        }
+        return null;
+    }
+    
     public void PegarUsuario(){
+        int nivel_assinatura = SNWindows.getNivelSerialPC();
         ResetarCrimes();
         JSONObject Usuario = new JSONObject();
+        int vzespreso = 0;
+        int vzesmulta = 0;
         
         if(InicializadorMain.ModoOffline){
             String Cad1 = txtID.getText();
@@ -885,16 +978,73 @@ public class Prisoes extends javax.swing.JFrame {
             String Cad3 = txtPlaca.getText();
             String Cad4 = txtTelefone.getText();
             if(Cad1.length() <= 0){Alerta("Necessário digitar o passaporte!", "Ocorreu algum erro");txtID.grabFocus(); return ;}
-            if(Cad2.length() <= 5){Alerta("Necessário digitar o nome! Está muito curto.", "Ocorreu algum erro");txtNome.grabFocus(); return ;}
-            if(Cad3.length() <= 0)Cad3 = "N/A";
-            if(Cad4.length() <= 0)Cad4 = "N/A";
-            Usuario.put("id_usuario", Cad1);
-            Usuario.put("nome_completo", Cad2);
-            Usuario.put("nome", Cad2);
-            Usuario.put("sobrenome", Cad2);
-            Usuario.put("registration", Cad3);
-            Usuario.put("phone", Cad4);
-            Usuario.put("age", "0");
+            
+            
+            int PassaporteDigitado = Integer.parseInt(Cad1);
+            JSONObject getUser = GetUserOffline(PassaporteDigitado);
+            if(nivel_assinatura <= 0 && UsuariosOfflineTbl.length() > SNWindows.UsuariosAssinatura[nivel_assinatura]){
+                getUser = null;
+            }
+            if(getUser != null){
+                Usuario.put("id_usuario", getUser.getInt("user_id"));
+                Usuario.put("nome_completo", getUser.getString("nome"));
+                Usuario.put("nome", getUser.getString("nome"));
+                Usuario.put("sobrenome", getUser.getString("nome"));
+                Usuario.put("registration", getUser.getString("registration"));
+                Usuario.put("phone", getUser.getString("phone"));
+                
+                if(getUser.getInt("age") > 0){
+                    Usuario.put("age", getUser.getInt("age")+"");
+                }else{
+                    Usuario.put("age", "0");
+                }
+                //vzespreso = getUser.getInt("vezes_preso");
+            }else{
+                if(Cad2.length() <= 5){Alerta("Necessário digitar o nome! Está muito curto.", "Ocorreu algum erro");txtNome.grabFocus(); return ;}
+                if(Cad3.length() <= 0)Cad3 = "N/A";
+                if(Cad4.length() <= 0)Cad4 = "N/A";
+                Usuario.put("id_usuario", Cad1);
+                Usuario.put("nome_completo", Cad2);
+                Usuario.put("nome", Cad2);
+                Usuario.put("sobrenome", Cad2);
+                Usuario.put("registration", Cad3);
+                Usuario.put("phone", Cad4);
+                Usuario.put("age", "0");
+                
+                
+                if(UsuariosOfflineTbl.length() < SNWindows.UsuariosAssinatura[nivel_assinatura]){
+                    JSONObject Novo_user = new JSONObject();
+                    Novo_user.put("user_id", PassaporteDigitado);
+                    Novo_user.put("nome", Cad2);
+                    Novo_user.put("registration", Cad3);
+                    Novo_user.put("phone", Cad4);
+                    Novo_user.put("age", 0);
+
+                    UsuariosOfflineTbl.put(Novo_user);
+                    if(OpcoesUsuariosTbl.has("save_automatico") && OpcoesUsuariosTbl.getInt("save_automatico") == 1){
+                        GerenciamentoUsuarios.SAVEUsersAdd(UsuariosOfflineTbl, OpcoesUsuariosTbl);
+                    }else{
+                        Object[] options = { "Registrar", "Não registrar" };
+                        int result = JOptionPane.showOptionDialog(null, "Me parece que este usuário não está registrado no seu banco de dados, deseja registrar agora?\nAo registrar não precisará cadastrar novamente.", "Cadastro de Usuário", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                        if (result == JOptionPane.OK_OPTION) {
+                            GerenciamentoUsuarios.SAVEUsersAdd(UsuariosOfflineTbl, OpcoesUsuariosTbl);
+                        }
+                    }
+                }else{
+                    if(!NaoAbrirDnvAss){
+                        Object[] options = { "Quero uma Assinatura", "Não mostrar novamente" };
+                        int result = JOptionPane.showOptionDialog(null, "Você chegou no seu limite de registro de usuários que é de "+SNWindows.UsuariosAssinatura[nivel_assinatura]+"."
+                                + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Erro no Cadastro de Usuário", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                        if (result == JOptionPane.OK_OPTION) {
+                            HttpDownloadUtility.openURL("https://discord.gg/nFNqvDs");
+                        }else{
+                            NaoAbrirDnvAss = true;
+                        }
+                    }
+                }
+                
+            }
+            
         }else{
             String TxtPegarBusca = txtID.getText();
             if(TxtPegarBusca.length() > 0){
@@ -964,7 +1114,7 @@ public class Prisoes extends javax.swing.JFrame {
         String identidade = Usuario.getString("registration");
         
         //SETAGENS DE TEXTOS INFO
-        des_NomeS.setText(nome);
+        des_NomeS.setText(nome+" ("+pass+")");
         String Idade = Usuario.getString("age");
         if("0".equals(Idade)){
             Idade="N/A";
@@ -988,8 +1138,7 @@ public class Prisoes extends javax.swing.JFrame {
         JSONObject usua = new JSONObject(usuario.getDados());
         prenderDBarray.put("id_prendeu", usua.getString("id_usuario"));*/
 
-        int vzespreso = 0;
-        int vzesmulta = 0;
+        
         for(int i2 = 0; i2 < prisoesDBarray.length(); i2++){
             JSONObject ohier = prisoesDBarray.getJSONObject(i2);
             //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
@@ -1158,7 +1307,7 @@ public class Prisoes extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         SalvarBt = new javax.swing.JButton();
         ResetarBt = new javax.swing.JButton();
-        SalvarBt1 = new javax.swing.JButton();
+        ProcuradoBt = new javax.swing.JButton();
         CopiarDiscordBt = new javax.swing.JButton();
         PesquisarPainel = new javax.swing.JPanel();
         txtID = new javax.swing.JTextField();
@@ -1188,6 +1337,7 @@ public class Prisoes extends javax.swing.JFrame {
         jLabel1.setText("REGISTRO DE PRISÕES");
 
         jTabbedPane1.setToolTipText("");
+        jTabbedPane1.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
 
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -1195,7 +1345,7 @@ public class Prisoes extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 923, Short.MAX_VALUE)
+            .addGap(0, 946, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1495,6 +1645,11 @@ public class Prisoes extends javax.swing.JFrame {
         SalvarBt.setBackground(new java.awt.Color(255, 255, 255));
         SalvarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
         SalvarBt.setText("REGISTRAR PRISÃO");
+        SalvarBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SalvarBtActionPerformed(evt);
+            }
+        });
 
         ResetarBt.setBackground(new java.awt.Color(255, 255, 255));
         ResetarBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -1505,9 +1660,14 @@ public class Prisoes extends javax.swing.JFrame {
             }
         });
 
-        SalvarBt1.setBackground(new java.awt.Color(255, 255, 255));
-        SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        SalvarBt1.setText("REGISTRAR PROCURADO");
+        ProcuradoBt.setBackground(new java.awt.Color(255, 255, 255));
+        ProcuradoBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        ProcuradoBt.setText("REGISTRAR PROCURADO");
+        ProcuradoBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ProcuradoBtActionPerformed(evt);
+            }
+        });
 
         CopiarDiscordBt.setBackground(new java.awt.Color(255, 255, 255));
         CopiarDiscordBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
@@ -1528,7 +1688,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ProcuradoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1540,7 +1700,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ProcuradoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1663,7 +1823,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jMenu3.setText("FECHAR");
+        jMenu3.setText("VOLTAR");
 
         jMenuItem2.setText("VOLTAR PARA O PAINEL");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -1703,7 +1863,7 @@ public class Prisoes extends javax.swing.JFrame {
                     .addComponent(DetalhesPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(PainelDetalhes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(PesquisarPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane1))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1716,8 +1876,8 @@ public class Prisoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1814,6 +1974,14 @@ public class Prisoes extends javax.swing.JFrame {
         DigitandoCampo(4);
     }//GEN-LAST:event_txtTelefoneKeyTyped
 
+    private void SalvarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SalvarBtActionPerformed
+
+    private void ProcuradoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProcuradoBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ProcuradoBtActionPerformed
+
     public boolean SomenteNumeros(KeyEvent evt){
         char c = evt.getKeyChar();
         if (!((c >= '0') && (c <= '9') ||
@@ -1867,9 +2035,9 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JPanel PainelDetalhes;
     private javax.swing.JButton PesquisarBt;
     private javax.swing.JPanel PesquisarPainel;
+    private javax.swing.JButton ProcuradoBt;
     private javax.swing.JButton ResetarBt;
     private javax.swing.JButton SalvarBt;
-    private javax.swing.JButton SalvarBt1;
     private javax.swing.JLabel TimeAgora;
     private javax.swing.JLabel des_Idade;
     private javax.swing.JLabel des_IdadeS;
