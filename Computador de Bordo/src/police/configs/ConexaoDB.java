@@ -502,7 +502,7 @@ public class ConexaoDB {
         return false;
     }
     
-    public boolean AddUserLSPD(String tabelad, JSONObject jsonob) {
+    public boolean AddUserLSPD(JSONObject jsonob) {
         try {
             // This will load the MySQL driver, each DB has its own driver
             
@@ -518,15 +518,14 @@ public class ConexaoDB {
             
             String motivon = "Ingressou na corporação.";
             
-            int lspd = jsonob.getInt("lspd");
             int newuser = jsonob.getInt("newuser");
             String data = System.currentTimeMillis()+"";
             
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -536,7 +535,7 @@ public class ConexaoDB {
             */
             //String query1 = "update "+tabelad+" set codigo='"+codigoc+"' where id="+cid+"";
             if(newuser == 0){
-                String query1 = "INSERT INTO "+tabelad+" (id, lspd, codigo, discord) VALUES ('"+cid+"', "+lspd+", '"+codigoc+"', '"+discorde+"')";
+                String query1 = "INSERT INTO cb_users (user_id, codigo) VALUES ('"+cid+"', '"+codigoc+"')";
                 statement.executeUpdate(query1);
             }
             
@@ -554,6 +553,39 @@ public class ConexaoDB {
         }
         return false;
     }
+    
+    public boolean DeleteUserLSPD(int user_id) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
+            
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            
+            String query = "DELETE FROM cb_users WHERE user_id="+user_id;
+            statement.executeUpdate(query);
+            
+            
+            // REMOVER DPS DE CORRIGIDO A HIERARQUIA
+            String query2 = "DELETE FROM cb_hierarquia WHERE id_usuario="+user_id;
+            statement.executeUpdate(query2);
+            System.out.println("Conectado ao servidor: "+host);
+            return true;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+    
+    
     
     public boolean AttDataLogin(int ide) {
         try {
@@ -861,7 +893,7 @@ public class ConexaoDB {
         return null;
     }
     
-    public boolean SetarCrimesECategoria(String categorias, String crimes, int GetCrimes) {
+    public boolean SetarCrimesECategoria(String categorias, String crimes, String aumento_reducao, String opcoes, int GetCrimes) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
@@ -871,8 +903,8 @@ public class ConexaoDB {
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
-            String query = "INSERT INTO cb_crimes (categorias, crimes) VALUES ('"+categorias+"', '"+crimes+"')";
-            if(GetCrimes > 0) query = "update cb_crimes set categorias='"+categorias+"', crimes='"+crimes+"' where id="+GetCrimes+"";
+            String query = "INSERT INTO cb_crimes (categorias, crimes, aumento_reducao, opcoes) VALUES ('"+categorias+"', '"+crimes+"', '"+aumento_reducao+"', '"+opcoes+"')";
+            if(GetCrimes > 0) query = "update cb_crimes set categorias='"+categorias+"', crimes='"+crimes+"',aumento_reducao='"+aumento_reducao+"', opcoes='"+opcoes+"' where id="+InicializadorMain.server_id+"";
             statement.executeUpdate(query);
             
             System.out.println("Conectado ao servidor ( SetarCrimesECategoria() ): "+host);

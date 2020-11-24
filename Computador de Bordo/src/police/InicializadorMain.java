@@ -94,6 +94,12 @@ public class InicializadorMain {
         usuariosDBarray = usuarios.AttDBUsuariosDiscord();
     }
     
+    public static void AttDBSHierarquia(){
+        Usuario usuarios = new Usuario();
+        usuariosDBarray = usuarios.AttDBUsuarios();
+        hierarquiaDBarray = usuarios.AttDBHierarquia();
+    }
+    
     public void AttDBSTodas(){
         Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuarios();

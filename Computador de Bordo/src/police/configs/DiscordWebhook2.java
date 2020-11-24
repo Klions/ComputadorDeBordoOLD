@@ -18,11 +18,11 @@ import police.InicializadorMain;
 public class DiscordWebhook2 {
     
     public static void EnviarMsg(String Canal, EmbedBuilder eb){
-        TextChannel usuar = InicializadorMain.jda.getTextChannelById​(Long.parseLong(Canal));
+        /*TextChannel usuar = InicializadorMain.jda.getTextChannelById​(Long.parseLong(Canal));
         
         eb.setFooter("Computador de Bordo", "https://imgur.com/vBK8vRk.png");
         Instant instant = Instant.from(ZonedDateTime.now());
         eb.setTimestamp(instant);
-        usuar.sendMessage(eb.build()).queue();
+        usuar.sendMessage(eb.build()).queue();*/
     }
 }

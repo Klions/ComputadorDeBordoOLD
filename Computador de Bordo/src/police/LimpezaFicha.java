@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 import police.configs.ConexaoDB;
 import police.configs.Config;
+import police.configs.GetImages;
 import police.configs.Usuario;
 
 /**
@@ -50,10 +52,15 @@ public class LimpezaFicha extends javax.swing.JFrame {
     JDA jda;
     public LimpezaFicha() {
         initComponents();
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
+        //this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(config.img_CBIcone)));
         this.setLocationRelativeTo(null);
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         
+        if(InicializadorMain.ModoOffline){
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
+        }else{
+            this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
+        }
         jPanel1.setBackground(new java.awt.Color(13, 32, 64));
         jPanel3.setBackground(new java.awt.Color(13, 32, 64));
         jPanel4.setBackground(new java.awt.Color(13, 32, 64));

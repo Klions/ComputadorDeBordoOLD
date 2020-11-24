@@ -120,10 +120,10 @@ public class Gerenciamento extends javax.swing.JFrame {
         TabelaOpcoes.setShowGrid(true);
         TabelaOpcoes.setUpdateSelectionOnSort(false);
         
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             UPDATE();
             UPDATEOpcoes();
-        }
+        //}
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         this.setLocationRelativeTo(null);
         PainelDetalhes.setBackground(new java.awt.Color(13, 32, 64));
@@ -158,7 +158,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     
     
     public static void PegarDB(){
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
             if(!"".equals(CategoriasStore) && CategoriasStore.length() > 10){
                 CategoriasCrimes = new JSONArray(CategoriasStore);
@@ -185,18 +185,22 @@ public class Gerenciamento extends javax.swing.JFrame {
             }
             novo_CategoriasCrimes = CategoriasCrimes;
             novo_CrimesRegistro = CrimesRegistro;
+        /*
         }else{
+            
             Usuario usuarios = new Usuario();
             GetCrimes = usuarios.CrimesServerID();
+            JSONArray temp_CategoriasCrimes = new JSONArray();
+            JSONArray temp_CrimesRegistro = new JSONArray();
             for(int i2 = 0; i2 < GetCrimes.length(); i2++){
                 JSONObject o2 = GetCrimes.getJSONObject(i2);
-                CategoriasCrimes = new JSONArray(o2.getString("categorias"));
-                CrimesRegistro = new JSONArray(o2.getString("crimes"));
+                temp_CategoriasCrimes = new JSONArray(o2.getString("categorias"));
+                temp_CrimesRegistro = new JSONArray(o2.getString("crimes"));
                 contageGetCrimes = o2.getInt("id");
             }
             novo_CategoriasCrimes = CategoriasCrimes;
             novo_CrimesRegistro = CrimesRegistro;
-        }
+        }*/
         PegarDBOpcoes();
         SalvarTime=10;
         AtualizarJanelas();
@@ -204,7 +208,7 @@ public class Gerenciamento extends javax.swing.JFrame {
     }
     
     public static void PegarDBOpcoes(){
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             ReducaoRegistro = new JSONArray();
             if(!"".equals(CrimesStoreOpcoes) && CrimesStoreOpcoes.length() > 10){
                 ReducaoRegistro = new JSONArray(CrimesStoreOpcoes);
@@ -230,8 +234,9 @@ public class Gerenciamento extends javax.swing.JFrame {
             }else{
                 ConfigGerais.put("pena_max", 0);
             }
+        /*
         }else{
-            /*
+            
             Usuario usuarios = new Usuario();
             GetCrimes = usuarios.CrimesServerID();
             for(int i2 = 0; i2 < GetCrimes.length(); i2++){
@@ -239,8 +244,8 @@ public class Gerenciamento extends javax.swing.JFrame {
                 ReducaoRegistro = new JSONArray(o2.getString("crimes"));
                 contageGetCrimes = o2.getInt("id");
             }
-            OpcoesCrimes = CategoriasCrimes;*/
-        }
+            OpcoesCrimes = CategoriasCrimes;
+        }*/
         AdicionarBotoesOpcoes();
         PegarValoresTabelaOpcoes();
         RecarregarValoresTabelaOpcoes();
@@ -824,48 +829,121 @@ public class Gerenciamento extends javax.swing.JFrame {
     }
     
     public void SAVE(){      //Save the UserName and Password (for one user)
-        try {
-            File file = new File(InicializadorMain.DestFile2);
-            if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile2);
+                if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
 
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
-            Base64.Encoder enc = Base64.getEncoder();
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+                Base64.Encoder enc = Base64.getEncoder();
+
+                bw.write(enc.encodeToString(novo_CategoriasCrimes.toString().getBytes())); //write the name
+                bw.newLine(); //leave a new Line
+                bw.write(enc.encodeToString(novo_CrimesRegistro.toString().getBytes())); //getPassword()
+                bw.close(); //close the BufferdWriter
+
+            } catch (IOException e) { e.printStackTrace(); }      
             
-            bw.write(enc.encodeToString(novo_CategoriasCrimes.toString().getBytes())); //write the name
-            bw.newLine(); //leave a new Line
-            bw.write(enc.encodeToString(novo_CrimesRegistro.toString().getBytes())); //getPassword()
-            bw.close(); //close the BufferdWriter
-
-        } catch (IOException e) { e.printStackTrace(); }        
+        }else{
+            ConexaoDB conexao = new ConexaoDB();
+            conexao.SetarCrimesECategoria(novo_CategoriasCrimes.toString(), novo_CrimesRegistro.toString(),ReducaoRegistro.toString(), ConfigGerais.toString(), contageGetCrimes);
+        }
     }//End Of Save
     
     public static void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile2);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CategoriasStore = DecoderStre;
-                }else{
-                    showMessageDialog(null,"Ocorreu um erro ao pegar as categorias salvas. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
-                }
-                
-                DecoderStre = DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CrimesStore = DecoderStre;
-                }else{
-                    showMessageDialog(null,"Ocorreu um erro ao pegar os crimes salvos. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile2);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CategoriasStore = DecoderStre;
+                    }else{
+                        showMessageDialog(null,"Ocorreu um erro ao pegar as categorias salvas. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CrimesStore = DecoderStre;
+                    }else{
+                        showMessageDialog(null,"Ocorreu um erro ao pegar os crimes salvos. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
+        }else{
+            Usuario usuarios = new Usuario();
+            GetCrimes = usuarios.CrimesServerID();
+            for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+                JSONObject o2 = GetCrimes.getJSONObject(i2);
+                CategoriasStore = o2.getString("categorias");
+                CrimesStore = o2.getString("crimes");
+                CrimesStoreOpcoes = o2.getString("aumento_reducao");
+                OpcoesStore = o2.getString("opcoes");
+                contageGetCrimes = o2.getInt("id");
+                System.out.println("contageGetCrimes: "+contageGetCrimes+" / CategoriasStore: "+CategoriasStore);
+            }
+        }
+    }
+    
+    public void SAVEOpcoes(){      //Save the UserName and Password (for one user)
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile3);
+                if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
+
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+                Base64.Encoder enc = Base64.getEncoder();
+                //System.out.println("enc.encodeToString(ReducaoRegistro.toString().getBytes()): "+enc.encodeToString(ReducaoRegistro.toString().getBytes()));
+                bw.write(enc.encodeToString(ReducaoRegistro.toString().getBytes())); //write the name
+
+                bw.newLine(); //leave a new Line
+
+                bw.write(enc.encodeToString(ConfigGerais.toString().getBytes())); //getPassword()
+                bw.close(); //close the BufferdWriter
+
+            } catch (IOException e) { e.printStackTrace(); }     
+        } 
+    }//End Of Save
+    
+    public static void UPDATEOpcoes(){ //UPDATE ON OPENING THE APPLICATION
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile3);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CrimesStoreOpcoes = DecoderStre;
+                    }else{
+                        showMessageDialog(null,"Ocorreu um erro ao pegar aumento/redução salvos. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                    }
+
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        OpcoesStore = DecoderStre;
+                    }else{
+                        showMessageDialog(null,"Ocorreu um erro ao pegar as opções salvas. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
         }
     }
     
@@ -1048,54 +1126,7 @@ public class Gerenciamento extends javax.swing.JFrame {
         //ValorTxt3.setText(PegarUser.getString("registration").toUpperCase());
     }
     
-    public void SAVEOpcoes(){      //Save the UserName and Password (for one user)
-        try {
-            File file = new File(InicializadorMain.DestFile3);
-            if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
-
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
-            Base64.Encoder enc = Base64.getEncoder();
-            //System.out.println("enc.encodeToString(ReducaoRegistro.toString().getBytes()): "+enc.encodeToString(ReducaoRegistro.toString().getBytes()));
-            bw.write(enc.encodeToString(ReducaoRegistro.toString().getBytes())); //write the name
-            
-            bw.newLine(); //leave a new Line
-            
-            bw.write(enc.encodeToString(ConfigGerais.toString().getBytes())); //getPassword()
-            bw.close(); //close the BufferdWriter
-
-        } catch (IOException e) { e.printStackTrace(); }        
-    }//End Of Save
     
-    public static void UPDATEOpcoes(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile3);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CrimesStoreOpcoes = DecoderStre;
-                }else{
-                    showMessageDialog(null,"Ocorreu um erro ao pegar aumento/redução salvos. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    OpcoesStore = DecoderStre;
-                }else{
-                    showMessageDialog(null,"Ocorreu um erro ao pegar as opções salvas. Os dados foram resetados.","Erro nos dados salvos",JOptionPane.PLAIN_MESSAGE);
-                }
-                scan.close();
-            }
-
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
-        }
-    }
     
     public void AddLinha(){
         //System.out.println("Tabelas[As].getRowCount(): "+Tabelas[As].getRowCount());
@@ -1854,19 +1885,12 @@ public class Gerenciamento extends javax.swing.JFrame {
     void SalvarDadosBT(){
         PegarValoresTabela();
         PegarValoresTabelaOpcoes();
-        if(InicializadorMain.ModoOffline){
-            SAVE();
-            UPDATE();
-            
-            SAVEOpcoes();
-            UPDATEOpcoes();
-            
-            PegarDB();
-        }else{
-            ConexaoDB conexao = new ConexaoDB();
-            conexao.SetarCrimesECategoria(novo_CategoriasCrimes.toString(), novo_CrimesRegistro.toString(), contageGetCrimes);
-            PegarDB();
-        }
+        SAVE();
+        UPDATE();
+
+        SAVEOpcoes();
+        UPDATEOpcoes();
+        PegarDB();
     }
     
 
@@ -1924,24 +1948,23 @@ public class Gerenciamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void ResetarTudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarTudoActionPerformed
-
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             UPDATE();
             UPDATEOpcoes();
-            if(novo_CategoriasCrimes.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || novo_CrimesRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
-                Object[] options = { "Resetar TUDO", "Resetar Alterações" }; 
-                int Escolha=JOptionPane.showOptionDialog(this,
-                        "Você deseja resetar tudo ou resetar as alterações?\nAo resetar tudo será zerada toda a tabela.", 
-                        "Vai um Master Reset?", 
-                        JOptionPane.DEFAULT_OPTION, 
-                        JOptionPane.WARNING_MESSAGE, 
-                        null, 
-                        options, 
-                        options[0]);
-                if(Escolha==JOptionPane.YES_OPTION){
-                    CategoriasStore="";
-                    CrimesStore="";
-                }
+        //}
+        if(novo_CategoriasCrimes.length() > SNWindows.CategAssinatura[Nivel_Ass][0] || novo_CrimesRegistro.length() > SNWindows.CategAssinatura[Nivel_Ass][1]){
+            Object[] options = { "Resetar TUDO", "Resetar Alterações" }; 
+            int Escolha=JOptionPane.showOptionDialog(this,
+                    "Você deseja resetar tudo ou resetar as alterações?\nAo resetar tudo será zerada toda a tabela.", 
+                    "Vai um Master Reset?", 
+                    JOptionPane.DEFAULT_OPTION, 
+                    JOptionPane.WARNING_MESSAGE, 
+                    null, 
+                    options, 
+                    options[0]);
+            if(Escolha==JOptionPane.YES_OPTION){
+                CategoriasStore="";
+                CrimesStore="";
             }
         }
         PegarDB();
@@ -1994,7 +2017,11 @@ public class Gerenciamento extends javax.swing.JFrame {
         Export.setVisible(true);*/
         String ExportStr = ExportarOuImportar.textAreaDialog(null, "Importar Tabela", "", true, "Importar");
         if(ExportStr != null && ExportStr.length() > 0){
-            ImportarDados(ExportStr);
+            if(ImportarDados(ExportStr)){
+                System.out.println("SUCESSO AO ImportarDados");
+            }else{
+                System.out.println("ERRO AO ImportarDados");
+            }
         }
     }//GEN-LAST:event_importarActionPerformed
 

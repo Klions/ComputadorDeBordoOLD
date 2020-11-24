@@ -101,6 +101,8 @@ public class Painel extends javax.swing.JFrame {
         }else{
             if(perm >= 1) corporacao.setVisible(true);
             if(perm >= 2) gerenciar.setVisible(true);
+            
+            DesativarBT(gerenciar4);
         }
         ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
         sobre.setText("COMPUTADOR DE BORDO v"+Config.versao);
@@ -128,7 +130,11 @@ public class Painel extends javax.swing.JFrame {
     private void DesativarBT(JButton Botao){
         Botao.setEnabled(false);
         Botao.setBackground(new java.awt.Color(0, 48, 73));
-        Botao.setToolTipText("Desativado no Modo Offline");
+        if(InicializadorMain.ModoOffline){
+            Botao.setToolTipText("Desativado no Modo Offline");
+        }else{
+            Botao.setToolTipText("Desativado no Modo Online");
+        }
     }
 
     /**

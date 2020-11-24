@@ -83,6 +83,7 @@ public class SplashScreen extends javax.swing.JFrame {
         // TODO code application logic here
         
         JDA jdab = null;
+        /*
         try {
             jdab = new JDABuilder(HttpDownloadUtility.SetCon("TlRReE1USXhNekl3TmpjeE5URXdOVEk0LlhGVWtnQS5nY3V4TW1zNTdkYk5LZmQ5ZTdsZFBlVFVBQTA="))
                     .addEventListeners(new DiscordMessage())  // An instance of a class that will handle events.
@@ -91,11 +92,12 @@ public class SplashScreen extends javax.swing.JFrame {
             Logger.getLogger(DiscordMessage.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
         }
+        
         try {
             jdab.awaitReady(); // Blocking guarantees that JDA will be completely loaded.
         } catch (InterruptedException ex) {
             Logger.getLogger(SplashScreen.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         InicializadorMain.jda = jdab;
         //System.out.println("Building JDA finalizado!");
         
@@ -691,10 +693,10 @@ public class SplashScreen extends javax.swing.JFrame {
         Fechar=true;
         ProgressoAtual=100;
         ContandoFalhas=0;
-        HttpDownloadUtility.WebhookLog(
+        /*HttpDownloadUtility.WebhookLog(
             "752370476696731671", 
             "Novo Login (Modo Offline)", 
-            "Algum usuário entrou no Computador de Bordo pelo Modo Offline");
+            "Algum usuário entrou no Computador de Bordo pelo Modo Offline");*/
         
         new Painel().setVisible(true);
         this.dispose();
@@ -702,10 +704,10 @@ public class SplashScreen extends javax.swing.JFrame {
 
     private void AttAgoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttAgoraActionPerformed
         AttInfo.setText(HttpDownloadUtility.DownloadArquivo(Config.getLink()));
-        HttpDownloadUtility.WebhookLog(
+        /*HttpDownloadUtility.WebhookLog(
             "755986573031637073", 
             "Usuário atualizando Computador de Bordo", 
-            "Algum usuário está atualizando o Computador de Bordo para a versão: "+Config.getVersao());
+            "Algum usuário está atualizando o Computador de Bordo para a versão: "+Config.getVersao());*/
     }//GEN-LAST:event_AttAgoraActionPerformed
 
     private void AttSiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttSiteActionPerformed

@@ -1065,8 +1065,8 @@ public class GerenciamentoOpcoes extends javax.swing.JFrame {
             UPDATEOpcoes();
             PegarDBOpcoes();
         }else{
-            ConexaoDB conexao = new ConexaoDB();
-            conexao.SetarCrimesECategoria(ConfigGerais.toString(), ReducaoRegistro.toString(), contageGetCrimes);
+            //ConexaoDB conexao = new ConexaoDB();
+            //conexao.SetarCrimesECategoria(ConfigGerais.toString(), ReducaoRegistro.toString(), contageGetCrimes);
             PegarDBOpcoes();
         }
         InfoDB1.setText("Salvo com sucesso!");

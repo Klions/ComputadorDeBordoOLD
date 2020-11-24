@@ -194,7 +194,7 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
         int nivel_assinatura = SNWindows.getNivelSerialPC();
         boolean NaoAdd = false;
         if(InicializadorMain.ModoOffline){
-            if(nivel_assinatura > 0){
+            //if(nivel_assinatura > 0){
                 if(modelTable.getRowCount() > SNWindows.UsuariosAssinatura[nivel_assinatura]){
                     jTable1.setEnabled(false);
                     showMessageDialog(null,"A tabela em uso possui "+modelTable.getRowCount()+" usuários e sua assinatura '"+SNWindows.TipoAssinatura[nivel_assinatura]+"' permite registrar até "+SNWindows.UsuariosAssinatura[nivel_assinatura]+" usuários."
@@ -202,12 +202,12 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
                 }else{
                     jTable1.setEnabled(true);
                 }
-            }else{
+            /*}else{
                 jTable1.setEnabled(false);
                 showMessageDialog(null,"Lamento, mas a tabela é de uma assinatura. Para importar ou exportar tabelas é necessário possuir uma assinatura."
                     + "\nVocê pode adquirir uma assinatura em nosso discord. (Exibir -> Sobre)", "Assinatura",JOptionPane.PLAIN_MESSAGE);
                 NaoAdd = true;
-            }
+            }*/
         }
         if(!NaoAdd){
             for(int i = 0; i < ReducaoRegistro.length(); i++){
@@ -439,6 +439,26 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
         }
     }
     
+    public void RemLinha(){
+        int row = jTable1.getSelectedRow();
+        if(row >= 0){
+            DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
+            String NomeRow = jTable1.getValueAt(row, 0)+"";
+            InfoDB1.setText(NomeRow+" foi removido");
+            model.removeRow( row );
+            if(model.getRowCount() > 0){
+                if(row < model.getRowCount() - 1 || row == model.getRowCount() - 1){
+                    jTable1.setRowSelectionInterval(row, row);
+                }else if(row == 0){
+                    jTable1.setRowSelectionInterval(row+1, row+1);
+                }else{
+                    jTable1.setRowSelectionInterval(row-1, row-1);
+                }
+            }
+            PegarTotalTabela();
+        }
+    }
+    
     public static boolean ImportarDadosOpcoes(String Valores){
         if(Valores.contains("\n")){
             String[] Valor = Valores.split("\n");
@@ -482,6 +502,7 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -583,6 +604,16 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
             }
         });
 
+        jButton5.setBackground(new java.awt.Color(255, 255, 255));
+        jButton5.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        jButton5.setText("REMOVER USUÁRIO");
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -593,7 +624,9 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton4)))
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -602,7 +635,9 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1054,8 +1089,8 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
             UPDATEUsers();
             PegarDBOpcoes();
         }else{
-            ConexaoDB conexao = new ConexaoDB();
-            conexao.SetarCrimesECategoria(ConfigGerais.toString(), ReducaoRegistro.toString(), contageGetCrimes);
+            //ConexaoDB conexao = new ConexaoDB();
+            //conexao.SetarCrimesECategoria(ConfigGerais.toString(), ReducaoRegistro.toString(), contageGetCrimes);
             PegarDBOpcoes();
         }
         InfoDB1.setText("Salvo com sucesso!");
@@ -1164,6 +1199,10 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
         EditarDados("registration");
     }//GEN-LAST:event_EditarBt3ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1224,6 +1263,7 @@ public class GerenciamentoUsuarios extends javax.swing.JFrame {
     private javax.swing.JMenuItem exportar;
     private javax.swing.JMenuItem importar;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;

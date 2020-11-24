@@ -106,8 +106,8 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="DetalhesPainel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" min="-2" pref="364" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jTabbedPane1" min="-2" pref="275" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="PainelDetalhes" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
@@ -707,7 +707,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="CopiarDiscordBt" min="-2" pref="160" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
-                  <Component id="SalvarBt1" min="-2" pref="195" max="-2" attributes="0"/>
+                  <Component id="ProcuradoBt" min="-2" pref="195" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="SalvarBt" min="-2" pref="195" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -721,7 +721,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="SalvarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="ResetarBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-                      <Component id="SalvarBt1" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="ProcuradoBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="CopiarDiscordBt" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -758,7 +758,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResetarBtActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="SalvarBt1">
+        <Component class="javax.swing.JButton" name="ProcuradoBt">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -769,7 +769,7 @@
             <Property name="text" type="java.lang.String" value="REGISTRAR PROCURADO"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SalvarBt1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ProcuradoBtActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="CopiarDiscordBt">

@@ -101,14 +101,15 @@ public class Prisoes extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(13, 32, 64));
         jPanel3.setBackground(new java.awt.Color(13, 32, 64));
         
+        PegarValoresOffline();
+        PegarValoresOfflineOpcoes();
+        PegarValoresOfflineUsuarios();
         
         if(InicializadorMain.ModoOffline){
             this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("imagens/CB2.png")));
             PesquisarPainel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CADASTRAR INDIVÍDUO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
             PesquisarBt.setText("CADASTRAR");
-            PegarValoresOffline();
-            PegarValoresOfflineOpcoes();
-            PegarValoresOfflineUsuarios();
+            
             
             JSONObject PegarUser = Usuario.getDados();
             if(PegarUser.getInt("id_usuario") == 0){
@@ -121,6 +122,7 @@ public class Prisoes extends javax.swing.JFrame {
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
         }
+        
         this.revalidate();
         this.repaint();
         this.pack();
@@ -153,85 +155,101 @@ public class Prisoes extends javax.swing.JFrame {
     }
     
     public void PegarValoresOffline(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile2);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CategoriasStore2 = DecoderStre;
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    CrimesStore2 = DecoderStre;
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile2);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CategoriasStore2 = DecoderStre;
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        CrimesStore2 = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
+        }else{
+            Usuario usuarios = new Usuario();
+            GetCrimes = usuarios.CrimesServerID();
+            for(int i2 = 0; i2 < GetCrimes.length(); i2++){
+                JSONObject o2 = GetCrimes.getJSONObject(i2);
+                CategoriasStore2 = o2.getString("categorias");
+                CrimesStore2 = o2.getString("crimes");
+                AumentoEReducao = o2.getString("aumento_reducao");
+                OpcoesCrimes = o2.getString("opcoes");
+            }
         }
     }
     
     public void PegarValoresOfflineOpcoes(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFile3);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    AumentoEReducao = DecoderStre;
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    OpcoesCrimes = DecoderStre;
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFile3);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        AumentoEReducao = DecoderStre;
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        OpcoesCrimes = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
         }
     }
     
     public void PegarValoresOfflineUsuarios(){ //UPDATE ON OPENING THE APPLICATION
-        try {
-            File file = new File(InicializadorMain.DestFileUsers);
-            if(file.exists()){    //if this file exists
-                Scanner scan = new Scanner(file);   //Use Scanner to read the File
-                /*while (scan.hasNext()) {
-                    System.out.println(scan.next());
-                }*/
-                Base64.Decoder dec = Base64.getDecoder();
-                String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    UsuariosOffline = DecoderStre;
-                }
-                
-                DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
-                if(!"".equals(DecoderStre)){
-                    OpcoesUsuarios = DecoderStre;
-                }
-                scan.close();
-            }
+        if(InicializadorMain.ModoOffline){
+            try {
+                File file = new File(InicializadorMain.DestFileUsers);
+                if(file.exists()){    //if this file exists
+                    Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                    /*while (scan.hasNext()) {
+                        System.out.println(scan.next());
+                    }*/
+                    Base64.Decoder dec = Base64.getDecoder();
+                    String DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        UsuariosOffline = DecoderStre;
+                    }
 
-        } catch (FileNotFoundException e) {         
-            e.printStackTrace();
+                    DecoderStre = Gerenciamento.DecodeBase64(scan.nextLine());
+                    if(!"".equals(DecoderStre)){
+                        OpcoesUsuarios = DecoderStre;
+                    }
+                    scan.close();
+                }
+
+            } catch (FileNotFoundException e) {         
+                e.printStackTrace();
+            }
         }
     }
     
     public void SetarBotoes(){
-        if(InicializadorMain.ModoOffline){
+        //if(InicializadorMain.ModoOffline){
             CategoriasCrimes = new JSONArray();
             if(!"".equals(CategoriasStore2) && CategoriasStore2.length() > 10){
                 CategoriasCrimes = new JSONArray(CategoriasStore2);
@@ -284,19 +302,20 @@ public class Prisoes extends javax.swing.JFrame {
             }
             
             
-            
-            UsuariosOfflineTbl = new JSONArray();
-            if(!"".equals(UsuariosOffline) && UsuariosOffline.length() > 10){
-                UsuariosOfflineTbl = new JSONArray(UsuariosOffline);
+            if(InicializadorMain.ModoOffline){
+                UsuariosOfflineTbl = new JSONArray();
+                if(!"".equals(UsuariosOffline) && UsuariosOffline.length() > 10){
+                    UsuariosOfflineTbl = new JSONArray(UsuariosOffline);
+                }
+
+                OpcoesUsuariosTbl = new JSONObject();
+                if(!"".equals(OpcoesUsuarios) && OpcoesUsuarios.length() > 10){
+                    OpcoesUsuariosTbl = new JSONObject(OpcoesUsuarios);
+                }else{
+                    OpcoesUsuariosTbl.put("save_automatico", 0);
+                }
             }
-            
-            OpcoesUsuariosTbl = new JSONObject();
-            if(!"".equals(OpcoesUsuarios) && OpcoesUsuarios.length() > 10){
-                OpcoesUsuariosTbl = new JSONObject(OpcoesUsuarios);
-            }else{
-                OpcoesUsuariosTbl.put("save_automatico", 0);
-            }
-        }else{
+        /*}else{
             Usuario usuarios = new Usuario();
             GetCrimes = usuarios.CrimesServerID();
             for(int i2 = 0; i2 < GetCrimes.length(); i2++){
@@ -304,7 +323,7 @@ public class Prisoes extends javax.swing.JFrame {
                 CategoriasCrimes = new JSONArray(o2.getString("categorias"));
                 CrimesRegistro = new JSONArray(o2.getString("crimes"));
             }
-        }
+        }*/
         AtualizarJanelas();
         /*
         Usuario usuarios = new Usuario();
@@ -746,7 +765,7 @@ public class Prisoes extends javax.swing.JFrame {
                 if(!InicializadorMain.ModoOffline){
                     AtivadoOn=true;
                 }else{
-                    SalvarBt1.setToolTipText("DESATIVADO NO MODO OFFLINE");
+                    ProcuradoBt.setToolTipText("DESATIVADO NO MODO OFFLINE");
                     SalvarBt.setToolTipText("DESATIVADO NO MODO OFFLINE");
                 }
                 
@@ -797,7 +816,7 @@ public class Prisoes extends javax.swing.JFrame {
         }
         CopiarDiscordBt.setEnabled(Ativado);
         
-        SalvarBt1.setEnabled(AtivadoOn);
+        ProcuradoBt.setEnabled(AtivadoOn);
         SalvarBt.setEnabled(AtivadoOn);
         
         if(MultaTotal>0) StrMultas = "R$"+String.format("%,d", MultaTotal);
@@ -1095,7 +1114,7 @@ public class Prisoes extends javax.swing.JFrame {
         String identidade = Usuario.getString("registration");
         
         //SETAGENS DE TEXTOS INFO
-        des_NomeS.setText(nome);
+        des_NomeS.setText(nome+" ("+pass+")");
         String Idade = Usuario.getString("age");
         if("0".equals(Idade)){
             Idade="N/A";
@@ -1288,7 +1307,7 @@ public class Prisoes extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         SalvarBt = new javax.swing.JButton();
         ResetarBt = new javax.swing.JButton();
-        SalvarBt1 = new javax.swing.JButton();
+        ProcuradoBt = new javax.swing.JButton();
         CopiarDiscordBt = new javax.swing.JButton();
         PesquisarPainel = new javax.swing.JPanel();
         txtID = new javax.swing.JTextField();
@@ -1641,12 +1660,12 @@ public class Prisoes extends javax.swing.JFrame {
             }
         });
 
-        SalvarBt1.setBackground(new java.awt.Color(255, 255, 255));
-        SalvarBt1.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
-        SalvarBt1.setText("REGISTRAR PROCURADO");
-        SalvarBt1.addActionListener(new java.awt.event.ActionListener() {
+        ProcuradoBt.setBackground(new java.awt.Color(255, 255, 255));
+        ProcuradoBt.setFont(new java.awt.Font("Arial Unicode MS", 0, 12)); // NOI18N
+        ProcuradoBt.setText("REGISTRAR PROCURADO");
+        ProcuradoBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SalvarBt1ActionPerformed(evt);
+                ProcuradoBtActionPerformed(evt);
             }
         });
 
@@ -1669,7 +1688,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ProcuradoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1681,7 +1700,7 @@ public class Prisoes extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SalvarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ResetarBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SalvarBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ProcuradoBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CopiarDiscordBt, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1857,8 +1876,8 @@ public class Prisoes extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DetalhesPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(PainelDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1959,9 +1978,9 @@ public class Prisoes extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_SalvarBtActionPerformed
 
-    private void SalvarBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarBt1ActionPerformed
+    private void ProcuradoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProcuradoBtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_SalvarBt1ActionPerformed
+    }//GEN-LAST:event_ProcuradoBtActionPerformed
 
     public boolean SomenteNumeros(KeyEvent evt){
         char c = evt.getKeyChar();
@@ -2016,9 +2035,9 @@ public class Prisoes extends javax.swing.JFrame {
     private javax.swing.JPanel PainelDetalhes;
     private javax.swing.JButton PesquisarBt;
     private javax.swing.JPanel PesquisarPainel;
+    private javax.swing.JButton ProcuradoBt;
     private javax.swing.JButton ResetarBt;
     private javax.swing.JButton SalvarBt;
-    private javax.swing.JButton SalvarBt1;
     private javax.swing.JLabel TimeAgora;
     private javax.swing.JLabel des_Idade;
     private javax.swing.JLabel des_IdadeS;

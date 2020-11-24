@@ -99,7 +99,7 @@ public class SNWindows {
     };
     
     public static int[] UsuariosAssinatura = {
-        3,
+        5,
         15,
         40,
         100,
