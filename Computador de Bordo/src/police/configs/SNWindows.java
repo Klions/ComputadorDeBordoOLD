@@ -249,6 +249,18 @@ public class SNWindows {
         return 0;
     }
     
+    public static int getNivelSerialPorSerial(String Serial){
+        if(InicializadorMain.ModoOffline){
+            for(int i = 0; i < cb_serial.length(); i++){
+                JSONObject obj = cb_serial.getJSONObject(i);
+                if(Serial.equals(obj.getString("serial"))){
+                    return obj.getInt("nivel");
+                }
+            }
+        }
+        return 0;
+    }
+    
     public static boolean SetSerialALL(String Serial){
         ConexaoDB conexao = new ConexaoDB();
         return conexao.UpdatePersonalizado("update cb_serial set pc_ativou='"+SerialNumber+"', data_ativou='"+System.currentTimeMillis()+"' where serial='"+Serial+"' AND data_ativou = '0'");

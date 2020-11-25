@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
 import police.configs.DiscordMessage;
+import police.configs.DiscordWebhook;
 import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
@@ -639,10 +640,16 @@ public class SplashScreen extends javax.swing.JFrame {
                 JSONObject obj = ServidoresRegistrados.getJSONObject(i);
                 String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
                 if(FormatNome.equals(IndexStr)){
-                    HttpDownloadUtility.WebhookLog(
+                    /*HttpDownloadUtility.WebhookLog(
                         "752370476696731671", 
                         "Novo Login (Cidade "+obj.getString("nome_cidade")+")", 
-                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+".");
+                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+".");*/
+                    if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)){
+                        HttpDownloadUtility.WebhookDiscord("https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX",
+                        "Novo Login ("+obj.getString("nome_cidade")+")", 
+                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+". (Modo Online)");
+                    }
+                    
                     GetImages.PegarImagensCB(obj.getString("url_logo"));
                     SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
                     nomedacidade = obj.getString("nome_cidade");
@@ -697,7 +704,18 @@ public class SplashScreen extends javax.swing.JFrame {
             "752370476696731671", 
             "Novo Login (Modo Offline)", 
             "Algum usuário entrou no Computador de Bordo pelo Modo Offline");*/
+        if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)){
+            HttpDownloadUtility.WebhookDiscord("https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX",
+                "Novo Login (Modo Offline)",
+                "Algum usuário entrou no Computador de Bordo pelo Modo Offline");
+        }
         
+        /*
+        try {
+            webhook.execute(); //Handle exception
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
         new Painel().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_EntrarOfflineActionPerformed

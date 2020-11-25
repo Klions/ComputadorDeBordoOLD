@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONObject;
 import police.configs.GetImages;
+import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
 import police.configs.Usuario;
-import static police.configs.Usuario.getDados;
 
 /**
  *
@@ -74,7 +74,14 @@ public class ViewUsuario extends javax.swing.JFrame {
         String Serial = SerialTxt.getText();
         if(Serial.length()<10){ showMessageDialog(null,"Lamento, mas o serial informado é inválido.", "Erro ao ativar o serial",JOptionPane.PLAIN_MESSAGE); return; }
         if(SNWindows.setSerialOnPC(Serial)){
-            showMessageDialog(null,"Nice tchu mitcho", "Erro ao ativar o serial",JOptionPane.PLAIN_MESSAGE);
+            String serial_nome = SNWindows.TipoAssinatura[SNWindows.getNivelSerialPorSerial(Serial)].toUpperCase();
+            HttpDownloadUtility.WebhookDiscord("https://discordapp.com/api/webhooks/781234838271164466/Bji5tJ0pzsNvhtCZMN2wpqFyoAg-UjSN6kUHeXR-YXa9u-BxIQ61FHD-jIHAZD2agFYM",
+                        "Serial Ativado", 
+                        "Um usuário ativou um serial de nível "+serial_nome+"!!");
+            AttAssinatura();
+            RecarregarValoresTabela();
+            this.setLocationRelativeTo(null);
+            showMessageDialog(null,"Você ativou com sucesso um serial de nível "+serial_nome+".\nAproveite os benefícios! <3", "Serial ativado com sucesso!!",JOptionPane.PLAIN_MESSAGE);
         }else{
             showMessageDialog(null,"Lamento, mas o serial informado é inválido ou já foi ativado.", "Erro ao ativar o serial",JOptionPane.PLAIN_MESSAGE);
         }
@@ -360,7 +367,7 @@ public class ViewUsuario extends javax.swing.JFrame {
         SerialPainel.setOpaque(false);
 
         SerialTxt.setBackground(new java.awt.Color(255, 153, 153));
-        SerialTxt.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        SerialTxt.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         SerialTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         SerialTxt.setToolTipText("Cole o SERIAL e pressione ENTER");
         SerialTxt.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "SERIAL ASSINATURA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.TOP));
