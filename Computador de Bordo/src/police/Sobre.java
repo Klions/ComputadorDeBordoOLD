@@ -172,6 +172,7 @@ public class Sobre extends javax.swing.JFrame {
         verificaratt.setBackground(new java.awt.Color(255, 255, 255));
         verificaratt.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         verificaratt.setText("VERIFICAR ATUALIZAÇÕES");
+        verificaratt.setEnabled(false);
         verificaratt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 verificarattActionPerformed(evt);

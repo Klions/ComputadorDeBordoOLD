@@ -312,6 +312,11 @@ public class VerPrisoes extends javax.swing.JFrame {
     }
     
      public void TabelaAtt(){
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
+        hierarquiaDBarray = InicializadorMain.hierarquiaDBarray;
+        procuradosDBarray = InicializadorMain.procuradosDBarray;
+        
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         model.setRowCount(0);
         pesquisa.setText("");
@@ -333,7 +338,6 @@ public class VerPrisoes extends javax.swing.JFrame {
                 JSONObject ohier = prisoesDBarray.getJSONObject(i2);
                 //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
                 int ide = ohier.getInt("id");
-                int tornz = ohier.getInt("tornz");
                 int meses = ohier.getInt("meses");
                 int multas = ohier.getInt("multas");
                 int id_usuario = ohier.getInt("id_usuario");
@@ -341,25 +345,20 @@ public class VerPrisoes extends javax.swing.JFrame {
                 int protocolo = ohier.getInt("protocolo");
                 long data = ohier.getLong("data");
                 String pagou = ohier.getString("pagou");
-                String motivo = ohier.getString("motivo");
                 Timestamp timestamp = new Timestamp(data);
                 String date = new SimpleDateFormat("dd/MM/yy hh:mm").format(timestamp.getTime());
                 String TornzTEXT="inválido";
-                if(meses > 0 && tornz > 0){
-                    TornzTEXT=meses+" preso / "+tornz+" tornozeleira";
-                }else if(meses > 0){
+                if(meses > 0){
                     TornzTEXT=meses+" preso";
-                }else if(tornz > 0){
-                    TornzTEXT=tornz+" tornozeleira";
                 }else if(multas > 0){
                     TornzTEXT="somente multa";
                 }
                 if(verpresoes == 0){
-                    if((meses > 0 || tornz > 0) && parseInt(pagou) > 0){
+                    if((meses > 0) && parseInt(pagou) > 0){
                         model.addRow(new Object[]{id_usuario, protocolo, TornzTEXT, "$ "+String.format("%,d", multas), date});
                     }
                 }else if(verpresoes == 1){
-                    if((meses <= 0 && tornz <= 0) && multas > 0 && parseInt(pagou) > 0){
+                    if((meses <= 0) && multas > 0 && parseInt(pagou) > 0){
                          model.addRow(new Object[]{id_usuario, protocolo, TornzTEXT, "$ "+String.format("%,d", multas), date});
                     }
                 }
@@ -370,7 +369,6 @@ public class VerPrisoes extends javax.swing.JFrame {
                 JSONObject ohier = procuradosDBarray.getJSONObject(i2);
                 //System.out.println("hierarquiaDBarray: "+ohier.toString()+" // ");
                 int ide = ohier.getInt("id");
-                int tornz = ohier.getInt("tornz");
                 int meses = ohier.getInt("meses");
                 int multas = ohier.getInt("multas");
                 int id_usuario = ohier.getInt("id_usuario");
@@ -378,20 +376,15 @@ public class VerPrisoes extends javax.swing.JFrame {
                 int protocolo = ohier.getInt("protocolo");
                 long data = ohier.getLong("data");
                 String pagou = ohier.getString("pagou");
-                String motivo = ohier.getString("motivo");
                 Timestamp timestamp = new Timestamp(data);
                 String date = new SimpleDateFormat("dd/MM/yy hh:mm").format(timestamp.getTime());
                 String TornzTEXT="inválido";
-                if(meses > 0 && tornz > 0){
-                    TornzTEXT=meses+" preso / "+tornz+" tornozeleira";
-                }else if(meses > 0){
+                if(meses > 0){
                     TornzTEXT=meses+" preso";
-                }else if(tornz > 0){
-                    TornzTEXT=tornz+" tornozeleira";
                 }else if(multas > 0){
                     TornzTEXT="somente multa";
                 }
-                if((meses > 0 || tornz > 0 || multas > 0) && parseInt(pagou) == 0){
+                if((meses > 0 || multas > 0) && parseInt(pagou) == 0){
                     model.addRow(new Object[]{id_usuario, protocolo, TornzTEXT, "$ "+String.format("%,d", multas), date});
                     
                     if(ohier.getInt("nivel_procurado") > nivel_procurado) nivel_procurado = ohier.getInt("nivel_procurado");
@@ -468,7 +461,8 @@ public class VerPrisoes extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PESQUISAR REGISTRO PELO PASSAPORTE", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
 
-        id.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+        id.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        id.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         id.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 idKeyPressed(evt);

@@ -20,6 +20,8 @@ import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Calendar;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,6 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import police.configs.ConexaoDB;
 import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
@@ -44,10 +47,8 @@ import police.configs.Usuario;
  * @author John
  */
 public class Prisoes extends javax.swing.JFrame {
-
-    /**
-     * Creates new form Prisoes
-     */
+    VerPrisoes verprisoes = new VerPrisoes();
+    
     JSONArray CrimesRegistro = new JSONArray();
     JSONArray CategoriasCrimes = new JSONArray();
     
@@ -69,6 +70,7 @@ public class Prisoes extends javax.swing.JFrame {
     JSONArray procuradosDBarray = new JSONArray();
     
     String CrimesDiscordFormat = "";
+    String CrimesDBFormat = "";
     
     static String CrimesStore2="";
     static String CategoriasStore2="";
@@ -78,6 +80,11 @@ public class Prisoes extends javax.swing.JFrame {
     
     static String UsuariosOffline="";
     static String OpcoesUsuarios="";
+    
+    static String Protocolor = "";
+    
+    static int s_Meses = 0;
+    static int s_Multa = 0;
     
     JSONObject UsuarioPegar = new JSONObject();
     
@@ -128,11 +135,7 @@ public class Prisoes extends javax.swing.JFrame {
         this.pack();
         SetarBotoes();
         this.setLocationRelativeTo(null);
-        
-        usuariosDBarray = InicializadorMain.usuariosDBarray;
-        discordDBarray = InicializadorMain.discordDBarray;
-        
-        
+        PegarDBMain();
         Timer timer = new Timer(); 
         TimerTask tt = new TimerTask() { 
   
@@ -152,6 +155,13 @@ public class Prisoes extends javax.swing.JFrame {
             }
         }; 
         timer.schedule(tt, 500, 1000);
+    }
+    
+    void PegarDBMain(){
+        usuariosDBarray = InicializadorMain.usuariosDBarray;
+        discordDBarray = InicializadorMain.discordDBarray;
+        procuradosDBarray = InicializadorMain.procuradosDBarray;
+        prisoesDBarray = InicializadorMain.prisoesDBarray;
     }
     
     public void PegarValoresOffline(){ //UPDATE ON OPENING THE APPLICATION
@@ -685,8 +695,13 @@ public class Prisoes extends javax.swing.JFrame {
         int ContageCrimes = 0;
         
         String ReducaoDis = "";
+        String ReducaoDB = "";
+        
         CrimesDiscordFormat = "";
+        CrimesDBFormat = "";
+        
         String CrimesDis = "";
+        String CrimesDB = "";
         
         for(int i = 0; i < RegistroInputs.length(); i++){
             JSONObject obj = RegistroInputs.getJSONObject(i);
@@ -707,8 +722,10 @@ public class Prisoes extends javax.swing.JFrame {
                         CrimesExtenso = obj.getString("texto")+" (x"+ValorInput+")";
                     }else{
                         CrimesExtenso += " + "+obj.getString("texto")+" (x"+ValorInput+")";
+                        CrimesDB+=" // ";
                     }
-                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: R$"+String.format("%,d", ValorMulta)+"]";
+                    CrimesDis+="\n• "+obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: $"+String.format("%,d", ValorMulta)+"]";
+                    CrimesDB+=obj.getString("texto")+" (x"+ValorInput+") [MESES: "+ValorMeses+" / MULTA: $"+String.format("%,d", ValorMulta)+"]";
                     ContageCrimes++;
                 }
             }
@@ -727,29 +744,35 @@ public class Prisoes extends javax.swing.JFrame {
                         CrimesExtenso = obj.getString("texto");
                     }else{
                         CrimesExtenso += " + "+obj.getString("texto");
+                        CrimesDB+=" // ";
                     }
-                    CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: R$"+String.format("%,d", obj.getInt("multa"))+"]";
+                    CrimesDis+="\n• "+obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: $"+String.format("%,d", obj.getInt("multa"))+"]";
+                    CrimesDB+=obj.getString("texto")+" [MESES: "+obj.getInt("meses")+" / MULTA: $"+String.format("%,d", obj.getInt("multa"))+"]";
                     ContageCrimes++;
                 }else{
                     int ValorConta = 0;
                     if("FIXO".equals(obj.getString("calculo"))){
                         ValorConta = obj.getInt("meses");
-                        System.out.println("obj.getInt(\"meses\"): "+obj.getInt("meses")+" / MesesTotal: "+MesesTotal+" / ValorConta: "+ValorConta);
+                        //System.out.println("obj.getInt(\"meses\"): "+obj.getInt("meses")+" / MesesTotal: "+MesesTotal+" / ValorConta: "+ValorConta);
                         if("REDUCAO".equals(obj.getString("tipo"))){
                             ReducaoDis+="\n• "+obj.getString("texto")+" (-"+obj.getInt("meses")+")[REDUÇÃO DE "+ValorConta+" MESES]";
                             MesesTotal-=ValorConta;
+                            ReducaoDB+=" // "+obj.getString("texto")+" (-"+obj.getInt("meses")+")[REDUÇÃO DE "+ValorConta+" MESES]";
                         }else{
                             ReducaoDis+="\n• "+obj.getString("texto")+" (+"+obj.getInt("meses")+")[AUMENTO DE "+ValorConta+" MESES]";
                             MesesTotal+=ValorConta;
+                            ReducaoDB+=" // "+obj.getString("texto")+" (-"+obj.getInt("meses")+")[REDUÇÃO DE "+ValorConta+" MESES]";
                         }
                     }else{
                         ValorConta = (obj.getInt("meses")*MesesTotal)/100;
                         if("REDUCAO".equals(obj.getString("tipo"))){
                             ReducaoDis+="\n• "+obj.getString("texto")+" (-"+obj.getInt("meses")+"%)[REDUÇÃO DE "+ValorConta+" MESES]";
                             MesesTotal-=ValorConta;
+                            ReducaoDB+=" // "+obj.getString("texto")+" (-"+obj.getInt("meses")+"%)[REDUÇÃO DE "+ValorConta+" MESES]";
                         }else{
                             ReducaoDis+="\n• "+obj.getString("texto")+" (+"+obj.getInt("meses")+"%)[AUMENTO DE "+ValorConta+" MESES]";
                             MesesTotal+=ValorConta;
+                            ReducaoDB+=" // "+obj.getString("texto")+" (+"+obj.getInt("meses")+"%)[AUMENTO DE "+ValorConta+" MESES]";
                         }
                     }
                 }
@@ -803,11 +826,27 @@ public class Prisoes extends javax.swing.JFrame {
                 
                 if(!"".equals(ReducaoDis)) FormatDiscord+="# AUMENTO/REDUÇÃO DE PENA:"+ReducaoDis+"\n\n";
                 
-                FormatDiscord+= "* MULTA TOTAL: R$"+String.format("%,d", MultaTotal)+
+                FormatDiscord+= "* MULTA TOTAL: $"+String.format("%,d", MultaTotal)+
                     "\n* PENA TOTAL: "+StrPenaTotal+
                     "\n\n"+
                     "* DATA: "+dataFormatada;
-                CrimesDiscordFormat = FormatarParaDiscord(FormatDiscord);
+                CrimesDiscordFormat = FormatDiscord;
+                
+                
+                String FormatParaDB = "[INDIVÍDUO]("+nome+" ["+UsuarioPegar.getInt("id_usuario")+"])"+RGi+
+                    " // [POLICIAL]("+nome_policial+" ["+PolicialUser.getInt("id_usuario")+"])"+
+                    " //// "+
+                    "# CRIMES COMETIDOS: //"+
+                    CrimesDB+
+                    " //// ";
+                
+                if(!"".equals(ReducaoDB)) FormatParaDB+="# AUMENTO/REDUÇÃO DE PENA:"+ReducaoDis+" //// ";
+                
+                FormatParaDB+= "* MULTA TOTAL: $"+String.format("%,d", MultaTotal)+
+                    " // * PENA TOTAL: "+StrPenaTotal+
+                    " //// "+
+                    "* DATA: "+dataFormatada;
+                CrimesDBFormat = FormatParaDB;
             }else{
                 info_CrimesS.setText("Necessário escolher os crimes do indivíduo");
             }
@@ -819,15 +858,24 @@ public class Prisoes extends javax.swing.JFrame {
         ProcuradoBt.setEnabled(AtivadoOn);
         SalvarBt.setEnabled(AtivadoOn);
         
-        if(MultaTotal>0) StrMultas = "R$"+String.format("%,d", MultaTotal);
+        if(MultaTotal>0) StrMultas = "$"+String.format("%,d", MultaTotal);
         if(MesesTotal>0) StrMeses = MesesTotal+" meses";
         info_Pena1S.setText(StrMultas);
         info_Pena2S.setText(StrMeses);
         CopiarDiscordBt.setText("COPIAR P/ DISCORD");
+        
+        s_Meses = MesesTotal;
+        s_Multa = MultaTotal;
     }
     
     public static String FormatarParaDiscord(String Texto){
         return "```md\n"+Texto+"\n```";
+    }
+    public static String DesformatarDiscord(String texto){
+        String TextoDesformatado = texto;
+        TextoDesformatado = TextoDesformatado.replace("```md","");
+        TextoDesformatado = TextoDesformatado.replace("```","");
+        return TextoDesformatado;
     }
     
     public void ResetarBotoes(){
@@ -899,14 +947,15 @@ public class Prisoes extends javax.swing.JFrame {
     }
     
     public int ProcuradoPorID(int user_id){
-        int nivel_procurado = 0;
+        int nivel_procurado = -1;
         for(int i3 = 0; i3 < procuradosDBarray.length(); i3++){
             JSONObject oproc = procuradosDBarray.getJSONObject(i3);
             int meseer = oproc.getInt("meses");
             int multaar = oproc.getInt("multas");
             int pagou = oproc.getInt("pagou");
-            int nv_procurado = oproc.getInt("nivel_procurado");
+            
             if(user_id==oproc.getInt("id_usuario")){
+                int nv_procurado = oproc.getInt("nivel_procurado");
                 if(pagou <= 0){
                     if(meseer > 0 || multaar > 0){
                         if(nv_procurado > nivel_procurado) nivel_procurado = nv_procurado;
@@ -1180,7 +1229,7 @@ public class Prisoes extends javax.swing.JFrame {
         }
 
         int PlayerProcurado = ProcuradoPorID(pass);
-        if(PlayerProcurado > 0){
+        if(PlayerProcurado >= 0){
             des_ProcuradoS.setText("SIM");
             des_ProcuradoS.setForeground(new java.awt.Color(255,51,51));
             procuradoBt.setEnabled(true);
@@ -1243,6 +1292,7 @@ public class Prisoes extends javax.swing.JFrame {
     public void ResetarCrimes(){
         ResetarBotoes();
         ResetarCampoTexto();
+        PegarDBMain();
     }
     
     public void ResetarTudo(){
@@ -1256,6 +1306,41 @@ public class Prisoes extends javax.swing.JFrame {
         this.repaint();
         this.pack();
         AttCrimes();
+        txtID.requestFocus();
+    }
+    
+    public boolean AbrirMenuVerPrisoes(int ModeloBusca){
+        int pass = 0;
+        if(UsuarioPegar.has("id_usuario")){
+            pass = UsuarioPegar.getInt("id_usuario");
+        }
+        if(pass > 0){
+            if(!verprisoes.isVisible()){
+                verprisoes.setVisible(true);
+                verprisoes.ResetarCampos();
+                verprisoes.verpresoes=ModeloBusca;
+                verprisoes.TabelaAtt();
+                verprisoes.id.setText(pass+"");
+                verprisoes.id.setEnabled(false);
+                verprisoes.resetar.setEnabled(false);
+                verprisoes.PesquisarT();
+                verprisoes.setLocationRelativeTo(null);
+            }else{
+                verprisoes.verpresoes=ModeloBusca;
+                verprisoes.TabelaAtt();
+                verprisoes.id.setText(pass+"");
+                verprisoes.requestFocus();
+                verprisoes.PesquisarT();
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    void CopiarClipboard(String texto){
+        StringSelection stringSelection = new StringSelection(texto);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
     }
 
     /**
@@ -1888,15 +1973,15 @@ public class Prisoes extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void vermultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vermultaActionPerformed
-        //AbrirMenuVerPrisoes(1);
+        AbrirMenuVerPrisoes(1);
     }//GEN-LAST:event_vermultaActionPerformed
 
     private void verpresoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verpresoActionPerformed
-        //AbrirMenuVerPrisoes(0);
+        AbrirMenuVerPrisoes(0);
     }//GEN-LAST:event_verpresoActionPerformed
 
     private void procuradoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procuradoBtActionPerformed
-        //AbrirMenuVerPrisoes(2);
+        AbrirMenuVerPrisoes(2);
     }//GEN-LAST:event_procuradoBtActionPerformed
 
     private void ResetarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetarBtActionPerformed
@@ -1904,9 +1989,7 @@ public class Prisoes extends javax.swing.JFrame {
     }//GEN-LAST:event_ResetarBtActionPerformed
 
     private void CopiarDiscordBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CopiarDiscordBtActionPerformed
-        StringSelection stringSelection = new StringSelection(CrimesDiscordFormat);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, null);
+        CopiarClipboard(FormatarParaDiscord(CrimesDiscordFormat));
         CopiarDiscordBt.setText("COPIADO!!");
     }//GEN-LAST:event_CopiarDiscordBtActionPerformed
 
@@ -1975,11 +2058,207 @@ public class Prisoes extends javax.swing.JFrame {
     }//GEN-LAST:event_txtTelefoneKeyTyped
 
     private void SalvarBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalvarBtActionPerformed
-        // TODO add your handling code here:
+        ConexaoDB conexao = new ConexaoDB();
+        
+        JSONObject my_obj = new JSONObject();
+        Random rand = new Random(); 
+        String Procol = (rand.nextInt(8999)+1000)+""; 
+        Calendar cal = Calendar.getInstance(); 
+        cal.getTime(); 
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+        //System.out.println(" / "+sdf.format(cal.getTime()));
+        Procol=sdf.format(cal.getTime())+Procol;
+        
+        Protocolor=Procol;
+        
+        info_ComandoS.setText("Nada para digitar");
+        if(UsuarioPegar.has("id_usuario")){
+            int pass = UsuarioPegar.getInt("id_usuario");
+            my_obj.put("passaporte", pass+"");
+
+            JSONObject user_local = Usuario.UsuarioMain;
+            my_obj.put("id_prendeu", user_local.getString("id_usuario"));
+
+            String temp_contravencoes = "Prisão ("+Procol+"): "+info_CrimesS.getText();
+            // VERIFICAR SE O JOGADOR ESTA PROCURADO
+            boolean player_procurado = false;
+            int proc_meses = 0;
+            int proc_multas = 0;
+            String temp_CrimesDBFormat = "";
+            String temp_CrimesDiscordFormat = "";
+            String temp_contravencoes_proc = "";
+            for(int i3 = 0; i3 < procuradosDBarray.length(); i3++){
+                JSONObject oproc = procuradosDBarray.getJSONObject(i3);
+                int meseer = oproc.getInt("meses");
+                int multaar = oproc.getInt("multas");
+                int pagou = oproc.getInt("pagou");
+                if(pass==oproc.getInt("id_usuario")){
+                    if(pagou <= 0){
+                        if(meseer > 0 || multaar > 0 ){
+                            proc_meses+=meseer;
+                            proc_multas+=multaar;
+                            player_procurado = true;
+                            temp_CrimesDBFormat+=" ////// "+oproc.getString("justificado");
+                            if(!"".equals(temp_CrimesDiscordFormat))temp_CrimesDiscordFormat+="\n\n";
+                            temp_CrimesDiscordFormat+=DesformatarDiscord(oproc.getString("justificado_discord"));
+                            temp_contravencoes_proc+=" / "+oproc.getString("contravencoes");
+                        }
+                    }
+                }
+            }
+            String CrimesFinal = "";
+            if(proc_meses > 0) CrimesFinal+="Meses: "+proc_meses;
+            if(proc_multas > 0){
+                if(!"".equals(CrimesFinal)) CrimesFinal+=" e ";
+                CrimesFinal+="Multas: $"+proc_multas;
+            }
+            boolean AddProcurado = false;
+            if(player_procurado){
+                Object[] options = { "Adicionar", "Cancelar" }; 
+                int Escolha=JOptionPane.showOptionDialog(this,
+                        "Este indivíduo está procurado por alguns crimes.\n"+CrimesFinal+"\nDeseja adicionar na pena total?", 
+                        "Indivíduo procurado", 
+                        JOptionPane.DEFAULT_OPTION, 
+                        JOptionPane.WARNING_MESSAGE, 
+                        null, 
+                        options, 
+                        options[0]);
+                if(Escolha==JOptionPane.YES_OPTION){
+                    AddProcurado = true;
+                    if(proc_meses > 0) s_Meses+=proc_meses;
+                    if(proc_multas > 0) s_Multa+=proc_multas;
+                    CrimesDiscordFormat+="\n\n\n"+temp_CrimesDiscordFormat;
+                    CrimesDBFormat+=" ////// "+temp_CrimesDBFormat;
+                    temp_contravencoes+=temp_contravencoes_proc;
+                }  
+            }
+            //========================================
+        
+            my_obj.put("protocolo", Procol);
+            my_obj.put("meses", s_Meses+"");
+            my_obj.put("multas", s_Multa+"");
+            
+            my_obj.put("contravencoes", temp_contravencoes);
+
+            Calendar cal2 = Calendar.getInstance(); 
+            cal2.getTime(); 
+            //SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy HH:mm");
+
+            //String ProcStr = "Relatório de Prisão "+sdf2.format(cal2.getTime());
+            my_obj.put("justificado", CrimesDBFormat);
+            my_obj.put("justificado_discord", FormatarParaDiscord(CrimesDiscordFormat));
+            SalvarBt.setEnabled(false);
+            ProcuradoBt.setEnabled(false);
+            
+            String StrMeses = "N/A";
+            String StrMultas = "N/A";
+            if(s_Multa>0) StrMultas = "$"+String.format("%,d", s_Multa);
+            if(s_Meses>0) StrMeses = s_Meses+" meses";
+            info_Pena1S.setText(StrMultas);
+            info_Pena2S.setText(StrMeses);
+            info_CrimesS.setText(temp_contravencoes);
+            info_ComandoS.setText("/protocolo "+Procol);
+            if(conexao.SalvarPrisao(my_obj)){
+                String nome = UsuarioPegar.getString("nome")+" "+UsuarioPegar.getString("sobrenome");
+                if(UsuarioPegar.has("nome_completo")) nome = UsuarioPegar.getString("nome_completo");
+                if(" ".equals(nome))nome="Sem Registro";
+                
+                if(AddProcurado){
+                    if(conexao.AttProcurados(pass, Procol)){
+                        System.out.println("Procurado do ID "+pass+" setado no protocolo "+Procol);
+                    }  
+                }
+                
+                showMessageDialog(null,
+                    nome+" foi registrado como detento no banco da "+InicializadorMain.info_cidade.getString("nome_policia").toUpperCase()+" com o protocolo: "+Procol+" !"+
+                    "\nFoi copiado o comando para ser digitado dentro do jogo (pressione T e depois pressione CTRL+V).",
+                    "Salvo com sucesso!!",
+                    JOptionPane.PLAIN_MESSAGE);
+                CopiarClipboard("/protocolo "+Procol);
+                
+                InicializadorMain.AttDbsStatic();
+            }
+        }
     }//GEN-LAST:event_SalvarBtActionPerformed
 
     private void ProcuradoBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProcuradoBtActionPerformed
-        // TODO add your handling code here:
+        ConexaoDB conexao = new ConexaoDB();
+        
+        JSONObject my_obj = new JSONObject();
+        Random rand = new Random(); 
+        String Procol = (rand.nextInt(8999)+1000)+""; 
+        Calendar cal = Calendar.getInstance(); 
+        cal.getTime(); 
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+        //System.out.println(" / "+sdf.format(cal.getTime()));
+        Procol=sdf.format(cal.getTime())+Procol;
+        
+        Protocolor=Procol;
+        
+        info_ComandoS.setText("Nada para digitar");
+        if(UsuarioPegar.has("id_usuario")){
+            int pass = UsuarioPegar.getInt("id_usuario");
+            my_obj.put("passaporte", pass+"");
+
+            JSONObject user_local = Usuario.UsuarioMain;
+            my_obj.put("id_prendeu", user_local.getString("id_usuario"));
+
+            my_obj.put("protocolo", Procol);
+            my_obj.put("meses", s_Meses+"");
+            my_obj.put("multas", s_Multa+"");
+
+
+            my_obj.put("contravencoes", "Procurado ("+Procol+"): "+info_CrimesS.getText());
+
+            Calendar cal2 = Calendar.getInstance(); 
+            cal2.getTime(); 
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy HH:mm");
+
+            String ProcStr = "## Relatório de Procurado "+sdf2.format(cal2.getTime());
+            my_obj.put("justificado", ProcStr+" //// "+CrimesDBFormat);
+
+            my_obj.put("justificado_discord", FormatarParaDiscord(ProcStr+"\n\n"+CrimesDiscordFormat));
+
+            String obs = JOptionPane.showInputDialog(this, "Alguma observação à acrescentar? Qualquer coisa que seja útil.\nVocê pode descrever características ou o modelo do veículo do indivíduo.", "Observações sobre o procurado", JOptionPane.PLAIN_MESSAGE);
+            my_obj.put("observacoes", obs);
+
+            ImageIcon iconer = new ImageIcon("src/police/imagens/gunimg.png");
+            Object[] possibilidades = {"Sem Informação", "Desarmado", "Portando Arma Branca", "Portando Arma Leve", "Portando Arma Pesada"};
+            String NivPro = (String)JOptionPane.showInputDialog(this,
+                "O indivíduo portava algum tipo de arma?\n"
+                + "Nos ajude a definir o risco deste indivíduo.",
+                "Nível de Caráter Perigoso do Procurado",
+                JOptionPane.QUESTION_MESSAGE, 
+                iconer,
+                possibilidades,
+                "Sem Informação");
+            int NivelProc = 0;
+            if(NivPro.contains("Desarmado")){
+                NivelProc = 1;
+            }else if(NivPro.contains("Portando Arma Branca")){
+                NivelProc = 2;
+            }else if(NivPro.contains("Portando Arma Leve")){
+                NivelProc = 3;
+            }else if(NivPro.contains("Portando Arma Pesada")){
+                NivelProc = 4;
+            }
+            my_obj.put("nivel_procurado", NivelProc+"");
+            //System.out.println("NivPro: "+NivPro+" / NivelProc: "+NivelProc);
+
+            if(conexao.SalvarProcurado(my_obj)){
+                String nome = UsuarioPegar.getString("nome")+" "+UsuarioPegar.getString("sobrenome");
+                if(UsuarioPegar.has("nome_completo")) nome = UsuarioPegar.getString("nome_completo");
+                if(" ".equals(nome))nome="Sem Registro";
+                
+                showMessageDialog(null,
+                    nome+" foi registrado como procurado no banco da "+InicializadorMain.info_cidade.getString("nome_policia").toUpperCase()+" com o protocolo: "+Procol+" !",
+                    "Salvo com sucesso!!",
+                    JOptionPane.PLAIN_MESSAGE);
+                InicializadorMain.AttDbsStatic();
+            }
+        }
     }//GEN-LAST:event_ProcuradoBtActionPerformed
 
     public boolean SomenteNumeros(KeyEvent evt){

@@ -53,6 +53,7 @@ public class Painel extends javax.swing.JFrame {
         }else{
             this.setIconImage(new ImageIcon(GetImages.LogoCB).getImage());
             icone.setIcon(new ImageIcon(GetImages.LogoCB_branco));
+            this.setTitle(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase()+" - COMPUTADOR DE BORDO v"+Config.versao);
         }
         VerAtt();
         

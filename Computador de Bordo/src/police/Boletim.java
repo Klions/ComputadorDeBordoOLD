@@ -189,6 +189,19 @@ public class Boletim extends javax.swing.JFrame {
         //id.requestFocus();
     }
     
+    public boolean SomenteNumeros(KeyEvent evt){
+        char c = evt.getKeyChar();
+        if (!((c >= '0') && (c <= '9') ||
+            (c == KeyEvent.VK_BACK_SPACE) ||
+            (c == KeyEvent.VK_DELETE) ||
+            (c == KeyEvent.VK_LEFT) ||
+            (c == KeyEvent.VK_RIGHT)) ) {
+            //getToolkit().beep();
+            evt.consume();
+        }
+        return true;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -234,7 +247,8 @@ public class Boletim extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "VÍTIMA / REGISTRANTE DO BOLETIM", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
         jPanel1.setOpaque(false);
 
-        id.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+        id.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        id.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         id.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 idKeyPressed(evt);
@@ -460,6 +474,7 @@ public class Boletim extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void idKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_idKeyTyped
+        SomenteNumeros(evt);    
         //AtualizarCrimes();
     }//GEN-LAST:event_idKeyTyped
 
