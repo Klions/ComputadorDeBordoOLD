@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.json.JSONArray;
@@ -294,6 +296,17 @@ public class SplashScreen extends javax.swing.JFrame {
         }
     }
     
+    int ErroC = 0;
+    private void Erro(String Error){
+        ErroC++;
+        ErroCodigo.setText(Error+" ("+ErroC+")");
+        
+        if(ErroC > 3){
+            showMessageDialog(null,"Você excedeu o limite de tentativas e o programa será fechado.", "Ocorreu um erro",JOptionPane.PLAIN_MESSAGE);
+            System.exit(0);
+        }
+    }
+    
     public boolean PegarInfoServidor(){
         ConexaoDB conexao = new ConexaoDB();
         ResultSet resulteSet = null;
@@ -317,16 +330,17 @@ public class SplashScreen extends javax.swing.JFrame {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        AtualizarCidadesJCombo();
+        //AtualizarCidadesJCombo();
         return true;
     }
+    /*
     public void AtualizarCidadesJCombo(){
         CidadesEscolha.removeAllItems();
         for(int i = 0; i < ServidoresRegistrados.length(); i++){
             JSONObject obj = ServidoresRegistrados.getJSONObject(i);
             CidadesEscolha.addItem(obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv"));
         }
-    }
+    }*/
     
     public boolean TestarConexaoCidade(){
         ConexaoDB conexao = new ConexaoDB();
@@ -372,6 +386,7 @@ public class SplashScreen extends javax.swing.JFrame {
         }
         return true;
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -390,10 +405,11 @@ public class SplashScreen extends javax.swing.JFrame {
         progresso = new javax.swing.JProgressBar();
         texto = new javax.swing.JLabel();
         EscolherCidadePainel = new javax.swing.JPanel();
-        CidadesEscolha = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         CidadeEscolhaBt = new javax.swing.JButton();
         EntrarOffline = new javax.swing.JButton();
+        CodigoCity = new javax.swing.JTextField();
+        ErroCodigo = new javax.swing.JLabel();
         Att = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         AttBts = new javax.swing.JPanel();
@@ -424,7 +440,7 @@ public class SplashScreen extends javax.swing.JFrame {
             .addGroup(TituloPainelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(TituloPainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                     .addComponent(atualizadot, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -465,12 +481,9 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addContainerGap(39, Short.MAX_VALUE))
         );
 
-        CidadesEscolha.setMaximumRowCount(20);
-        CidadesEscolha.setNextFocusableComponent(CidadeEscolhaBt);
-
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("ESCOLHA A CIDADE:");
+        jLabel1.setText("CÓDIGO DA CIDADE:");
 
         CidadeEscolhaBt.setBackground(new java.awt.Color(255, 255, 255));
         CidadeEscolhaBt.setText("ENTRAR");
@@ -491,6 +504,11 @@ public class SplashScreen extends javax.swing.JFrame {
             }
         });
 
+        ErroCodigo.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        ErroCodigo.setForeground(new java.awt.Color(255, 51, 51));
+        ErroCodigo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        ErroCodigo.setText(" ");
+
         javax.swing.GroupLayout EscolherCidadePainelLayout = new javax.swing.GroupLayout(EscolherCidadePainel);
         EscolherCidadePainel.setLayout(EscolherCidadePainelLayout);
         EscolherCidadePainelLayout.setHorizontalGroup(
@@ -499,22 +517,29 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(EntrarOffline, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
-                        .addComponent(CidadesEscolha, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CidadeEscolhaBt, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)))
+                        .addComponent(CodigoCity, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(CidadeEscolhaBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ErroCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         EscolherCidadePainelLayout.setVerticalGroup(
             EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1)
+                    .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
+                        .addComponent(ErroCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(1, 1, 1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CidadesEscolha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CidadeEscolhaBt))
+                .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(CidadeEscolhaBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(CodigoCity))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(EntrarOffline, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -554,7 +579,7 @@ public class SplashScreen extends javax.swing.JFrame {
             .addGroup(AttBtsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(AttAgora, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 19, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 21, Short.MAX_VALUE)
                 .addComponent(AttSite, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -601,16 +626,16 @@ public class SplashScreen extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addComponent(Att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(icone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ProgressoPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(TituloPainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(Att, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(TituloPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -618,13 +643,14 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addComponent(Att, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(icone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(TituloPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(12, 12, 12)
                         .addComponent(ProgressoPainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(11, 11, 11)
-                        .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(EscolherCidadePainel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(icone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -632,14 +658,15 @@ public class SplashScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CidadeEscolhaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CidadeEscolhaBtActionPerformed
-        int IndexSel = CidadesEscolha.getSelectedIndex();
-        String IndexStr = CidadesEscolha.getSelectedItem()+"";
-        if(IndexSel >= 0){
+        //int IndexSel = CidadesEscolha.getSelectedIndex();
+        String IndexStr = CodigoCity.getText().toUpperCase();//CidadesEscolha.getSelectedItem()+"";
+        if(IndexStr.length() > 0){
             String nomedacidade = "";
             for(int i = 0; i < ServidoresRegistrados.length(); i++){
                 JSONObject obj = ServidoresRegistrados.getJSONObject(i);
-                String FormatNome = obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
+                String FormatNome = obj.getString("nome_policia_abv").toUpperCase()+""+obj.getInt("id");//obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
                 if(FormatNome.equals(IndexStr)){
+                    
                     /*HttpDownloadUtility.WebhookLog(
                         "752370476696731671", 
                         "Novo Login (Cidade "+obj.getString("nome_cidade")+")", 
@@ -665,7 +692,9 @@ public class SplashScreen extends javax.swing.JFrame {
             }
             if(!"".equals(nomedacidade)){
                 PegarDados=true;
+                Erro("");
             }else{
+                Erro("CÓDIGO DA CIDADE INVÁLIDO");
                 PegarInfoServidor();
             }
         }else{
@@ -793,8 +822,9 @@ public class SplashScreen extends javax.swing.JFrame {
     private javax.swing.JLabel AttInfo;
     private javax.swing.JButton AttSite;
     private javax.swing.JButton CidadeEscolhaBt;
-    private javax.swing.JComboBox<String> CidadesEscolha;
+    private javax.swing.JTextField CodigoCity;
     private javax.swing.JButton EntrarOffline;
+    private javax.swing.JLabel ErroCodigo;
     private javax.swing.JPanel EscolherCidadePainel;
     private javax.swing.JPanel ProgressoPainel;
     private javax.swing.JPanel TituloPainel;
