@@ -678,11 +678,11 @@ public class Corporacao extends javax.swing.JFrame {
             //String discord = cdiscord.getText();
             String codigo = ccodigo.getText();
             my_obj.put("passaporte", pass);
-            my_obj.put("nome", nome+" "+sobrenome);
+            //my_obj.put("nome", nome+" "+sobrenome);
             my_obj.put("codigo", codigo);
-            my_obj.put("discord", Usuario.DiscordPorID(Integer.parseInt(pass)));
-            my_obj.put("nome_patente", "");
-            my_obj.put("oqfez", 0);
+            //my_obj.put("discord", Usuario.DiscordPorID(Integer.parseInt(pass)));
+            //my_obj.put("nome_patente", "");
+            //my_obj.put("oqfez", 0);
             if(conexao.AtualizarDatabaseDado("cb_users", my_obj)){
                 int dialogButton = JOptionPane.YES_NO_OPTION;
                 if(newcodigo){

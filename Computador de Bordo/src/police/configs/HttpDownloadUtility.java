@@ -216,4 +216,43 @@ public class HttpDownloadUtility {
         if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)) DiscordWebhook2.EnviarMsg(canal_id, eb);
         return true;
     }
+    
+    public static boolean WebhookDiscord(String Url, String Titulo, String Description){ // 
+        DiscordWebhook webhook = new DiscordWebhook(Url);
+        webhook.setContent("");
+        webhook.setAvatarUrl("https://i.imgur.com/3VY1Yjx.png");
+        Color CorEmbed = new Color(5, 65, 99);
+        if(Description.toLowerCase().contains("online")){
+            webhook.setUsername("Modo Cidade");
+            CorEmbed = new Color(254, 254, 254);
+        }else if(Description.toLowerCase().contains("offline")){
+            webhook.setUsername("Modo Offline");
+            CorEmbed = new Color(41, 143, 202);
+        }else{
+            webhook.setUsername("Computador de Bordo");
+        }
+        
+        //webhook.setTts(true);
+        webhook.addEmbed(new DiscordWebhook.EmbedObject()
+                //.setTitle("Title")
+                .setDescription(Description)
+                .setColor(CorEmbed)
+                .addField("IP", SNWindows.IP, false)
+                .addField("PC", SNWindows.SerialNumber, false)
+                .addField("VERSÃO CB", Config.versao, false)
+                //.setThumbnail("https://kryptongta.com/images/kryptonlogo.png")
+                .setFooter("Computador de Bordo • "+Titulo, "https://i.imgur.com/x47Q1tn.png")
+                //.setImage("https://kryptongta.com/images/kryptontitle2.png")
+                .setAuthor(Titulo, "","https://i.imgur.com/x47Q1tn.png"));
+                //.setUrl("https://kryptongta.com"));
+        /*webhook.addEmbed(new DiscordWebhook.EmbedObject()
+        .setDescription("Just another added embed object!"));*/
+        
+        try {
+            webhook.execute(); //Handle exception
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
+    }
 }

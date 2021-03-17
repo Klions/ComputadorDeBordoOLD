@@ -192,17 +192,17 @@ public class SNWindows {
         
         ResultSet resulteSet2 = conexao.GetPersonalizado("select * from cb_serial_cidade ORDER BY id DESC");
         try {
-            while (resulteSet.next()) {
+            while (resulteSet2.next()) {
                 JSONObject getTemporario2 = new JSONObject();
-                getTemporario2.put("id", resulteSet.getInt("id"));
-                getTemporario2.put("server_id", resulteSet.getInt("server_id"));
-                getTemporario2.put("serial", resulteSet.getString("serial"));
-                getTemporario2.put("nivel", resulteSet.getInt("nivel"));
-                getTemporario2.put("data", resulteSet.getString("data"));
-                getTemporario2.put("data_ativou", resulteSet.getString("data_ativou"));
-                getTemporario2.put("comprovante_id", resulteSet.getInt("comprovante_id"));
-                getTemporario2.put("expira", resulteSet.getInt("expira"));
-                getTemporario2.put("discord_id", resulteSet.getString("discord_id"));
+                getTemporario2.put("id", resulteSet2.getInt("id"));
+                getTemporario2.put("server_id", resulteSet2.getInt("server_id"));
+                getTemporario2.put("serial", resulteSet2.getString("serial"));
+                getTemporario2.put("nivel", resulteSet2.getInt("nivel"));
+                getTemporario2.put("data", resulteSet2.getString("data"));
+                getTemporario2.put("data_ativou", resulteSet2.getString("data_ativou"));
+                getTemporario2.put("comprovante_id", resulteSet2.getInt("comprovante_id"));
+                getTemporario2.put("expira", resulteSet2.getInt("expira"));
+                getTemporario2.put("discord_id", resulteSet2.getString("discord_id"));
                 cb_serial_cidade.put(getTemporario2);
                 //System.out.println("getSerialALL(): "+resulteSet.getString("serial"));
             }
@@ -243,6 +243,18 @@ public class SNWindows {
                 JSONObject obj = cb_serial_cidade.getJSONObject(i);
                 if(InicializadorMain.server_id == obj.getInt("server_id")){
                     if(!"0".equals(obj.getString("data_ativou"))) return obj.getInt("nivel");
+                }
+            }
+        }
+        return 0;
+    }
+    
+    public static int getNivelSerialPorSerial(String Serial){
+        if(InicializadorMain.ModoOffline){
+            for(int i = 0; i < cb_serial.length(); i++){
+                JSONObject obj = cb_serial.getJSONObject(i);
+                if(Serial.equals(obj.getString("serial"))){
+                    return obj.getInt("nivel");
                 }
             }
         }

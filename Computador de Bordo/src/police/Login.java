@@ -65,6 +65,8 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
         PainelLogin.setBackground(new java.awt.Color(13, 32, 64));
         jPanel1.setBackground(new java.awt.Color(13, 32, 64));
+        
+        versaoatual.setText("Versão: "+Config.versao);
         //att.setBackground(new java.awt.Color(222, 82, 82));
         AttUsers();
         //AttDBUsuarios();
@@ -311,7 +313,7 @@ public class Login extends javax.swing.JFrame {
     public JSONObject PegarUsuario(Integer user_id){
         for(int i = 0; i < usuariosDBarray.length(); i++){
             JSONObject data = usuariosDBarray.getJSONObject(i);
-            System.out.println("user_id: "+user_id+" / data.getInt(id_usuario): "+data.getInt("id_usuario"));
+            //System.out.println("user_id: "+user_id+" / data.getInt(id_usuario): "+data.getInt("id_usuario"));
             if(user_id==data.getInt("id_usuario")){
                 return data;
             }
@@ -379,7 +381,7 @@ public class Login extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel5 = new javax.swing.JLabel();
+        info = new javax.swing.JLabel();
         versaoatual = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         icone = new javax.swing.JLabel();
@@ -397,14 +399,19 @@ public class Login extends javax.swing.JFrame {
         setBackground(new java.awt.Color(51, 51, 51));
         setResizable(false);
 
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel5.setText("Desenvolvido por kli0ns#7497 vulgo Ferraz");
-        jLabel5.setEnabled(false);
+        info.setForeground(new java.awt.Color(255, 255, 255));
+        info.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        info.setText("Clique aqui para entrar no nosso Discord");
+        info.setEnabled(false);
+        info.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                infoMouseClicked(evt);
+            }
+        });
 
         versaoatual.setForeground(new java.awt.Color(255, 255, 255));
         versaoatual.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        versaoatual.setText("Versão atual:");
+        versaoatual.setText("Carregando...");
         versaoatual.setEnabled(false);
 
         icone.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -535,7 +542,7 @@ public class Login extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(info, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(versaoatual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -545,7 +552,7 @@ public class Login extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
+                .addComponent(info)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(versaoatual)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -577,6 +584,10 @@ public class Login extends javax.swing.JFrame {
             Codigo.requestFocus();
         }
     }//GEN-LAST:event_NomeKeyPressed
+
+    private void infoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoMouseClicked
+        HttpDownloadUtility.openURL("https://discord.gg/nFNqvDs");
+    }//GEN-LAST:event_infoMouseClicked
 
     /**
      * @param args the command line arguments
@@ -619,9 +630,9 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JTextField Nome;
     private javax.swing.JPanel PainelLogin;
     private javax.swing.JLabel icone;
+    private javax.swing.JLabel info;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox lembrar;
     private javax.swing.JLabel txtErro;

@@ -436,13 +436,12 @@ public class Usuario {
                 getTemporario.put("id", contage);
                 getTemporario.put("id_usuario", resulteSet.getInt("id_usuario"));
                 getTemporario.put("data", resulteSet.getString("data"));
-                getTemporario.put("motivo", resulteSet.getString("motivo"));
                 getTemporario.put("id_prendeu", resulteSet.getInt("id_prendeu"));
                 getTemporario.put("protocolo", resulteSet.getString("protocolo"));
-                getTemporario.put("tornz", resulteSet.getInt("tornz"));
                 getTemporario.put("meses", resulteSet.getInt("meses"));
                 getTemporario.put("multas", resulteSet.getInt("multas"));
                 getTemporario.put("justificado", resulteSet.getString("justificado"));
+                getTemporario.put("justificado_discord", resulteSet.getString("justificado_discord"));
                 
                 if(resulteSet.getString("limpo")==null){
                     getTemporario.put("limpo", "");
@@ -530,13 +529,12 @@ public class Usuario {
                 getTemporario.put("id", contage);
                 getTemporario.put("id_usuario", resulteSet.getInt("id_usuario"));
                 getTemporario.put("data", resulteSet.getString("data"));
-                getTemporario.put("motivo", resulteSet.getString("motivo"));
                 getTemporario.put("procurou_id", resulteSet.getInt("procurou_id"));
                 getTemporario.put("protocolo", resulteSet.getString("protocolo"));
                 getTemporario.put("meses", resulteSet.getInt("meses"));
                 getTemporario.put("multas", resulteSet.getInt("multas"));
-                getTemporario.put("tornz", resulteSet.getInt("tornz"));
                 getTemporario.put("justificado", resulteSet.getString("justificado"));
+                getTemporario.put("justificado_discord", resulteSet.getString("justificado_discord"));
                 getTemporario.put("nivel_procurado", resulteSet.getInt("nivel_procurado"));
                 getTemporario.put("observacao", resulteSet.getString("observacao"));
                 getTemporario.put("contravencoes", resulteSet.getString("contravencoes"));
@@ -570,13 +568,12 @@ public class Usuario {
                 getTemporario.put("id", contage);
                 getTemporario.put("id_usuario", resulteSet.getInt("id_usuario"));
                 getTemporario.put("data", resulteSet.getString("data"));
-                getTemporario.put("motivo", resulteSet.getString("motivo"));
                 getTemporario.put("procurou_id", resulteSet.getInt("procurou_id"));
                 getTemporario.put("protocolo", resulteSet.getString("protocolo"));
                 getTemporario.put("meses", resulteSet.getInt("meses"));
                 getTemporario.put("multas", resulteSet.getInt("multas"));
-                getTemporario.put("tornz", resulteSet.getInt("tornz"));
                 getTemporario.put("justificado", resulteSet.getString("justificado"));
+                getTemporario.put("justificado_discord", resulteSet.getString("justificado_discord"));
                 getTemporario.put("nivel_procurado", resulteSet.getInt("nivel_procurado"));
                 getTemporario.put("observacao", resulteSet.getString("observacao"));
                 getTemporario.put("contravencoes", resulteSet.getString("contravencoes"));

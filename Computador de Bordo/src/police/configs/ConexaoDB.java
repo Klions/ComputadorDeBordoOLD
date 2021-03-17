@@ -667,14 +667,13 @@ public class ConexaoDB {
             String passaporte = jsonob.getString("passaporte");
             //String dados = jsonob.getString("dados");
             
-            String motivo = jsonob.getString("motivo");
             String id_prendeu = jsonob.getString("id_prendeu");
             String protocolo = jsonob.getString("protocolo");
             String justificado = jsonob.getString("justificado");
+            String justificado_discord = jsonob.getString("justificado_discord");
             
             String meses = jsonob.getString("meses");
             String multas = jsonob.getString("multas");
-            String tornz = jsonob.getString("tornozeleira");
             String contravencoes = jsonob.getString("contravencoes");
             String data = System.currentTimeMillis()+"";
             
@@ -693,7 +692,7 @@ public class ConexaoDB {
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
             //String query1 = "update "+tabelad+" set passaporte='"+cid+"', nome='"+cnome+"', codigo='"+ccodigo+"', discord='"+cdiscord+"' where passaporte='"+ide+"'";
-            String query1 = "INSERT INTO cb_prisoes (id_usuario, data, motivo, id_prendeu, protocolo, meses, multas, tornz, justificado, contravencoes) VALUES ('"+passaporte+"', '"+data+"', '"+motivo+"', '"+id_prendeu+"', '"+protocolo+"', '"+meses+"', '"+multas+"', '"+tornz+"', '"+justificado+"', '"+contravencoes+"')";
+            String query1 = "INSERT INTO cb_prisoes (id_usuario, data, id_prendeu, protocolo, meses, multas, justificado, justificado_discord, contravencoes) VALUES ('"+passaporte+"', '"+data+"', '"+id_prendeu+"', '"+protocolo+"', '"+meses+"', '"+multas+"', '"+justificado+"', '"+justificado_discord+"', '"+contravencoes+"')";
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host+" INSERT id_usuario: "+passaporte);
             return true;
@@ -715,14 +714,13 @@ public class ConexaoDB {
             String passaporte = jsonob.getString("passaporte");
             //String dados = jsonob.getString("dados");
             
-            String motivo = jsonob.getString("motivo");
             String id_prendeu = jsonob.getString("id_prendeu");
             String protocolo = jsonob.getString("protocolo");
             String justificado = jsonob.getString("justificado");
+            String justificado_discord = jsonob.getString("justificado_discord");
             
             String meses = jsonob.getString("meses");
             String multas = jsonob.getString("multas");
-            String tornz = jsonob.getString("tornozeleira");
             
             String data = System.currentTimeMillis()+"";
             
@@ -734,9 +732,8 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
-
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
             // Result set get the result of the SQL query
@@ -744,7 +741,7 @@ public class ConexaoDB {
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
             //String query1 = "update "+tabelad+" set passaporte='"+cid+"', nome='"+cnome+"', codigo='"+ccodigo+"', discord='"+cdiscord+"' where passaporte='"+ide+"'";
-            String query1 = "INSERT INTO cb_procurados (id_usuario, data, motivo, procurou_id, protocolo, meses, multas, tornz, justificado, nivel_procurado, observacao, contravencoes) VALUES ('"+passaporte+"', '"+data+"', '"+motivo+"', '"+id_prendeu+"', '"+protocolo+"', '"+meses+"', '"+multas+"', '"+tornz+"', '"+justificado+"', '"+nivel_procurado+"', '"+obser+"', '"+contravencoes+"')";
+            String query1 = "INSERT INTO cb_procurados (id_usuario, data, procurou_id, protocolo, meses, multas, justificado, justificado_discord, nivel_procurado, observacao, contravencoes) VALUES ('"+passaporte+"', '"+data+"', '"+id_prendeu+"', '"+protocolo+"', '"+meses+"', '"+multas+"', '"+justificado+"', '"+justificado_discord+"', '"+nivel_procurado+"', '"+obser+"', '"+contravencoes+"')";
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
             return true;
@@ -764,8 +761,8 @@ public class ConexaoDB {
             
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
             statement = connect.createStatement();
             String query1 = "INSERT INTO cb_usuarios (passaporte, lspd) VALUES ('"+passaporte+"', '"+LSPDE+"')";
             statement.executeUpdate(query1);
@@ -788,8 +785,8 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -816,8 +813,8 @@ public class ConexaoDB {
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
             connect = DriverManager
-                    .getConnection("jdbc:mysql://"+host+"/"+banco+"?"
-                            + "user="+user+"&password="+pass);
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
 
             // Statements allow to issue SQL queries to the database
             statement = connect.createStatement();
@@ -826,7 +823,7 @@ public class ConexaoDB {
             /*resultSet = statement
                     .executeQuery("update "+tabelad+" set passaporte="+cid+", nome="+cnome+", codigo="+ccodigo+", discord="+cdiscord+" where passaporte LIKE "+ide);
             */
-            String query1 = "update cb_procurados set pagou='"+protocolo+"' where id_usuario='"+user_id+"' AND pagou=0";
+            String query1 = "update cb_procurados set pagou='"+protocolo+"' where id_usuario="+user_id+" AND pagou=0";
             statement.executeUpdate(query1);
             System.out.println("Conectado ao servidor: "+host);
             return true;
