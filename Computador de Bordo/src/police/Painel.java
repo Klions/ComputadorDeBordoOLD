@@ -84,7 +84,7 @@ public class Painel extends javax.swing.JFrame {
     }
     public void Carregar(){
         //System.err.println("getDados: "+ usuario.getDados()+"/ fechou");
-        JSONObject obj = usuario.getDados();
+        JSONObject obj = Usuario.getDados();
         
         Titulo1.setText(InicializadorMain.info_cidade.getString("nome_policia").toUpperCase());
         Titulo2.setText(InicializadorMain.info_cidade.getString("nome_cidade").toUpperCase());
@@ -185,7 +185,7 @@ public class Painel extends javax.swing.JFrame {
         pessoas.setOpaque(false);
 
         crimes.setBackground(new java.awt.Color(153, 153, 255));
-        crimes.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        crimes.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         crimes.setText("REGISTROS");
         crimes.setToolTipText("Registrar Multas e Crimes");
         crimes.addActionListener(new java.awt.event.ActionListener() {
@@ -195,7 +195,7 @@ public class Painel extends javax.swing.JFrame {
         });
 
         boletim.setBackground(new java.awt.Color(102, 102, 255));
-        boletim.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        boletim.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         boletim.setText("BOLETIM");
         boletim.setToolTipText("Escrever um Boletim de Ocorrência");
         boletim.addActionListener(new java.awt.event.ActionListener() {
@@ -237,7 +237,7 @@ public class Painel extends javax.swing.JFrame {
         corporacao.setOpaque(false);
 
         gerenciar1.setBackground(new java.awt.Color(204, 204, 0));
-        gerenciar1.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar1.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         gerenciar1.setText("GERENCIAR CORPORAÇÃO");
         gerenciar1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -246,7 +246,7 @@ public class Painel extends javax.swing.JFrame {
         });
 
         gerenciar2.setBackground(new java.awt.Color(102, 204, 0));
-        gerenciar2.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar2.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         gerenciar2.setText("LIMPAR FICHA");
         gerenciar2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -304,8 +304,8 @@ public class Painel extends javax.swing.JFrame {
         gerenciar.setOpaque(false);
 
         gerenciar3.setBackground(new java.awt.Color(0, 153, 102));
-        gerenciar3.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        gerenciar3.setText("GERENCIAR Crimes");
+        gerenciar3.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
+        gerenciar3.setText("GERENCIAR CRIMES");
         gerenciar3.setToolTipText("Adicionar ou Remover Crimes");
         gerenciar3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -314,7 +314,7 @@ public class Painel extends javax.swing.JFrame {
         });
 
         gerenciar4.setBackground(new java.awt.Color(0, 153, 102));
-        gerenciar4.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
+        gerenciar4.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         gerenciar4.setText("GERENCIAR USUÁRIOS");
         gerenciar4.setToolTipText("Adicionar ou Remover Crimes");
         gerenciar4.addActionListener(new java.awt.event.ActionListener() {

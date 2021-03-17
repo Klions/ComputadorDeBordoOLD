@@ -313,7 +313,7 @@ public class Login extends javax.swing.JFrame {
     public JSONObject PegarUsuario(Integer user_id){
         for(int i = 0; i < usuariosDBarray.length(); i++){
             JSONObject data = usuariosDBarray.getJSONObject(i);
-            System.out.println("user_id: "+user_id+" / data.getInt(id_usuario): "+data.getInt("id_usuario"));
+            //System.out.println("user_id: "+user_id+" / data.getInt(id_usuario): "+data.getInt("id_usuario"));
             if(user_id==data.getInt("id_usuario")){
                 return data;
             }

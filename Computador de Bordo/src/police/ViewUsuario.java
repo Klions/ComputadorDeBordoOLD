@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.JSONObject;
+import police.configs.ConexaoDB;
 import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
@@ -25,6 +26,9 @@ public class ViewUsuario extends javax.swing.JFrame {
     /**
      * Creates new form ViewUsuario
      */
+    JSONObject usuario = Usuario.getDados();
+    ConexaoDB conexao = new ConexaoDB();
+    int AttSenha = 0;
     public ViewUsuario() {
         initComponents();
         getContentPane().setBackground(new java.awt.Color(13, 32, 64));
@@ -39,6 +43,8 @@ public class ViewUsuario extends javax.swing.JFrame {
             EditarBt4.setEnabled(false);
         }else{
             jLabel12.setText("•••••••••");
+            jLabel12.setToolTipText("Clique para exibir");
+            
             EditarBt1.setEnabled(false);
             EditarBt2.setEnabled(false);
             EditarBt3.setEnabled(false);
@@ -53,17 +59,18 @@ public class ViewUsuario extends javax.swing.JFrame {
     public void AttAssinatura(){
         int nivel_ass = SNWindows.getNivelSerialPC();
         
-        if(nivel_ass != 0){
-            SerialPainel.setVisible(false);
-            AssinaturaTxt2.setText("Muito obrigado por contribuir no desenvolvimento <3");
+        if(InicializadorMain.ModoOffline){
+            if(nivel_ass != 0){
+                SerialPainel.setVisible(false);
+                AssinaturaTxt2.setText("Muito obrigado por contribuir no desenvolvimento <3");
+            }else{
+                SerialPainel.setVisible(true);
+                AssinaturaTxt2.setText("Você pode pegar uma assinatura para ajudar no desenvolvimento <3");
+            }
         }else{
-            SerialPainel.setVisible(true);
-            AssinaturaTxt2.setText("Você pode pegar uma assinatura para ajudar no desenvolvimento <3");
-        }
-        if(!InicializadorMain.ModoOffline){
             AssinaturaTxt2.setText("A cidade nos ajuda no desenvolvimento <3");
             SerialPainel.setVisible(false);
-            PainelAssinatura.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1), "ASSINATURA PARA CIDADE", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.BELOW_TOP, new java.awt.Font("Tahoma", 0, 10))); // NOI18N
+            //PainelAssinatura.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1), "ASSINATURA PARA CIDADE", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.BELOW_TOP, new java.awt.Font("Tahoma", 0, 10))); // NOI18N
         }
         pack();
         AssinaturaTxt.setText(SNWindows.TipoAssinatura[nivel_ass].toUpperCase());
@@ -90,12 +97,46 @@ public class ViewUsuario extends javax.swing.JFrame {
     public void EditarDados(String Valor){
         String Numbr = "";
         if("id".equals(Valor) || "id_usuario".equals(Valor) || "age".equals(Valor)) Numbr = " Coloque somente números.";
-        
+         
         String obs = JOptionPane.showInputDialog(this, "Qual seria o novo valor?"+Numbr, "Modificar valor", JOptionPane.PLAIN_MESSAGE);
         if(obs != null){
             if((obs.length() > 0 && obs.length() < 20 && "".equals(Numbr)) || (!"".equals(Numbr) && isNumeric(obs) && obs.length() < 6)){
-                Usuario.setDadosParcial(Valor, obs);
-                Usuario.setContaPC();
+                if(InicializadorMain.ModoOffline){
+                    Usuario.setDadosParcial(Valor, obs);
+                    Usuario.setContaPC();
+                }else{
+                    String codigo_atual = usuario.getString("codigo");
+                    
+                    if("codigo".equals(Valor)){
+                        if(!codigo_atual.equals(obs)){
+                            JSONObject my_obj = new JSONObject();
+                            my_obj.put("passaporte", usuario.getInt("id_usuario")+"");
+                            my_obj.put("codigo", obs);
+                            if(AttSenha > 1){
+                                showMessageDialog(null,"Você atualizou sua senha muitas vezes recentemente.", "Ocorreu um erro",JOptionPane.PLAIN_MESSAGE);
+                            }else{
+                                if(conexao.AtualizarDatabaseDado("cb_users", my_obj)){
+                                    AttSenha++;
+                                    showMessageDialog(null,"Senha para login atualizada com sucesso.", "Valor atualizado com sucesso!",JOptionPane.PLAIN_MESSAGE);
+                                    if(usuario != null){
+                                        usuario.put("codigo", obs);
+                                        Usuario.setDados(usuario);
+                                    }
+                                }else{
+                                    showMessageDialog(null,"Ocorreu um erro ao tentar atualizar sua senha. Entre em contato com o nosso suporte.", "Erro ao atualizar senha",JOptionPane.PLAIN_MESSAGE);
+                                }
+                            }
+                        }else{
+                            showMessageDialog(null,"A nova senha não pode ser a mesma que a antiga!", "Digite um valor diferente.",JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                }
+            }else{
+                if("".equals(Numbr)){
+                    showMessageDialog(null,"Ocorreu um erro ao tentar atualizar o valor. O valor não pode ser vazio ou maior que 20 caracteres.", "Erro ao atualizar valor",JOptionPane.PLAIN_MESSAGE);
+                }else{
+                    showMessageDialog(null,"Ocorreu um erro ao tentar atualizar o valor. O valor não pode ser vazio, conter letras ou simbolos e ser maior que 6 caracteres.", "Erro ao atualizar valor",JOptionPane.PLAIN_MESSAGE);
+                }
             }
         }
         RecarregarValoresTabela();
@@ -111,10 +152,10 @@ public class ViewUsuario extends javax.swing.JFrame {
     }
     
     public void RecarregarValoresTabela(){
-        JSONObject PegarUser = Usuario.getDados();
-        ValorTxt.setText(PegarUser.getInt("id_usuario")+"");
-        ValorTxt2.setText(PegarUser.getString("nome")+" "+PegarUser.getString("sobrenome"));
-        ValorTxt3.setText(PegarUser.getString("registration").toUpperCase());
+        //JSONObject PegarUser = usuario.getDados();
+        ValorTxt.setText(usuario.getInt("id_usuario")+"");
+        ValorTxt2.setText(usuario.getString("nome")+" "+usuario.getString("sobrenome"));
+        ValorTxt3.setText(usuario.getString("registration").toUpperCase());
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -299,6 +340,11 @@ public class ViewUsuario extends javax.swing.JFrame {
 
         EditarBt4.setBackground(new java.awt.Color(255, 255, 255));
         EditarBt4.setText("EDITAR");
+        EditarBt4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditarBt4ActionPerformed(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
@@ -309,6 +355,11 @@ public class ViewUsuario extends javax.swing.JFrame {
         jLabel12.setForeground(new java.awt.Color(255, 255, 255));
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("Somente no Online");
+        jLabel12.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel12MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -540,6 +591,22 @@ public class ViewUsuario extends javax.swing.JFrame {
     private void EditarBt3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarBt3ActionPerformed
         EditarDados("registration");
     }//GEN-LAST:event_EditarBt3ActionPerformed
+
+    private void EditarBt4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarBt4ActionPerformed
+        //obj.getInt("permissao");
+        EditarDados("codigo");
+    }//GEN-LAST:event_EditarBt4ActionPerformed
+
+    private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked
+        if(!InicializadorMain.ModoOffline){
+            String ValorAtual = jLabel12.getText();
+            if(ValorAtual.equals("•••••••••")){
+                jLabel12.setText(usuario.getString("codigo"));
+            }else{
+                jLabel12.setText("•••••••••");
+            }
+        }
+    }//GEN-LAST:event_jLabel12MouseClicked
 
     /**
      * @param args the command line arguments

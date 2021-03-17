@@ -217,7 +217,7 @@ public class SplashScreen extends javax.swing.JFrame {
             if(ValorProgresso > ProgressoAtual){
                 ProgressoAtual+=2+gerador.nextInt(10);
             }else{
-                ContandoFalhas++;
+                if(!EscolherCidadePainel.isVisible()) ContandoFalhas++;
                 //System.out.print("ContandoFalhas: "+ContandoFalhas);
             }
         }else{
@@ -233,9 +233,13 @@ public class SplashScreen extends javax.swing.JFrame {
         if(ContandoFalhas > 36){
             texto.setText("CONEXÃO EXTREMAMENTE LENTA");
             if(ContandoFalhas > 60) texto.setText("FINALIZANDO PROGRAMA POR FALTA DE CONEXÃO");
-            if(ContandoFalhas > 70) System.exit(0);
+            if(ContandoFalhas > 70){
+                showMessageDialog(null,"O programa será fechado automaticamente por falta de conexão com a internet.", "Erro de Rede",JOptionPane.PLAIN_MESSAGE);
+                System.exit(0);
+            }
         }
         if(PegarDados){
+            ContandoFalhas=0;
             PegarDados=false;
             ProgressoPainel.setVisible(true);
             EscolherCidadePainel.setVisible(false);
@@ -245,7 +249,6 @@ public class SplashScreen extends javax.swing.JFrame {
             ProgressoAtual=ValorProgresso;
             ValorProgresso=80;
             progresso.setValue(ProgressoAtual);
-            ContandoFalhas=0;
             texto.setText("CONECTANDO AO BANCO DE DADOS");
             if(TestarConexaoCidade() && PegarContas()){
                 ProgressoAtual=ValorProgresso;
@@ -275,7 +278,8 @@ public class SplashScreen extends javax.swing.JFrame {
                 Fechar=true;
                 TentandoReconect = 10;
                 EstaAberto = true;
-                wait(5000);
+                showMessageDialog(null,"Ocorreu um erro ao tentar conectar ao banco de dados da cidade. Entre em contato com o nosso suporte.", "Erro de Conexão com a Cidade",JOptionPane.PLAIN_MESSAGE);
+                wait(1000);
                 this.dispose();
                 SplashScreen splash = new SplashScreen();
             }
