@@ -27,6 +27,7 @@ public class InicializadorMain {
     public static JDA jda = null;
     public static JSONArray discordDBarray = new JSONArray();
     public static JSONArray usuariosDBarray = new JSONArray();
+    public static JSONArray configsDBarray = new JSONArray();
     
     public static JSONArray prisoesDBarray = new JSONArray();
     public static JSONArray blacklistDBarray = new JSONArray();
@@ -64,6 +65,7 @@ public class InicializadorMain {
                 if(server_id > 0){
                     Usuario usuarios = new Usuario();
                     usuariosDBarray = usuarios.AttDBUsuarios();
+                    configsDBarray = usuarios.AttDbConfigs();
                     discordDBarray = usuarios.AttDBDiscord();
                     prisoesDBarray = usuarios.AttDBPrisoes();
                     procuradosDBarray = usuarios.AttDBProcurados();
@@ -78,6 +80,9 @@ public class InicializadorMain {
     }
     public JSONArray AttDBUsuarios(){
         return usuariosDBarray;
+    }
+    public JSONArray AttDBConfigs(){
+        return configsDBarray;
     }
     public JSONArray AttDBDiscord(){
         return discordDBarray;
@@ -100,9 +105,15 @@ public class InicializadorMain {
         hierarquiaDBarray = usuarios.AttDBHierarquia();
     }
     
+    public static void AttDBSConfigs(){
+        Usuario usuarios = new Usuario();
+        configsDBarray = usuarios.AttDbConfigs();
+    }
+    
     public void AttDBSTodas(){
         Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuarios();
+        configsDBarray = usuarios.AttDbConfigs();
         discordDBarray = usuarios.AttDBDiscord();
         prisoesDBarray = usuarios.AttDBPrisoes();
         blacklistDBarray = usuarios.AttBlackList();
@@ -114,6 +125,7 @@ public class InicializadorMain {
     public static void AttDbsStatic(){
         Usuario usuarios = new Usuario();
         usuariosDBarray = usuarios.AttDBUsuarios();
+        configsDBarray = usuarios.AttDbConfigs();
         discordDBarray = usuarios.AttDBDiscord();
         prisoesDBarray = usuarios.AttDBPrisoes();
         blacklistDBarray = usuarios.AttBlackList();

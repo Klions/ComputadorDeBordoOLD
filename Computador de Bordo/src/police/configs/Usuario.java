@@ -203,6 +203,7 @@ public class Usuario {
                 JSONObject getTempoInfo = new JSONObject();
                 getTempoInfo.put("id_usuario", resulteSet2.getInt("user_id"));
                 getTempoInfo.put("codigo", resulteSet2.getString("codigo"));
+                getTempoInfo.put("admin", resulteSet2.getInt("admin"));
                 getTempoInfo.put("permissao", resulteSet2.getInt("permissao"));
                 getTempoInfo.put("ultimologin", resulteSet2.getString("ultimologin"));
                 usuariosInfo.put(getTempoInfo);
@@ -223,6 +224,7 @@ public class Usuario {
                     for(int i = 0; i < usuariosInfo.length(); i++){
                         JSONObject o = usuariosInfo.getJSONObject(i);
                         if(o.getInt("id_usuario") == resulteSet.getInt("user_id")){
+                            getTemporario.put("admin", o.getInt("admin"));
                             getTemporario.put("permissao", o.getInt("permissao"));
                             getTemporario.put("codigo", o.getString("codigo"));
                             getTemporario.put("ultimologin", o.getString("ultimologin"));
@@ -230,6 +232,7 @@ public class Usuario {
                         }
                     }
                     if(!setador){
+                        getTemporario.put("admin", 0);
                         getTemporario.put("permissao", 0);
                         getTemporario.put("codigo", "");
                         getTemporario.put("ultimologin", 0);
@@ -264,6 +267,33 @@ public class Usuario {
             
         }*/
         return usuariosDBarray;
+    }
+    
+    public JSONArray AttDbConfigs(){
+        ConexaoDB conexao = new ConexaoDB();
+        JSONArray configsDBarray = new JSONArray();
+        if(!"".equals(InicializadorMain.host_server)){
+            ResultSet resulteSet = conexao.PegarConfig();
+            try {
+                while (resulteSet.next()) {
+                    JSONObject getTemporario = new JSONObject();
+                    getTemporario.put("id", resulteSet.getString("id"));
+                    getTemporario.put("nome", resulteSet.getString("nome"));
+                    getTemporario.put("valor", resulteSet.getString("valor"));
+                    configsDBarray.put(getTemporario);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Corporacao.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            System.out.println("Não foi conectado ao PegarConfig( / InicializadorMain.host_server: "+InicializadorMain.host_server);
+        }
+        /*for(int ir = 0; ir < usuariosDBarray.length(); ir++){
+            JSONObject o = usuariosDBarray.getJSONObject(ir);
+            System.out.println(o.toString());
+            
+        }*/
+        return configsDBarray;
     }
     
     public JSONArray AttDBUsuariosDiscord(){

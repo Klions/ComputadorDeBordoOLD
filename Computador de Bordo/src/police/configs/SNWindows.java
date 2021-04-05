@@ -286,4 +286,71 @@ public class SNWindows {
           System.exit(2);
         }
     }
+    
+    public static boolean possuiConfig(String nome){
+        if(!InicializadorMain.ModoOffline){
+            for(int i = 0; i < InicializadorMain.configsDBarray.length(); i++){
+                JSONObject obj = InicializadorMain.configsDBarray.getJSONObject(i);
+                if(nome.equals(obj.getString("nome"))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isAdemir(){
+        JSONObject obj = Usuario.getDados();
+        if(!InicializadorMain.ModoOffline){
+            int admin = obj.getInt("admin");
+            if(admin > 0) return true;
+        }
+        return false;
+    }
+    
+    public static JSONArray getCargos(){
+        JSONArray cargos_disponiveis = new JSONArray();
+        if(!InicializadorMain.ModoOffline){
+            for(int i = 0; i < InicializadorMain.configsDBarray.length(); i++){
+                JSONObject obj = InicializadorMain.configsDBarray.getJSONObject(i);
+                if("hierarquia".equals(obj.getString("nome"))){
+                    return new JSONArray(obj.getString("valor"));
+                }
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static JSONObject getCargoObjUser(){
+        JSONObject cargos_disponiveis = new JSONObject();
+        JSONObject obj_user = Usuario.getDados();
+        JSONArray cargos_hierarquia = getCargos();
+        for(int i2 = 0; i2 < cargos_hierarquia.length(); i2++){
+            JSONObject obj_cargo = cargos_hierarquia.getJSONObject(i2);
+            if(obj_user.getInt("permissao") == obj_cargo.getInt("id")){
+                System.out.println("obj_cargo(): "+obj_cargo.toString());
+                return obj_cargo;
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static boolean getPermUser(String perm){
+        JSONObject obj_cargo = getCargoObjUser();
+        if(obj_cargo.getInt(perm) == 1) return true;
+        return false;
+    }
+    
+    public static JSONArray getConfig(String ConfigName){
+        JSONArray cargos_disponiveis = new JSONArray();
+        if(!InicializadorMain.ModoOffline){
+            for(int i = 0; i < InicializadorMain.configsDBarray.length(); i++){
+                JSONObject obj = InicializadorMain.configsDBarray.getJSONObject(i);
+                if(ConfigName.equals(obj.getString("nome"))){
+                    return new JSONArray(obj.getString("valor"));
+                }
+            }
+        }
+        return cargos_disponiveis;
+    }
 }

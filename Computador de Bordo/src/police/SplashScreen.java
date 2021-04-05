@@ -6,6 +6,9 @@
 package police;
 
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,22 +16,23 @@ import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.login.LoginException;
-import javax.swing.ImageIcon;
+//import javax.security.auth.login.LoginException;
+//import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.showMessageDialog;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
+//import net.dv8tion.jda.api.JDABuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import police.configs.ConexaoDB;
 import police.configs.Config;
-import police.configs.DiscordMessage;
-import police.configs.DiscordWebhook;
+//import police.configs.DiscordMessage;
+//import police.configs.DiscordWebhook;
 import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
 import police.configs.SNWindows;
@@ -39,7 +43,6 @@ import police.configs.Usuario;
  * @author John
  */
 public class SplashScreen extends javax.swing.JFrame {
-
     /**
      * Creates new form VerCrimes
      */
@@ -115,6 +118,7 @@ public class SplashScreen extends javax.swing.JFrame {
             }
             
             SNWindows.PegarIP();
+            UPDATESplash();
             
             ProgressoAtual=ValorProgresso;
             ValorProgresso=65;
@@ -125,6 +129,7 @@ public class SplashScreen extends javax.swing.JFrame {
                 ContandoFalhas = 0;
                 ProgressoPainel.setVisible(false);
                 EscolherCidadePainel.setVisible(true);
+                CodigoCity.grabFocus();
                 VerificarEstaRodando();
                 this.revalidate();
                 this.repaint();
@@ -391,6 +396,69 @@ public class SplashScreen extends javax.swing.JFrame {
         return true;
     }
     
+    private void UPDATESplash(){ //UPDATE ON OPENING THE APPLICATION
+        try {
+            File file = new File(InicializadorMain.DestFile);
+            if(file.exists()){    //if this file exists
+                Scanner scan = new Scanner(file);   //Use Scanner to read the File
+                /*while (scan.hasNext()) {
+                    System.out.println(scan.next());
+                }*/
+                CodigoCity.setText(scan.nextLine());  //append the text to name field
+                scan.close();
+                CidadeEscolhaBt.requestFocus();
+            }
+        } catch (FileNotFoundException e) {         
+            e.printStackTrace();
+        }
+    }
+    
+    private void Entrar(){
+        //int IndexSel = CidadesEscolha.getSelectedIndex();
+        String IndexStr = CodigoCity.getText().toUpperCase();//CidadesEscolha.getSelectedItem()+"";
+        if(IndexStr.length() > 0){
+            String nomedacidade = "";
+            for(int i = 0; i < ServidoresRegistrados.length(); i++){
+                JSONObject obj = ServidoresRegistrados.getJSONObject(i);
+                String FormatNome = obj.getString("nome_policia_abv").toUpperCase()+""+obj.getInt("id");//obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
+                if(FormatNome.equals(IndexStr)){
+                    
+                    /*HttpDownloadUtility.WebhookLog(
+                        "752370476696731671", 
+                        "Novo Login (Cidade "+obj.getString("nome_cidade")+")", 
+                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+".");*/
+                    if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)){
+                        HttpDownloadUtility.WebhookDiscord("https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX",
+                        "Novo Login ("+obj.getString("nome_cidade")+")", 
+                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+". (Modo Online)");
+                    }
+                    
+                    GetImages.PegarImagensCB(obj.getString("url_logo"));
+                    SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
+                    nomedacidade = obj.getString("nome_cidade");
+                    
+                    JSONObject getTemporario2 = new JSONObject();
+                    getTemporario2.put("id", obj.getInt("id"));
+                    getTemporario2.put("nome_cidade", obj.getString("nome_cidade"));
+                    getTemporario2.put("nome_policia", obj.getString("nome_policia"));
+                    getTemporario2.put("nome_policia_abv", obj.getString("nome_policia_abv"));
+                    getTemporario2.put("url_logo", obj.getString("url_logo"));
+                    getTemporario2.put("codigo_cidade", IndexStr);
+                    InicializadorMain.info_cidade = getTemporario2;
+                }
+            }
+            if(!"".equals(nomedacidade)){
+                PegarDados=true;
+                Erro("");
+            }else{
+                Erro("CÓDIGO DA CIDADE INVÁLIDO");
+                PegarInfoServidor();
+            }
+        }else{
+            
+        }
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -508,6 +576,12 @@ public class SplashScreen extends javax.swing.JFrame {
             }
         });
 
+        CodigoCity.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                CodigoCityKeyPressed(evt);
+            }
+        });
+
         ErroCodigo.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         ErroCodigo.setForeground(new java.awt.Color(255, 51, 51));
         ErroCodigo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -540,7 +614,6 @@ public class SplashScreen extends javax.swing.JFrame {
                     .addGroup(EscolherCidadePainelLayout.createSequentialGroup()
                         .addComponent(ErroCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(1, 1, 1)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(EscolherCidadePainelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(CidadeEscolhaBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(CodigoCity))
@@ -662,48 +735,7 @@ public class SplashScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CidadeEscolhaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CidadeEscolhaBtActionPerformed
-        //int IndexSel = CidadesEscolha.getSelectedIndex();
-        String IndexStr = CodigoCity.getText().toUpperCase();//CidadesEscolha.getSelectedItem()+"";
-        if(IndexStr.length() > 0){
-            String nomedacidade = "";
-            for(int i = 0; i < ServidoresRegistrados.length(); i++){
-                JSONObject obj = ServidoresRegistrados.getJSONObject(i);
-                String FormatNome = obj.getString("nome_policia_abv").toUpperCase()+""+obj.getInt("id");//obj.getString("nome_cidade")+" - "+obj.getString("nome_policia_abv");
-                if(FormatNome.equals(IndexStr)){
-                    
-                    /*HttpDownloadUtility.WebhookLog(
-                        "752370476696731671", 
-                        "Novo Login (Cidade "+obj.getString("nome_cidade")+")", 
-                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+".");*/
-                    if(!"7AC28570-51FC-0000-0000-000000000000".equals(SNWindows.SerialNumber)){
-                        HttpDownloadUtility.WebhookDiscord("https://discordapp.com/api/webhooks/754076621581058060/9Ek0Q-VumXWVyZhEzl_pFmvMmia9nrgOL05wqJ2ggyAguRZw19282ByKBpZfyY_fmTFX",
-                        "Novo Login ("+obj.getString("nome_cidade")+")", 
-                        "Algum usuário entrou no Computador de Bordo da "+obj.getString("nome_policia")+". (Modo Online)");
-                    }
-                    
-                    GetImages.PegarImagensCB(obj.getString("url_logo"));
-                    SetarBancoServidor(obj.getString("db_host"), obj.getString("db_banco"), obj.getString("db_user"), obj.getString("db_senha"), obj.getInt("id"));
-                    nomedacidade = obj.getString("nome_cidade");
-                    
-                    JSONObject getTemporario2 = new JSONObject();
-                    getTemporario2.put("id", obj.getInt("id"));
-                    getTemporario2.put("nome_cidade", obj.getString("nome_cidade"));
-                    getTemporario2.put("nome_policia", obj.getString("nome_policia"));
-                    getTemporario2.put("nome_policia_abv", obj.getString("nome_policia_abv"));
-                    getTemporario2.put("url_logo", obj.getString("url_logo"));
-                    InicializadorMain.info_cidade = getTemporario2;
-                }
-            }
-            if(!"".equals(nomedacidade)){
-                PegarDados=true;
-                Erro("");
-            }else{
-                Erro("CÓDIGO DA CIDADE INVÁLIDO");
-                PegarInfoServidor();
-            }
-        }else{
-            
-        }
+        Entrar();
     }//GEN-LAST:event_CidadeEscolhaBtActionPerformed
 
     private void EntrarOfflineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EntrarOfflineActionPerformed
@@ -764,6 +796,12 @@ public class SplashScreen extends javax.swing.JFrame {
     private void AttSiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttSiteActionPerformed
         HttpDownloadUtility.openURL(Config.getLink());
     }//GEN-LAST:event_AttSiteActionPerformed
+
+    private void CodigoCityKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CodigoCityKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            Entrar(); // TODO add your handling code here:
+        }
+    }//GEN-LAST:event_CodigoCityKeyPressed
 
     public boolean SetarBancoServidor(String s_host, String s_banco, String s_user, String s_senha, int server_ide){
         InicializadorMain.host_server = s_host;

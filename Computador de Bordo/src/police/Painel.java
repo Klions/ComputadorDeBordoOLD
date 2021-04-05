@@ -186,7 +186,7 @@ public class Painel extends javax.swing.JFrame {
 
         crimes.setBackground(new java.awt.Color(153, 153, 255));
         crimes.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
-        crimes.setText("REGISTROS");
+        crimes.setText("PRISÃO / MULTA");
         crimes.setToolTipText("Registrar Multas e Crimes");
         crimes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -196,7 +196,7 @@ public class Painel extends javax.swing.JFrame {
 
         boletim.setBackground(new java.awt.Color(102, 102, 255));
         boletim.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
-        boletim.setText("BOLETIM");
+        boletim.setText("BOLETIM DE OCORRÊNCIA");
         boletim.setToolTipText("Escrever um Boletim de Ocorrência");
         boletim.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -497,7 +497,8 @@ public class Painel extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void gerenciar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerenciar1ActionPerformed
-        new Corporacao().setVisible(true);
+        //new Corporacao().setVisible(true);
+        new GerenciarServer().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_gerenciar1ActionPerformed
 

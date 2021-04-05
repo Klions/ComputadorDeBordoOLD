@@ -110,6 +110,64 @@ public class ConexaoDB {
         return null;
     }
     
+    public ResultSet PegarConfig() {
+        try {
+            // This will load the MySQL driver, each DB has its own driver
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            /*connect = DriverManager
+                    .getConnection("jdbc:mysql://"+host_server+"/"+banco_server+"?"
+                            + "user="+user_server+"&password="+pass_server);*/
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
+
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            // Result set get the result of the SQL query
+            resultSet = statement
+                    .executeQuery("select * from cb_config ORDER BY id");
+            
+            System.out.println("Conectado ao banco de dados do SERVIDOR: "+InicializadorMain.host_server);
+            return resultSet;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    
+    public boolean SetarConfig(String nome, String valor) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager
+                    .getConnection("jdbc:mysql://"+InicializadorMain.host_server+"/"+InicializadorMain.banco_server+"?"+ "user="+InicializadorMain.user_server+"&password="+InicializadorMain.pass_server);
+            
+
+            // Statements allow to issue SQL queries to the database
+            statement = connect.createStatement();
+            String query = "INSERT INTO cb_config (nome, valor) VALUES ('"+nome+"', '"+valor+"')";
+            if(SNWindows.possuiConfig(nome)) query = "update cb_config set valor='"+valor+"' where nome='"+nome+"'";
+            statement.executeUpdate(query);
+            
+            System.out.println("Conectado ao servidor ( SetarConfig() ): "+host_server+" / query: "+query);
+            return true;
+
+        } catch (Exception e) {
+            try {
+                throw e;
+            } catch (Exception ex) {
+                Logger.getLogger(ConexaoDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+    
     public ResultSet PegarDiscord() {
         try {
             // This will load the MySQL driver, each DB has its own driver

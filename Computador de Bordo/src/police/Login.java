@@ -336,37 +336,44 @@ public class Login extends javax.swing.JFrame {
         }
         return false;
     }
-    
+    String CodigoCidade = "";
     public void SAVE(){      //Save the UserName and Password (for one user)
         try {
             File file = new File(InicializadorMain.DestFile);
             if(!file.exists()) file.createNewFile();  //if the file !exist create a new one
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
-            
+            bw.write(InicializadorMain.info_cidade.getString("codigo_cidade")); //write the name
+            bw.newLine(); //leave a new Line
             bw.write(Nome.getText()); //write the name
             bw.newLine(); //leave a new Line
-            bw.write(Codigo.getText()); //getPassword()
+            bw.write(Codigo.getPassword()); //getPassword() getText()
             bw.close(); //close the BufferdWriter
-
         } catch (IOException e) { e.printStackTrace(); }        
     }//End Of Save
     
     public void UPDATE(){ //UPDATE ON OPENING THE APPLICATION
         try {
             File file = new File(InicializadorMain.DestFile);
+            Nome.grabFocus();
             if(file.exists()){    //if this file exists
-
                 Scanner scan = new Scanner(file);   //Use Scanner to read the File
                 /*while (scan.hasNext()) {
                     System.out.println(scan.next());
                 }*/
-                Nome.setText(scan.nextLine());  //append the text to name field
-                Codigo.setText(scan.nextLine()); //append the text to password field
+                if(scan.hasNext()){
+                    CodigoCidade = scan.nextLine();
+                }
+                if(scan.hasNext()){
+                    Nome.setText(scan.nextLine());  //append the text to name field
+                }
+                if(scan.hasNext()){
+                    Codigo.setText(scan.nextLine()); //append the text to password field
+                    Codigo.grabFocus();
+                }
                 scan.close();
-                Entrar.requestFocus();
+                //Entrar.requestFocus();
             }
-
         } catch (FileNotFoundException e) {         
             e.printStackTrace();
         }
@@ -390,8 +397,8 @@ public class Login extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         Nome = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        Codigo = new javax.swing.JTextField();
         lembrar = new javax.swing.JCheckBox();
+        Codigo = new javax.swing.JPasswordField();
         Entrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -443,14 +450,7 @@ public class Login extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("CÓDIGO:");
-
-        Codigo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        Codigo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                CodigoKeyPressed(evt);
-            }
-        });
+        jLabel3.setText("SENHA:");
 
         lembrar.setForeground(new java.awt.Color(255, 255, 255));
         lembrar.setSelected(true);
@@ -458,6 +458,13 @@ public class Login extends javax.swing.JFrame {
         lembrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lembrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         lembrar.setOpaque(false);
+
+        Codigo.setText("jPasswordField1");
+        Codigo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                CodigoKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout PainelLoginLayout = new javax.swing.GroupLayout(PainelLogin);
         PainelLogin.setLayout(PainelLoginLayout);
@@ -485,9 +492,9 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(Nome, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Codigo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                .addGroup(PainelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(Codigo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lembrar)
                 .addGap(14, 14, 14))
@@ -555,7 +562,7 @@ public class Login extends javax.swing.JFrame {
                 .addComponent(info)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(versaoatual)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         pack();
@@ -573,12 +580,6 @@ public class Login extends javax.swing.JFrame {
         SomenteNumeros(evt);
     }//GEN-LAST:event_NomeKeyTyped
 
-    private void CodigoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CodigoKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            LogarConta();
-        }
-    }//GEN-LAST:event_CodigoKeyPressed
-
     private void NomeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_NomeKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             Codigo.requestFocus();
@@ -588,6 +589,12 @@ public class Login extends javax.swing.JFrame {
     private void infoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoMouseClicked
         HttpDownloadUtility.openURL("https://discord.gg/nFNqvDs");
     }//GEN-LAST:event_infoMouseClicked
+
+    private void CodigoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CodigoKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            LogarConta();
+        }
+    }//GEN-LAST:event_CodigoKeyPressed
 
     /**
      * @param args the command line arguments
@@ -625,7 +632,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField Codigo;
+    private javax.swing.JPasswordField Codigo;
     private javax.swing.JButton Entrar;
     private javax.swing.JTextField Nome;
     private javax.swing.JPanel PainelLogin;
