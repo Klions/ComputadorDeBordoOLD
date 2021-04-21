@@ -619,7 +619,7 @@ public class GerenciarCargos extends javax.swing.JFrame {
 
         jMenu2.setText("FECHAR");
 
-        jMenuItem2.setText("FECHAR JANELA");
+        jMenuItem2.setText("VOLTAR AO GERENCIADOR");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
@@ -735,6 +735,9 @@ public class GerenciarCargos extends javax.swing.JFrame {
                 new GerenciarServer().setVisible(true);
                 this.dispose();
             }
+        }else{
+            new GerenciarServer().setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 

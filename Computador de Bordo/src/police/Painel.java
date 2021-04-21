@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.json.JSONObject;
-import static police.Prisoes.FecharJanela;
+//import static police.Prisoes.FecharJanela;
 import police.configs.Config;
 import police.configs.GetImages;
 import police.configs.HttpDownloadUtility;
@@ -99,13 +99,16 @@ public class Painel extends javax.swing.JFrame {
             //DesativarBT(boletim);
             
             gerenciar.setVisible(true);
+            ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
         }else{
             if(perm >= 1) corporacao.setVisible(true);
             if(perm >= 2) gerenciar.setVisible(true);
             
             DesativarBT(gerenciar4);
+            JSONObject cargo_usuario = SNWindows.getCargoObjUser();
+            ContaBt.setText(cargo_usuario.getString("nome_cargo").toUpperCase()+" • "+obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
         }
-        ContaBt.setText(obj.getString("nome").toUpperCase()+" "+obj.getString("sobrenome").toUpperCase());
+        
         sobre.setText("COMPUTADOR DE BORDO v"+Config.versao);
         pack();
     }

@@ -323,22 +323,131 @@ public class SNWindows {
     
     public static JSONObject getCargoObjUser(){
         JSONObject cargos_disponiveis = new JSONObject();
-        JSONObject obj_user = Usuario.getDados();
+        //JSONObject obj_user = Usuario.getDados();
         JSONArray cargos_hierarquia = getCargos();
         for(int i2 = 0; i2 < cargos_hierarquia.length(); i2++){
-            JSONObject obj_cargo = cargos_hierarquia.getJSONObject(i2);
-            if(obj_user.getInt("permissao") == obj_cargo.getInt("id")){
-                System.out.println("obj_cargo(): "+obj_cargo.toString());
-                return obj_cargo;
+            cargos_disponiveis = cargos_hierarquia.getJSONObject(i2);
+            //if(obj_user.getInt("permissao") == cargos_disponiveis.getInt("id")){
+            //System.out.println("getHierarquiaUserValueInt: "+getHierarquiaUserValueInt("cargo")+" / cargos_disponiveis.getInt(\"id\"): "+cargos_disponiveis.getInt("id"));
+            if(getHierarquiaUserValueInt("cargo") == cargos_disponiveis.getInt("id")){
+                return cargos_disponiveis;
             }
         }
         return cargos_disponiveis;
     }
     
+    public static JSONObject getCargoObjUserID(int USER_ID){
+        JSONObject cargos_disponiveis = new JSONObject();
+        JSONArray cargos_hierarquia = getCargos();
+        for(int i2 = 0; i2 < cargos_hierarquia.length(); i2++){
+            cargos_disponiveis = cargos_hierarquia.getJSONObject(i2);
+            if(getHierarquiaPorUserIDValueInt(USER_ID, "cargo") == cargos_disponiveis.getInt("id")){
+                return cargos_disponiveis;
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static JSONObject getCargoPorID(int ID_CARGO){
+        JSONObject cargos_disponiveis = new JSONObject();
+        JSONArray cargos_hierarquia = getCargos();
+        for(int i2 = 0; i2 < cargos_hierarquia.length(); i2++){
+            cargos_disponiveis = cargos_hierarquia.getJSONObject(i2);
+            if(ID_CARGO == cargos_disponiveis.getInt("id")){
+                //System.out.println("obj_cargo(): "+cargos_disponiveis.toString());
+                return cargos_disponiveis;
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static JSONArray getHierarquiaPorID(int ID_USER){
+        JSONArray cargos_disponiveis = new JSONArray();
+        if(!InicializadorMain.ModoOffline){
+            for(int i = 0; i < InicializadorMain.hierarquiaDBarray.length(); i++){
+                JSONObject obj = InicializadorMain.hierarquiaDBarray.getJSONObject(i);
+                if(ID_USER == obj.getInt("id_usuario")){
+                    cargos_disponiveis.put(obj);
+                }
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static JSONObject getLastHierarquiaPorID(int ID_USER){
+        JSONObject cargos_disponiveis = new JSONObject();
+        if(!InicializadorMain.ModoOffline){
+            for(int i = 0; i < InicializadorMain.hierarquiaDBarray.length(); i++){
+                JSONObject obj = InicializadorMain.hierarquiaDBarray.getJSONObject(i);
+                if(ID_USER == obj.getInt("id_usuario")){
+                    cargos_disponiveis = obj;
+                }
+            }
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static JSONArray getHierarquiaUser(){
+        JSONArray cargos_disponiveis = new JSONArray();
+        JSONObject obj_user = Usuario.getDados();
+        if(!InicializadorMain.ModoOffline){
+            cargos_disponiveis = getHierarquiaPorID(obj_user.getInt("id_usuario"));
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static String getHierarquiaUserValueString(String VALOR){
+        JSONArray cargos_disponiveis = getHierarquiaUser();
+        String UltimoValor = "";
+        for(int i = 0; i < cargos_disponiveis.length(); i++){
+            JSONObject obj = cargos_disponiveis.getJSONObject(i);
+            UltimoValor = obj.getString(VALOR);
+        }
+        return UltimoValor;
+    }
+    
+    public static int getHierarquiaUserValueInt(String VALOR){
+        JSONArray cargos_disponiveis = getHierarquiaUser();
+        int UltimoValor = 0;
+        for(int i = 0; i < cargos_disponiveis.length(); i++){
+            JSONObject obj = cargos_disponiveis.getJSONObject(i);
+            UltimoValor = obj.getInt(VALOR);
+        }
+        return UltimoValor;
+    }
+    
+    
+    public static JSONArray getHierarquiaPorUserID(int USERID){
+        JSONArray cargos_disponiveis = new JSONArray();
+        if(!InicializadorMain.ModoOffline){
+            cargos_disponiveis = getHierarquiaPorID(USERID);
+        }
+        return cargos_disponiveis;
+    }
+    
+    public static String getHierarquiaPorUserIDValueString(int USERID, String VALOR){
+        JSONArray cargos_disponiveis = getHierarquiaPorUserID(USERID);
+        String UltimoValor = "";
+        for(int i = 0; i < cargos_disponiveis.length(); i++){
+            JSONObject obj = cargos_disponiveis.getJSONObject(i);
+            UltimoValor = obj.getString(VALOR);
+        }
+        return UltimoValor;
+    }
+    
+    public static int getHierarquiaPorUserIDValueInt(int USERID, String VALOR){
+        JSONArray cargos_disponiveis = getHierarquiaPorUserID(USERID);
+        int UltimoValor = 0;
+        for(int i = 0; i < cargos_disponiveis.length(); i++){
+            JSONObject obj = cargos_disponiveis.getJSONObject(i);
+            UltimoValor = obj.getInt(VALOR);
+        }
+        return UltimoValor;
+    }
+    
     public static boolean getPermUser(String perm){
         JSONObject obj_cargo = getCargoObjUser();
-        if(obj_cargo.getInt(perm) == 1) return true;
-        return false;
+        return obj_cargo.getInt(perm) == 1;
     }
     
     public static JSONArray getConfig(String ConfigName){
